@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS custom properties ─────────────────────────────────────────────── */
+:root {
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Outfit', system-ui, sans-serif;
+  --ist-green: #0b3d36;
+  --ist-teal: #0d9488;
+  --ist-cream: #f7f4ef;
+  --header-h: 4.5rem;
+  --prayer-bar-h: 0px;
+  --mobile-cta-h: 0px;
+}
+
+/* ── Base ───────────────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-ist-cream text-ist-ink font-sans antialiased;
+  min-height: 100vh;
+}
+
+::selection {
+  background: rgba(13, 148, 136, 0.25);
+}
+
+:focus-visible {
+  outline: 2px solid #0d9488;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+[id] {
+  scroll-margin-top: calc(var(--header-h) + 0.75rem);
+}
+
+/* ── Hero overlay ───────────────────────────────────────────────────────── */
+.hero-photo-scrim {
+  background:
+    linear-gradient(105deg, rgba(7, 42, 37, 0.9) 0%, rgba(11, 61, 54, 0.72) 50%, rgba(7, 42, 37, 0.45) 100%),
+    linear-gradient(180deg, rgba(7, 42, 37, 0.2) 0%, rgba(7, 42, 37, 0.65) 100%);
+}
+
+/* ── Section background variants ───────────────────────────────────────── */
+.section-band {
+  background-color: rgba(255, 255, 255, 0.55);
+}
+
+.section-band-green {
+  @apply bg-ist-green text-white;
+}
+
+.section-band-cream {
+  background-color: #ede8e0;
+}
+
+/* ── Decorative line separator ─────────────────────────────────────────── */
+.section-rule {
+  @apply mx-auto my-0 block h-px w-12 bg-ist-teal/40;
+}
+
+/* ── Animations ─────────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.05),
+    rgba(255,255,255,0.22),
+    rgba(255,255,255,0.05)
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .shimmer { animation: none !important; }
+}
+
+/* ── Layout utilities ───────────────────────────────────────────────────── */
+@layer components {
+  .container-ist {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Page & section headings */
+  .page-title {
+    @apply font-display text-4xl leading-[1.05] text-ist-green sm:text-5xl lg:text-6xl;
+  }
+
+  .section-title {
+    @apply font-display text-3xl leading-tight text-ist-green sm:text-4xl;
+  }
+
+  .card-title {
+    @apply font-display text-2xl leading-snug text-ist-green sm:text-[1.75rem];
+  }
+
+  /* Eyebrow label above headings */
+  .eyebrow {
+    @apply flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-ist-teal;
+  }
+
+  .eyebrow::before {
+    content: '';
+    @apply block h-px w-6 bg-ist-teal/60;
+  }
+
+  /* Inline text link */
+  .text-link {
+    @apply font-medium text-ist-teal underline-offset-4 hover:underline;
+  }
+
+  /* Card base */
+  .card {
+    @apply overflow-hidden bg-white shadow-soft transition-shadow duration-300 hover:shadow-lift;
+  }
+}
