@@ -394,6 +394,9 @@ export type Career = {
   applySubject: string;
   responsibilities: string[];
   requirements: string[];
+  /** Poster path from CMS uploads or seeded assets */
+  imageSrc?: string;
+  isActive?: boolean;
 };
 
 export const careersEmail = 'jobs@myist.org';
@@ -459,6 +462,7 @@ export const careers: Career[] = [
   },
 ];
 
+/** @deprecated Prefer `@/lib/careers` — kept for seed/compat lookups against static seed data. */
 export function getCareerById(id: string | null | undefined) {
   if (!id) return undefined;
   return careers.find((c) => c.id === id);

@@ -5,6 +5,7 @@ import {
   getSiteSettings,
   listAnnouncements,
   listAuditLogs,
+  listCareers,
   listEvents,
   listMedia,
   listPrograms,
@@ -19,6 +20,7 @@ export default async function AdminDashboard() {
   const programs = listPrograms();
   const media = listMedia();
   const announcements = listAnnouncements(false);
+  const careers = listCareers(false);
   const users = listAdmins();
   const logs = listAuditLogs(8);
   const settings = getSiteSettings();
@@ -26,6 +28,7 @@ export default async function AdminDashboard() {
   const cards = [
     { label: 'Events', value: events.length, href: '/admin/events' },
     { label: 'Programs', value: programs.length, href: '/admin/programs' },
+    { label: 'Careers', value: careers.filter((c) => c.is_active).length, href: '/admin/careers' },
     { label: 'Pictures', value: media.length, href: '/admin/media' },
     { label: 'Announcements', value: announcements.length, href: '/admin/announcements' },
     { label: 'Users', value: users.length, href: '/admin/users' },

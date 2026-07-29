@@ -2,7 +2,7 @@ import Database from 'better-sqlite3';
 import fs from 'fs';
 import path from 'path';
 import bcrypt from 'bcryptjs';
-import { notices } from './content';
+import { careers as seedCareers, notices } from './content';
 import { seedAnnouncementsExtra, seedEventsExtra, seedProgramsExtra } from './seed-data';
 import { seedInstagramPosts } from './instagram';
 
@@ -87,6 +87,32 @@ export type DbInstagramPost = {
   is_active: number;
   sort_order: number;
   updated_at: string;
+};
+
+export type DbCareer = {
+  id: string;
+  title: string;
+  type: string;
+  department: string | null;
+  summary: string;
+  schedule: string | null;
+  location: string | null;
+  deadline: string;
+  start_date: string | null;
+  contract: string | null;
+  apply_email: string;
+  apply_subject: string;
+  responsibilities_json: string | null;
+  requirements_json: string | null;
+  image_src: string | null;
+  is_active: number;
+  sort_order: number;
+  updated_at: string;
+};
+
+const CAREER_POSTERS: Record<string, string> = {
+  'maktab-male-teacher': '/images/careers/maktab-male-teacher.png',
+  'social-media-coordinator': '/images/careers/social-media-coordinator.png',
 };
 
 let _db: Database.Database | null = null;
@@ -196,6 +222,27 @@ function schema(db: Database.Database) {
       sort_order INTEGER NOT NULL DEFAULT 0,
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
+
+    CREATE TABLE IF NOT EXISTS careers (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      type TEXT NOT NULL,
+      department TEXT,
+      summary TEXT NOT NULL,
+      schedule TEXT,
+      location TEXT,
+      deadline TEXT NOT NULL,
+      start_date TEXT,
+      contract TEXT,
+      apply_email TEXT NOT NULL,
+      apply_subject TEXT NOT NULL,
+      responsibilities_json TEXT,
+      requirements_json TEXT,
+      image_src TEXT,
+      is_active INTEGER NOT NULL DEFAULT 1,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
   `);
 
   // Migrations for older DBs — only constant-safe column defs
@@ -223,7 +270,7 @@ function enrichDemoContent(db: Database.Database) {
     | { value: string }
     | undefined;
   const currentVersion = Number(versionRow?.value || 0);
-  const TARGET_VERSION = 4;
+  const TARGET_VERSION = 5;
   const refreshDemo = currentVersion < TARGET_VERSION;
 
   const insertEvent = db.prepare(`
@@ -402,6 +449,57 @@ function enrichDemoContent(db: Database.Database) {
       video_src: null,
       sort_order: i,
     });
+  });
+
+  const insertCareer = db.prepare(`
+    INSERT OR IGNORE INTO careers
+      (id, title, type, department, summary, schedule, location, deadline, start_date, contract,
+       apply_email, apply_subject, responsibilities_json, requirements_json, image_src, is_active, sort_order)
+    VALUES
+      (@id, @title, @type, @department, @summary, @schedule, @location, @deadline, @start_date, @contract,
+       @apply_email, @apply_subject, @responsibilities_json, @requirements_json, @image_src, 1, @sort_order)
+  `);
+  const refreshCareer = db.prepare(`
+    UPDATE careers SET
+      title = @title,
+      type = @type,
+      department = @department,
+      summary = @summary,
+      schedule = @schedule,
+      location = @location,
+      deadline = @deadline,
+      start_date = @start_date,
+      contract = @contract,
+      apply_email = @apply_email,
+      apply_subject = @apply_subject,
+      responsibilities_json = @responsibilities_json,
+      requirements_json = @requirements_json,
+      image_src = COALESCE(@image_src, image_src),
+      sort_order = @sort_order,
+      updated_at = datetime('now')
+    WHERE id = @id
+  `);
+  seedCareers.forEach((c, i) => {
+    const row = {
+      id: c.id,
+      title: c.title,
+      type: c.type,
+      department: c.department || null,
+      summary: c.summary,
+      schedule: c.schedule || null,
+      location: c.location || null,
+      deadline: c.deadline,
+      start_date: c.startDate || null,
+      contract: c.contract || null,
+      apply_email: c.applyEmail,
+      apply_subject: c.applySubject,
+      responsibilities_json: JSON.stringify(c.responsibilities),
+      requirements_json: JSON.stringify(c.requirements),
+      image_src: CAREER_POSTERS[c.id] || c.imageSrc || null,
+      sort_order: i,
+    };
+    insertCareer.run(row);
+    if (refreshDemo) refreshCareer.run(row);
   });
 
   if (refreshDemo) {
@@ -610,6 +708,24 @@ export function listInstagramPosts(activeOnly = true) {
   return db
     .prepare(`SELECT * FROM instagram_posts ORDER BY sort_order ASC, updated_at DESC`)
     .all() as DbInstagramPost[];
+}
+
+export function listCareers(activeOnly = true) {
+  const db = getDb();
+  if (activeOnly) {
+    return db
+      .prepare(
+        `SELECT * FROM careers WHERE is_active = 1 ORDER BY sort_order ASC, updated_at DESC`,
+      )
+      .all() as DbCareer[];
+  }
+  return db
+    .prepare(`SELECT * FROM careers ORDER BY sort_order ASC, updated_at DESC`)
+    .all() as DbCareer[];
+}
+
+export function getCareer(id: string) {
+  return getDb().prepare(`SELECT * FROM careers WHERE id = ?`).get(id) as DbCareer | undefined;
 }
 
 export function getSiteSettings() {

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { careers, careersEmail } from '@/lib/content';
+import { careersEmail } from '@/lib/content';
+import { listPublicCareers } from '@/lib/careers';
 import { images } from '@/lib/images';
 import { Badge, Button, Section } from '@/components/ui';
 import { FadeUp, PageTransition, Stagger, StaggerItem } from '@/components/motion';
@@ -9,8 +10,11 @@ import { PageHero } from '@/components/PageHero';
 import { IconBriefcase } from '@/components/icons';
 
 export const metadata: Metadata = { title: 'Careers' };
+export const dynamic = 'force-dynamic';
 
 export default function CareersPage() {
+  const careers = listPublicCareers();
+
   return (
     <PageTransition>
       <PageHero
@@ -29,7 +33,8 @@ export default function CareersPage() {
               {careers.length} role{careers.length === 1 ? '' : 's'} available
             </h2>
             <p className="mt-2 max-w-xl text-sm text-ist-ink/60">
-              Send your resume and cover letter to {careersEmail}. Due to the volume of applications, only shortlisted candidates will be contacted.
+              Send your resume and cover letter to {careersEmail}. Due to the volume of applications,
+              only shortlisted candidates will be contacted.
             </p>
           </div>
           <Button href={`mailto:${careersEmail}`} variant="outline" external>
@@ -39,21 +44,25 @@ export default function CareersPage() {
 
         {careers.length === 0 ? (
           <FadeUp className="mt-12 border-y border-ist-green/8 py-14 text-center text-ist-ink/50">
-            There are no open positions at this time. Check back soon, or send a general expression of interest to{' '}
-            <a href={`mailto:${careersEmail}`} className="text-link">{careersEmail}</a>.
+            There are no open positions at this time. Check back soon, or send a general expression of
+            interest to <a href={`mailto:${careersEmail}`} className="text-link">{careersEmail}</a>.
           </FadeUp>
         ) : (
-          <Stagger staggerDelay={0.08} className="mt-12 divide-y divide-ist-green/8 border-y border-ist-green/8">
+          <Stagger
+            staggerDelay={0.08}
+            className="mt-12 divide-y divide-ist-green/8 border-y border-ist-green/8"
+          >
             {careers.map((c) => {
-              const poster = images.careers[c.id];
+              const posterSrc = c.imageSrc || images.careers[c.id]?.src;
+              const posterAlt = images.careers[c.id]?.alt || `${c.title} posting`;
               return (
                 <StaggerItem key={c.id}>
                   <article className="group grid gap-6 py-8 lg:grid-cols-[160px_1fr_auto] lg:items-center">
                     <div className="relative aspect-[4/3] overflow-hidden border border-ist-green/10 bg-ist-green/[0.03] lg:aspect-square lg:h-36 lg:w-40">
-                      {poster ? (
+                      {posterSrc ? (
                         <Image
-                          src={poster.src}
-                          alt={poster.alt}
+                          src={posterSrc}
+                          alt={posterAlt}
                           fill
                           sizes="160px"
                           className="object-cover transition duration-500 group-hover:scale-[1.03]"

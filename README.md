@@ -6,7 +6,7 @@ Marketing site for **Islamic Society of Toronto (Masjid Darus Salaam)**.
 
 - Next.js (App Router) + TypeScript + Tailwind CSS + Framer Motion
 - SQLite database (`data/ist.db`) for events, programmes, media, announcements
-- Admin CMS at `/admin` (events, programmes, pictures)
+- Admin CMS at `/admin` (events, programmes, pictures, careers/jobs, Instagram)
 - Forms → `POST /api/forms` → email `mamjed@myist.org` (Resend when configured)
 - Prayer times + Classic widget from central Prayer Clock: `http://142.93.61.217`
 
@@ -24,6 +24,7 @@ Open **http://localhost:3000**
 
 - URL: `/admin/login`
 - Default credentials (change in `.env.local`): `admin` / `ist-admin-2026`
+- Manage events, programmes, **careers/jobs**, pictures, announcements, Instagram, users, and site settings
 
 ### Prayer Clock
 
