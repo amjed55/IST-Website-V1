@@ -28,12 +28,14 @@ Open **http://localhost:3000**
 
 ### Prayer Clock
 
-The sticky iqamah banner and `/prayer-times` Classic embed read from the central Prayer Clock API:
+The sticky iqamah banner and `/prayer-times` native Classic board read from the central Prayer Clock API (no iframe):
 
 ```
 NEXT_PUBLIC_PRAYER_CLOCK_API_URL=http://142.93.61.217
 NEXT_PUBLIC_PRAYER_CLOCK_EMBED_URL=http://142.93.61.217/classic
 ```
+
+`/prayer-times` renders the Classic TV layout natively in the page. The embed URL remains available as an optional fullscreen TV link.
 
 Repo reference: https://github.com/amjed55/prayer-clock
 
