@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { programSnapshot } from '@/lib/content';
 import { educationSubsections } from '@/lib/subsections';
 import { images, programImage } from '@/lib/images';
