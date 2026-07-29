@@ -87,6 +87,7 @@ export type DbInstagramPost = {
   is_active: number;
   sort_order: number;
   updated_at: string;
+  source?: string | null;
 };
 
 export type DbCareer = {
@@ -220,6 +221,7 @@ function schema(db: Database.Database) {
       video_src TEXT,
       is_active INTEGER NOT NULL DEFAULT 1,
       sort_order INTEGER NOT NULL DEFAULT 0,
+      source TEXT DEFAULT 'manual',
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
@@ -256,6 +258,7 @@ function schema(db: Database.Database) {
   ensureColumn(db, 'programs', 'image_src', 'TEXT');
   ensureColumn(db, 'programs', 'hub', 'TEXT');
   ensureColumn(db, 'site_settings', 'updated_at', 'TEXT');
+  ensureColumn(db, 'instagram_posts', 'source', "TEXT DEFAULT 'manual'");
 
   // Backfill role if null after migration
   try {
@@ -270,7 +273,7 @@ function enrichDemoContent(db: Database.Database) {
     | { value: string }
     | undefined;
   const currentVersion = Number(versionRow?.value || 0);
-  const TARGET_VERSION = 5;
+  const TARGET_VERSION = 6;
   const refreshDemo = currentVersion < TARGET_VERSION;
 
   const insertEvent = db.prepare(`
@@ -403,9 +406,9 @@ function enrichDemoContent(db: Database.Database) {
 
   const insertIg = db.prepare(`
     INSERT OR IGNORE INTO instagram_posts
-      (id, permalink, media_type, caption, poster_src, video_src, is_active, sort_order)
+      (id, permalink, media_type, caption, poster_src, video_src, is_active, sort_order, source)
     VALUES
-      (@id, @permalink, @media_type, @caption, @poster_src, @video_src, 1, @sort_order)
+      (@id, @permalink, @media_type, @caption, @poster_src, @video_src, 0, @sort_order, 'demo')
   `);
   const refreshIg = db.prepare(`
     UPDATE instagram_posts SET
@@ -429,7 +432,13 @@ function enrichDemoContent(db: Database.Database) {
       sort_order: post.sort_order,
     };
     insertIg.run(row);
-    if (refreshDemo) refreshIg.run(row);
+    // Demo placeholders are inactive by default — live /admin posts take over the grid
+    if (refreshDemo) {
+      refreshIg.run(row);
+      db.prepare(
+        `UPDATE instagram_posts SET is_active = 0, source = 'demo', updated_at = datetime('now') WHERE id = ?`,
+      ).run(post.id);
+    }
   }
 
   // Env-configured post URLs (comma-separated) — preferred live embeds
@@ -708,6 +717,68 @@ export function listInstagramPosts(activeOnly = true) {
   return db
     .prepare(`SELECT * FROM instagram_posts ORDER BY sort_order ASC, updated_at DESC`)
     .all() as DbInstagramPost[];
+}
+
+/** Upsert live Instagram posts and deactivate demo placeholders. */
+export function upsertLiveInstagramPosts(
+  posts: {
+    id: string;
+    permalink: string;
+    media_type: string;
+    caption?: string | null;
+    poster_src?: string | null;
+    sort_order: number;
+  }[],
+) {
+  const db = getDb();
+  const upsert = db.prepare(`
+    INSERT INTO instagram_posts
+      (id, permalink, media_type, caption, poster_src, video_src, is_active, sort_order, source, updated_at)
+    VALUES
+      (@id, @permalink, @media_type, @caption, @poster_src, NULL, 1, @sort_order, 'live', datetime('now'))
+    ON CONFLICT(id) DO UPDATE SET
+      permalink = excluded.permalink,
+      media_type = excluded.media_type,
+      caption = COALESCE(excluded.caption, instagram_posts.caption),
+      poster_src = COALESCE(excluded.poster_src, instagram_posts.poster_src),
+      is_active = 1,
+      sort_order = excluded.sort_order,
+      source = 'live',
+      updated_at = datetime('now')
+  `);
+
+  const tx = db.transaction(() => {
+    // Hide non-embeddable demo cards whenever live content lands
+    db.prepare(
+      `UPDATE instagram_posts SET is_active = 0, updated_at = datetime('now')
+       WHERE source = 'demo' OR (permalink NOT LIKE '%/p/%' AND permalink NOT LIKE '%/reel/%' AND permalink NOT LIKE '%/tv/%')`,
+    ).run();
+
+    posts.forEach((p) =>
+      upsert.run({
+        id: p.id,
+        permalink: p.permalink,
+        media_type: p.media_type,
+        caption: p.caption || null,
+        poster_src: p.poster_src || null,
+        sort_order: p.sort_order,
+      }),
+    );
+  });
+  tx();
+}
+
+export function getInstagramSyncMeta() {
+  const settings = getSiteSettings();
+  return {
+    syncedAt: settings.instagram_live_synced_at || null,
+    source: settings.instagram_live_source || null,
+  };
+}
+
+export function setInstagramSyncMeta(source: string) {
+  setSiteSetting('instagram_live_synced_at', new Date().toISOString());
+  setSiteSetting('instagram_live_source', source);
 }
 
 export function listCareers(activeOnly = true) {

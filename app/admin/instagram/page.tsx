@@ -13,12 +13,14 @@ type IgPost = {
   is_active: number;
   sort_order: number;
   updated_at: string;
+  source?: string | null;
 };
 
 export default function AdminInstagramPage() {
   const [posts, setPosts] = useState<IgPost[]>([]);
   const [msg, setMsg] = useState('');
   const [editing, setEditing] = useState<IgPost | null>(null);
+  const [syncing, setSyncing] = useState(false);
 
   async function load() {
     const res = await fetch('/api/admin/instagram');
@@ -33,6 +35,25 @@ export default function AdminInstagramPage() {
   useEffect(() => {
     load();
   }, []);
+
+  async function syncLive() {
+    setSyncing(true);
+    setMsg('Syncing live posts from Instagram…');
+    try {
+      const res = await fetch('/api/content/instagram?refresh=1');
+      const data = await res.json();
+      setMsg(
+        data.posts?.length
+          ? `Synced ${data.posts.length} live post${data.posts.length === 1 ? '' : 's'} (${data.sync?.source || 'public'})`
+          : data.sync?.error || 'Sync finished — no live posts found',
+      );
+      load();
+    } catch {
+      setMsg('Live sync failed');
+    } finally {
+      setSyncing(false);
+    }
+  }
 
   async function onCreate(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -93,13 +114,33 @@ export default function AdminInstagramPage() {
     <>
       <AdminNav title="Instagram" username="admin" />
       <main className="mx-auto max-w-6xl space-y-8 px-4 py-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 border border-white/10 bg-white/5 p-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ist-teal-light">
+              Live profile grid
+            </p>
+            <p className="mt-1 text-sm text-white/60">
+              Pulls recent posts from instagram.com/islamicsocietyoftoronto into the site tile grid.
+            </p>
+          </div>
+          <button
+            type="button"
+            disabled={syncing}
+            onClick={syncLive}
+            className="bg-ist-teal px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          >
+            {syncing ? 'Syncing…' : 'Sync live feed'}
+          </button>
+        </div>
+
         <form onSubmit={onCreate} className="grid gap-3 border border-white/10 bg-white/5 p-5 md:grid-cols-2">
           <h2 className="font-display text-2xl md:col-span-2">Add carousel post</h2>
           <p className="text-sm text-white/60 md:col-span-2">
-            Paste a post or reel URL (<code className="text-ist-teal-light">/p/…</code> or{' '}
-            <code className="text-ist-teal-light">/reel/…</code>) for the official Instagram embed
-            (videos play in-site). Optionally upload a poster and/or video file for native HTML5
-            playback instead of the embed.
+            The public grid syncs live posts from @{`islamicsocietyoftoronto`} automatically. Use this
+            form to pin extra post/reel URLs, or click <strong>Sync live feed</strong> below to refresh
+            now. Prefer <code className="text-ist-teal-light">/p/…</code> or{' '}
+            <code className="text-ist-teal-light">/reel/…</code> links. Optional poster/video uploads
+            enable native HTML5 playback in the expand view.
           </p>
           <input
             name="permalink"
@@ -209,7 +250,8 @@ export default function AdminInstagramPage() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs uppercase tracking-wider text-ist-teal-light">
-                  {p.is_active ? 'Active' : 'Hidden'} · {p.media_type} · order {p.sort_order}
+                  {p.is_active ? 'Active' : 'Hidden'} · {p.media_type} · {p.source || 'manual'} · order{' '}
+                  {p.sort_order}
                   {p.video_src ? ' · native video' : ''}
                 </p>
                 <p className="mt-1 truncate text-sm text-white/90">{p.caption || p.id}</p>

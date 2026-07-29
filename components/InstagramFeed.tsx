@@ -1,9 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type TouchEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { links } from '@/lib/content';
 import { Button } from '@/components/ui';
-import { FadeUp } from '@/components/motion';
+import { FadeUp, Stagger, StaggerItem } from '@/components/motion';
 import { IconInstagram } from '@/components/icons';
 
 const USERNAME = 'islamicsocietyoftoronto';
@@ -27,26 +27,6 @@ function InstagramIconBadge() {
   );
 }
 
-function Chevron({ dir }: { dir: 'left' | 'right' }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5" aria-hidden>
-      {dir === 'left' ? (
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-      ) : (
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-      )}
-    </svg>
-  );
-}
-
-function ExpandIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-4 w-4" aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3" />
-    </svg>
-  );
-}
-
 function CloseIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5" aria-hidden>
@@ -55,99 +35,61 @@ function CloseIcon() {
   );
 }
 
-function PostSlide({
+function isVideoType(type: string) {
+  return type === 'video' || type === 'reel';
+}
+
+function Tile({
   post,
-  compact,
-  expanded,
-  autoPlayVideo,
+  onExpand,
 }: {
   post: FeedPost;
-  compact?: boolean;
-  expanded?: boolean;
-  autoPlayVideo?: boolean;
+  onExpand: () => void;
 }) {
-  const height = expanded ? (compact ? 640 : 780) : compact ? 480 : 560;
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    const el = videoRef.current;
-    if (!el || !post.videoSrc) return;
-    if (autoPlayVideo) {
-      void el.play().catch(() => undefined);
-    } else if (!expanded) {
-      el.pause();
-    }
-  }, [autoPlayVideo, expanded, post.videoSrc]);
-
-  if (post.videoSrc) {
-    return (
-      <div className="relative h-full w-full overflow-hidden bg-ist-green-deep">
-        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-        <video
-          ref={videoRef}
-          key={post.videoSrc}
-          className="h-full w-full object-cover"
-          style={{ minHeight: height }}
-          src={post.videoSrc}
-          poster={post.posterSrc}
-          controls
-          playsInline
-          loop
-          preload="metadata"
-        />
-        {post.caption && (
-          <p className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-4 pb-4 pt-10 text-sm text-white">
-            {post.caption}
-          </p>
-        )}
-      </div>
-    );
-  }
-
-  if (post.embeddable && post.embedSrc) {
-    return (
-      <iframe
-        title={post.caption || `Instagram post ${post.id}`}
-        src={post.embedSrc}
-        className="h-full w-full border-0 bg-white"
-        style={{ minHeight: height, height }}
-        loading="lazy"
-        allow="autoplay; encrypted-media; clipboard-write; picture-in-picture"
-        referrerPolicy="strict-origin-when-cross-origin"
-      />
-    );
-  }
+  const [imgFailed, setImgFailed] = useState(false);
 
   return (
-    <a
-      href={post.permalink || links.instagram}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group relative flex h-full min-h-[280px] w-full flex-col overflow-hidden bg-ist-green/[0.04]"
-      style={{ minHeight: height }}
+    <button
+      type="button"
+      onClick={onExpand}
+      className="group relative aspect-square w-full overflow-hidden border border-ist-green/10 bg-ist-green/[0.04] text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ist-teal"
     >
-      {post.posterSrc ? (
+      {post.posterSrc && !imgFailed ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={post.posterSrc}
           alt={post.caption || 'Instagram post'}
-          className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+          loading="lazy"
+          onError={() => setImgFailed(true)}
         />
       ) : (
-        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-ist-green to-ist-green-deep">
-          <InstagramIconBadge />
+        <div className="flex h-full items-center justify-center bg-gradient-to-br from-ist-green to-ist-green-deep">
+          <IconInstagram className="h-10 w-10 text-white/80" />
         </div>
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-      <div className="relative mt-auto p-5 text-white sm:p-6">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ist-gold">@{USERNAME}</p>
-        {post.caption && <p className="mt-2 text-sm leading-relaxed sm:text-base">{post.caption}</p>}
-        <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-white/85">
-          <IconInstagram className="h-3.5 w-3.5" />
-          View on Instagram
-        </span>
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-90 transition group-hover:opacity-100" />
+
+      <div className="absolute inset-x-0 bottom-0 p-3 text-white sm:p-4">
+        <p className="line-clamp-2 text-xs leading-snug sm:text-sm">
+          {post.caption || `@${USERNAME}`}
+        </p>
       </div>
-    </a>
+
+      {isVideoType(post.mediaType) && (
+        <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3" aria-hidden>
+            <path d="M8 5v14l11-7z" />
+          </svg>
+          {post.mediaType === 'reel' ? 'Reel' : 'Video'}
+        </span>
+      )}
+
+      <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-ist-green opacity-0 transition group-hover:opacity-100">
+        Expand
+      </span>
+    </button>
   );
 }
 
@@ -161,10 +103,8 @@ export function InstagramFeed({
   const profileUrl = links.instagram;
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [index, setIndex] = useState(0);
-  const [expanded, setExpanded] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const touchStartX = useRef<number | null>(null);
+  const [error, setError] = useState('');
+  const [expanded, setExpanded] = useState<FeedPost | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -172,9 +112,11 @@ export function InstagramFeed({
       try {
         const res = await fetch('/api/content/instagram');
         const data = await res.json();
-        if (!cancelled) setPosts(Array.isArray(data.posts) ? data.posts : []);
+        if (cancelled) return;
+        setPosts(Array.isArray(data.posts) ? data.posts : []);
+        if (!data.posts?.length && data.sync?.error) setError(data.sync.error);
       } catch {
-        if (!cancelled) setPosts([]);
+        if (!cancelled) setError('Could not load Instagram feed');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -184,32 +126,10 @@ export function InstagramFeed({
     };
   }, []);
 
-  const count = posts.length;
-  const current = count ? posts[index % count] : null;
-
-  const go = useCallback(
-    (delta: number) => {
-      if (!count) return;
-      setIndex((i) => (i + delta + count) % count);
-      setPaused(true);
-    },
-    [count],
-  );
-
-  useEffect(() => {
-    if (!count || paused || expanded) return;
-    const t = window.setInterval(() => {
-      setIndex((i) => (i + 1) % count);
-    }, 6500);
-    return () => window.clearInterval(t);
-  }, [count, paused, expanded]);
-
   useEffect(() => {
     if (!expanded) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setExpanded(false);
-      if (e.key === 'ArrowLeft') go(-1);
-      if (e.key === 'ArrowRight') go(1);
+      if (e.key === 'Escape') setExpanded(null);
     };
     window.addEventListener('keydown', onKey);
     const prev = document.body.style.overflow;
@@ -218,21 +138,11 @@ export function InstagramFeed({
       window.removeEventListener('keydown', onKey);
       document.body.style.overflow = prev;
     };
-  }, [expanded, go]);
+  }, [expanded]);
 
-  function onTouchStart(e: TouchEvent) {
-    touchStartX.current = e.touches[0]?.clientX ?? null;
-  }
-
-  function onTouchEnd(e: TouchEvent) {
-    const start = touchStartX.current;
-    touchStartX.current = null;
-    if (start == null) return;
-    const end = e.changedTouches[0]?.clientX ?? start;
-    const dx = end - start;
-    if (Math.abs(dx) < 48) return;
-    go(dx < 0 ? 1 : -1);
-  }
+  const gridClass = compact
+    ? 'grid grid-cols-2 gap-2 sm:grid-cols-3'
+    : 'grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4';
 
   return (
     <div>
@@ -243,7 +153,7 @@ export function InstagramFeed({
               <span className="eyebrow">Social</span>
               <h2 className="mt-3 font-display text-3xl text-ist-green sm:text-4xl">On Instagram</h2>
               <p className="mt-2 max-w-xl text-sm text-ist-ink/60 sm:text-base">
-                Posts from{' '}
+                Live posts from{' '}
                 <a
                   href={profileUrl}
                   target="_blank"
@@ -251,8 +161,8 @@ export function InstagramFeed({
                   className="font-semibold text-ist-teal hover:underline"
                 >
                   @{USERNAME}
-                </a>{' '}
-                — swipe through the carousel, expand any post, and play videos on this page.
+                </a>
+                . Tap a tile to expand — videos play on this page.
               </p>
             </div>
             <Button href={profileUrl} variant="outline" external className="shrink-0">
@@ -265,109 +175,37 @@ export function InstagramFeed({
 
       <FadeUp delay={0.08} className={showHeading ? 'mt-8' : ''}>
         {loading ? (
-          <div
-            className={`mx-auto flex items-center justify-center border border-ist-green/10 bg-white ${
-              compact ? 'max-w-md' : 'max-w-lg'
-            }`}
-            style={{ minHeight: compact ? 480 : 560 }}
-          >
-            <div className="flex flex-col items-center gap-3 text-ist-muted">
-              <InstagramIconBadge />
-              <p className="text-sm">Loading Instagram carousel…</p>
-            </div>
+          <div className={gridClass}>
+            {Array.from({ length: compact ? 6 : 8 }).map((_, i) => (
+              <div key={i} className="aspect-square animate-pulse bg-ist-green/[0.06]" />
+            ))}
           </div>
-        ) : count === 0 || !current ? (
+        ) : posts.length === 0 ? (
           <div className="border border-ist-green/10 bg-white px-6 py-12 text-center sm:px-10">
             <div className="mx-auto flex max-w-md flex-col items-center">
               <InstagramIconBadge />
               <h3 className="mt-5 font-display text-2xl text-ist-green">@{USERNAME}</h3>
               <p className="mt-2 text-sm leading-relaxed text-ist-ink/65">
-                Open our Instagram profile for the latest photos, reels, and announcements from Masjid
-                Darus Salaam.
+                {error ||
+                  'Live posts could not be loaded right now. Open Instagram for the latest updates.'}
               </p>
               <Button href={profileUrl} variant="primary" external className="mt-6">
                 <IconInstagram className="h-4 w-4" />
-                View live feed
+                View on Instagram
               </Button>
             </div>
           </div>
         ) : (
-          <div
-            className={`mx-auto ${compact ? 'max-w-md' : 'max-w-lg'}`}
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
-          >
-            <div
-              className="relative overflow-hidden border border-ist-green/10 bg-white shadow-soft"
-              onTouchStart={onTouchStart}
-              onTouchEnd={onTouchEnd}
-            >
-              <PostSlide
-                key={current.id}
-                post={current}
-                compact={compact}
-                autoPlayVideo={current.mediaType === 'video' || current.mediaType === 'reel'}
-              />
-
-              {count > 1 && (
-                <>
-                  <button
-                    type="button"
-                    aria-label="Previous post"
-                    onClick={() => go(-1)}
-                    className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-2 text-ist-green shadow-soft backdrop-blur transition hover:bg-white"
-                  >
-                    <Chevron dir="left" />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Next post"
-                    onClick={() => go(1)}
-                    className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-2 text-ist-green shadow-soft backdrop-blur transition hover:bg-white"
-                  >
-                    <Chevron dir="right" />
-                  </button>
-                </>
-              )}
-
-              <div className="absolute right-3 top-3 z-10 flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setExpanded(true);
-                    setPaused(true);
-                  }}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-ist-green/90 px-3 py-1.5 text-xs font-semibold text-white shadow-soft backdrop-blur transition hover:bg-ist-green"
-                >
-                  <ExpandIcon />
-                  Expand
-                </button>
-              </div>
-            </div>
-
-            {count > 1 && (
-              <div className="mt-4 flex items-center justify-center gap-2" role="tablist" aria-label="Instagram slides">
-                {posts.map((p, i) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={i === index}
-                    aria-label={`Go to post ${i + 1}`}
-                    onClick={() => {
-                      setIndex(i);
-                      setPaused(true);
-                    }}
-                    className={`h-2 rounded-full transition-all ${
-                      i === index ? 'w-6 bg-ist-teal' : 'w-2 bg-ist-green/20 hover:bg-ist-green/40'
-                    }`}
-                  />
-                ))}
-              </div>
-            )}
-
-            <p className="mt-3 text-center text-xs text-ist-muted">
-              {index + 1} / {count} · Videos play on this page ·{' '}
+          <>
+            <Stagger staggerDelay={0.05} className={gridClass}>
+              {posts.map((post) => (
+                <StaggerItem key={post.id}>
+                  <Tile post={post} onExpand={() => setExpanded(post)} />
+                </StaggerItem>
+              ))}
+            </Stagger>
+            <p className="mt-4 text-center text-xs text-ist-muted">
+              Live from Instagram · {posts.length} recent post{posts.length === 1 ? '' : 's'} ·{' '}
               <a
                 href={profileUrl}
                 target="_blank"
@@ -377,20 +215,20 @@ export function InstagramFeed({
                 @{USERNAME}
               </a>
             </p>
-          </div>
+          </>
         )}
       </FadeUp>
 
-      {expanded && current && (
+      {expanded && (
         <div
           className="fixed inset-0 z-[80] flex items-center justify-center bg-ist-green-deep/85 p-3 backdrop-blur-sm sm:p-6"
           role="dialog"
           aria-modal="true"
           aria-label="Expanded Instagram post"
-          onClick={() => setExpanded(false)}
+          onClick={() => setExpanded(null)}
         >
           <div
-            className="relative flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden bg-white shadow-2xl"
+            className="relative flex max-h-[92vh] w-full max-w-xl flex-col overflow-hidden bg-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between gap-3 border-b border-ist-green/10 px-4 py-3">
@@ -399,34 +237,14 @@ export function InstagramFeed({
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-ist-green">@{USERNAME}</p>
                   <p className="truncate text-xs text-ist-muted">
-                    {current.mediaType}
-                    {current.caption ? ` · ${current.caption}` : ''}
+                    {expanded.mediaType}
+                    {expanded.caption ? ` · ${expanded.caption}` : ''}
                   </p>
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                {count > 1 && (
-                  <>
-                    <button
-                      type="button"
-                      aria-label="Previous"
-                      onClick={() => go(-1)}
-                      className="rounded-full border border-ist-green/15 p-2 text-ist-green hover:bg-ist-green/5"
-                    >
-                      <Chevron dir="left" />
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="Next"
-                      onClick={() => go(1)}
-                      className="rounded-full border border-ist-green/15 p-2 text-ist-green hover:bg-ist-green/5"
-                    >
-                      <Chevron dir="right" />
-                    </button>
-                  </>
-                )}
                 <a
-                  href={current.permalink || profileUrl}
+                  href={expanded.permalink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hidden rounded-full border border-ist-green/15 px-3 py-1.5 text-xs font-semibold text-ist-green hover:bg-ist-green/5 sm:inline-flex"
@@ -436,20 +254,47 @@ export function InstagramFeed({
                 <button
                   type="button"
                   aria-label="Close"
-                  onClick={() => setExpanded(false)}
+                  onClick={() => setExpanded(null)}
                   className="rounded-full bg-ist-green p-2 text-white hover:bg-ist-green-deep"
                 >
                   <CloseIcon />
                 </button>
               </div>
             </div>
-            <div className="min-h-0 flex-1 overflow-auto">
-              <PostSlide
-                key={`expanded-${current.id}`}
-                post={current}
-                expanded
-                autoPlayVideo={Boolean(current.videoSrc)}
-              />
+
+            <div className="min-h-0 flex-1 overflow-auto bg-[#0a1f1b]">
+              {expanded.videoSrc ? (
+                // eslint-disable-next-line jsx-a11y/media-has-caption
+                <video
+                  key={expanded.videoSrc}
+                  className="max-h-[75vh] w-full object-contain"
+                  src={expanded.videoSrc}
+                  poster={expanded.posterSrc}
+                  controls
+                  autoPlay
+                  playsInline
+                />
+              ) : expanded.embedSrc ? (
+                <iframe
+                  title={expanded.caption || 'Instagram post'}
+                  src={expanded.embedSrc}
+                  className="h-[min(75vh,720px)] w-full border-0 bg-white"
+                  allow="autoplay; encrypted-media; clipboard-write; picture-in-picture"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                />
+              ) : (
+                <div className="p-8 text-center text-white/80">
+                  <p>Preview unavailable.</p>
+                  <a
+                    href={expanded.permalink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-block text-ist-teal-light underline"
+                  >
+                    View on Instagram
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>
