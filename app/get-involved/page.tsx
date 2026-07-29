@@ -6,6 +6,7 @@ import { images } from '@/lib/images';
 import { Button, Section } from '@/components/ui';
 import { PageTransition, Stagger, StaggerItem } from '@/components/motion';
 import { PageHero } from '@/components/PageHero';
+import { InstagramFeed } from '@/components/InstagramFeed';
 
 export const metadata: Metadata = { title: 'Get Involved' };
 
@@ -57,6 +58,10 @@ export default function GetInvolvedPage() {
             </StaggerItem>
           ))}
         </Stagger>
+      </Section>
+
+      <Section id="social" className="section-band">
+        <InstagramFeed />
       </Section>
     </PageTransition>
   );

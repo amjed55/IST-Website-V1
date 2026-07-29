@@ -23,6 +23,7 @@ import { PageHero } from '@/components/PageHero';
 import { NoticeStrip } from '@/components/NoticeStrip';
 import { MediaBand } from '@/components/MediaBand';
 import { HeroNavTiles } from '@/components/HeroNavTiles';
+import { InstagramFeed } from '@/components/InstagramFeed';
 
 export const dynamic = 'force-dynamic';
 
@@ -282,8 +283,13 @@ export default function HomePage() {
         </Stagger>
       </Section>
 
+      {/* ── Instagram ───────────────────────────────────────────────── */}
+      <Section id="social" className="section-band">
+        <InstagramFeed />
+      </Section>
+
       {/* ── Visit / Map ──────────────────────────────────────────────── */}
-      <Section className="section-band">
+      <Section>
         <MediaBand image={images.visit} eyebrow="Visit us" title="Join us at 20 Overlea Blvd">
           <p className="text-ist-ink/70">{site.address}</p>
           <p className="text-sm font-medium text-ist-gold">

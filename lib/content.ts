@@ -332,7 +332,7 @@ export const siteMapLinks = [
   { label: 'Sisters', href: '/community/sisters' },
   { label: 'Seniors', href: '/community/seniors' },
   { label: 'Sports', href: '/events#sports' },
-  { label: 'Social Media / Connect', href: '#connect' },
+  { label: 'Social Media / Connect', href: '#social' },
   { label: 'Deen Programs', href: '/community/weekly' },
   { label: 'Education', href: '/education' },
   { label: 'Our Mission', href: '/about/story' },
