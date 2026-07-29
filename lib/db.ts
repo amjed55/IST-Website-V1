@@ -81,8 +81,16 @@ function hasColumn(db: Database.Database, table: string, column: string) {
 }
 
 function ensureColumn(db: Database.Database, table: string, column: string, defSql: string) {
-  if (!hasColumn(db, table, column)) {
+  if (hasColumn(db, table, column)) return;
+  try {
+    // SQLite only allows constant defaults on ADD COLUMN — keep defSql simple (e.g. TEXT).
     db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${defSql}`);
+  } catch (err) {
+    // Ignore race / already-added; rethrow unexpected failures
+    const msg = err instanceof Error ? err.message : String(err);
+    if (!/duplicate column|already exists/i.test(msg)) {
+      console.warn(`[db] ensureColumn ${table}.${column}:`, msg);
+    }
   }
 }
 
@@ -162,15 +170,22 @@ function schema(db: Database.Database) {
     );
   `);
 
-  // Migrations for DBs created before newer columns (SQLite disallows non-constant defaults on ADD COLUMN)
+  // Migrations for older DBs — only constant-safe column defs
   ensureColumn(db, 'admins', 'display_name', 'TEXT');
-  ensureColumn(db, 'admins', 'role', "TEXT DEFAULT 'admin'");
+  ensureColumn(db, 'admins', 'role', 'TEXT');
   ensureColumn(db, 'admins', 'updated_at', 'TEXT');
   ensureColumn(db, 'events', 'image_src', 'TEXT');
   ensureColumn(db, 'events', 'starts_at', 'TEXT');
   ensureColumn(db, 'events', 'ends_at', 'TEXT');
   ensureColumn(db, 'programs', 'image_src', 'TEXT');
   ensureColumn(db, 'site_settings', 'updated_at', 'TEXT');
+
+  // Backfill role if null after migration
+  try {
+    db.prepare(`UPDATE admins SET role = 'admin' WHERE role IS NULL OR role = ''`).run();
+  } catch {
+    /* ignore */
+  }
 }
 
 function seed(db: Database.Database) {
@@ -299,10 +314,21 @@ function seed(db: Database.Database) {
 /** Mark non-recurring events past when ends_at (or starts_at) has passed. */
 export function expirePastEvents() {
   const db = getDb();
+  if (!hasColumn(db, 'events', 'ends_at') && !hasColumn(db, 'events', 'starts_at')) {
+    return 0;
+  }
   const now = Date.now();
   const rows = db
-    .prepare(`SELECT id, ends_at, starts_at, recurring, status FROM events WHERE status = 'upcoming' AND recurring = 0`)
-    .all() as { id: string; ends_at: string | null; starts_at: string | null; recurring: number; status: string }[];
+    .prepare(
+      `SELECT id, ends_at, starts_at, recurring, status FROM events WHERE status = 'upcoming' AND recurring = 0`,
+    )
+    .all() as {
+    id: string;
+    ends_at: string | null;
+    starts_at: string | null;
+    recurring: number;
+    status: string;
+  }[];
 
   const expire = db.prepare(
     `UPDATE events SET status = 'past', updated_at = datetime('now') WHERE id = ?`,

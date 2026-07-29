@@ -49,7 +49,9 @@ function ZuhrWindowNote() {
 }
 
 function eventImage(item: EventItem) {
-  if (item.imageSrc) return { src: item.imageSrc, alt: item.title };
+  if (item.imageSrc && item.imageSrc.trim()) {
+    return { src: item.imageSrc, alt: item.title };
+  }
   return images.eventsById[item.id] || images.events;
 }
 

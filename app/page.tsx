@@ -24,6 +24,8 @@ import { PageHero } from '@/components/PageHero';
 import { NoticeStrip } from '@/components/NoticeStrip';
 import { MediaBand } from '@/components/MediaBand';
 
+export const dynamic = 'force-dynamic';
+
 const yearsServing = new Date().getFullYear() - 1995;
 
 const stats = [
