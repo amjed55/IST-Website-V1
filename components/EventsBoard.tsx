@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { events, type EventItem } from '@/lib/content';
-import { images } from '@/lib/images';
+import { eventThumb } from '@/lib/images';
 import { addMinutes, format12, type TodayPrayersResponse } from '@/lib/prayer';
 import { Badge } from './ui';
 import { ease } from './motion';
@@ -52,7 +52,7 @@ function eventImage(item: EventItem) {
   if (item.imageSrc && item.imageSrc.trim()) {
     return { src: item.imageSrc, alt: item.title };
   }
-  return images.eventsById[item.id] || images.events;
+  return eventThumb(item.id);
 }
 
 function EventSlide({ item, muted }: { item: EventItem; muted?: boolean }) {

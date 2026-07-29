@@ -8,7 +8,7 @@ import {
   programSnapshot,
   site,
 } from '@/lib/content';
-import { images, pillarImage } from '@/lib/images';
+import { images, pillarImage, hubImage } from '@/lib/images';
 import { getMediaByKey, getSiteSettings } from '@/lib/db';
 import { Button, Section } from '@/components/ui';
 import {
@@ -24,6 +24,15 @@ import { NoticeStrip } from '@/components/NoticeStrip';
 import { MediaBand } from '@/components/MediaBand';
 import { HeroNavTiles } from '@/components/HeroNavTiles';
 import { InstagramFeed } from '@/components/InstagramFeed';
+import {
+  IconBriefcase,
+  IconDonate,
+  IconEducation,
+  IconHands,
+  IconMosque,
+  IconUsers,
+  topicIcons,
+} from '@/components/icons';
 
 export const dynamic = 'force-dynamic';
 
@@ -97,9 +106,14 @@ export default function HomePage() {
       <div className="border-y border-ist-green/8 bg-white">
         <div className="container-ist">
           <Stagger staggerDelay={0.1} className="grid divide-x divide-ist-green/8 sm:grid-cols-3">
-            {stats.map((s) => (
+            {stats.map((s, i) => {
+              const StatIcon = [IconMosque, IconUsers, IconEducation][i] || IconEducation;
+              return (
               <StaggerItem key={s.label}>
-                <div className="py-8 text-center">
+                <div className="flex flex-col items-center py-8 text-center">
+                  <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-ist-teal/10 text-ist-teal">
+                    <StatIcon className="h-5 w-5" />
+                  </span>
                   <p className="font-display text-5xl text-ist-green">
                     <AnimatedCounter value={s.value} suffix={s.suffix} />
                   </p>
@@ -108,7 +122,7 @@ export default function HomePage() {
                   </p>
                 </div>
               </StaggerItem>
-            ))}
+            );})}
           </Stagger>
         </div>
       </div>
@@ -176,22 +190,41 @@ export default function HomePage() {
         </FadeUp>
 
         <Stagger staggerDelay={0.1} className="mt-10 grid gap-6 md:grid-cols-3">
-          {hubs.map((hub) => (
-            <StaggerItem key={hub.id}>
-              <Link
-                href={hub.href}
-                className="group block border-t-2 border-ist-gold/60 pt-5 transition hover:border-ist-teal"
-              >
-                <h3 className="font-display text-2xl text-ist-green group-hover:text-ist-teal">
-                  {hub.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-ist-ink/65">{hub.body}</p>
-                <span className="mt-4 inline-flex text-sm font-semibold text-ist-teal">
-                  Visit hub →
-                </span>
-              </Link>
-            </StaggerItem>
-          ))}
+          {hubs.map((hub) => {
+            const img = hubImage(hub.id);
+            const Icon = topicIcons[hub.id] || IconEducation;
+            return (
+              <StaggerItem key={hub.id}>
+                <Link
+                  href={hub.href}
+                  className="group block overflow-hidden border border-ist-green/8 bg-white transition hover:border-ist-teal/40 hover:shadow-soft"
+                >
+                  <div className="relative aspect-[16/10] overflow-hidden">
+                    <Image
+                      src={img.src}
+                      alt={img.alt}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover transition duration-700 group-hover:scale-[1.05]"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-ist-green-deep/70 via-ist-green-deep/20 to-transparent" />
+                    <span className="absolute bottom-3 left-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-ist-teal">
+                      <Icon className="h-[18px] w-[18px]" />
+                    </span>
+                  </div>
+                  <div className="border-t-2 border-ist-gold/60 px-5 py-5 transition group-hover:border-ist-teal">
+                    <h3 className="font-display text-2xl text-ist-green group-hover:text-ist-teal">
+                      {hub.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-ist-ink/65">{hub.body}</p>
+                    <span className="mt-4 inline-flex text-sm font-semibold text-ist-teal">
+                      Visit hub →
+                    </span>
+                  </div>
+                </Link>
+              </StaggerItem>
+            );
+          })}
         </Stagger>
       </Section>
 
@@ -214,7 +247,9 @@ export default function HomePage() {
             {programSnapshot.map((title) => (
               <StaggerItem key={title}>
                 <div className="flex items-center gap-3 bg-ist-green px-5 py-4 transition hover:bg-ist-green-deep/80">
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-ist-gold" />
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-ist-gold">
+                    <IconEducation className="h-4 w-4" />
+                  </span>
                   <span className="text-base font-medium text-white/90">{title}</span>
                 </div>
               </StaggerItem>
@@ -244,16 +279,42 @@ export default function HomePage() {
         <Stagger staggerDelay={0.1} className="mt-10 grid gap-8 md:grid-cols-3">
           {connectThroughIst.map((item) => {
             const href = item.external ? item.externalHref || links.donate : item.href;
-            const className = 'group block';
+            const connectImg =
+              item.title === 'Donate'
+                ? images.connect.donate
+                : item.title === 'Careers'
+                  ? images.connect.careers
+                  : images.connect.volunteer;
+            const ConnectIcon =
+              item.title === 'Donate'
+                ? IconDonate
+                : item.title === 'Careers'
+                  ? IconBriefcase
+                  : IconHands;
             const body = (
               <>
-                <h3 className="font-display text-3xl text-ist-green transition group-hover:text-ist-teal">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-ist-ink/65">{item.body}</p>
-                <span className="mt-4 inline-flex text-sm font-semibold text-ist-teal">
-                  {item.title === 'Donate' ? 'Donate now →' : `Open ${item.title.toLowerCase()} →`}
-                </span>
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <Image
+                    src={connectImg.src}
+                    alt={connectImg.alt}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover transition duration-700 group-hover:scale-[1.05]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ist-green-deep/70 to-transparent" />
+                  <span className="absolute bottom-3 left-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-ist-teal">
+                    <ConnectIcon className="h-[18px] w-[18px]" />
+                  </span>
+                </div>
+                <div className="px-1 pt-4">
+                  <h3 className="font-display text-3xl text-ist-green transition group-hover:text-ist-teal">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-ist-ink/65">{item.body}</p>
+                  <span className="mt-4 inline-flex text-sm font-semibold text-ist-teal">
+                    {item.title === 'Donate' ? 'Donate now →' : `Open ${item.title.toLowerCase()} →`}
+                  </span>
+                </div>
               </>
             );
 
@@ -264,7 +325,7 @@ export default function HomePage() {
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={className}
+                    className="group block overflow-hidden"
                   >
                     {body}
                   </a>
@@ -274,7 +335,7 @@ export default function HomePage() {
 
             return (
               <StaggerItem key={item.title}>
-                <Link href={href} className={className}>
+                <Link href={href} className="group block overflow-hidden">
                   {body}
                 </Link>
               </StaggerItem>

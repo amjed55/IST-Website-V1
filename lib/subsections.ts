@@ -1,4 +1,3 @@
-import type { SiteImage } from '@/lib/images';
 import {
   about,
   communityPrograms,
@@ -7,7 +6,7 @@ import {
   site,
   type Program,
 } from '@/lib/content';
-import { images } from '@/lib/images';
+import { images, programImage, type SiteImage } from '@/lib/images';
 
 export type SubsectionPage = {
   slug: string;
@@ -109,7 +108,7 @@ export const aboutSubsections: SubsectionPage[] = [
       about.reach,
       `Since ${about.since}, IST — Masjid Darus Salaam — has served as the spiritual and community home for Muslims across Thorncliffe Park, Flemingdon Park, and the wider East Toronto area.`,
     ],
-    image: images.about,
+    image: images.aboutBySlug.story,
     parentLabel: 'About',
     parentHref: '/about',
   },
@@ -123,7 +122,7 @@ export const aboutSubsections: SubsectionPage[] = [
       'IST is led by a team of Imams, qualified scholars, and committed volunteers who oversee daily worship, education programmes, and pastoral care — including nikah ceremonies and counselling services.',
       'For questions about leadership, programme registrations, or pastoral needs, please reach out to the masjid office directly.',
     ],
-    image: images.about,
+    image: images.aboutBySlug.leadership,
     parentLabel: 'About',
     parentHref: '/about',
     cta: { label: 'Contact the office', href: '/contact' },
@@ -138,7 +137,7 @@ export const aboutSubsections: SubsectionPage[] = [
       'Gym rental is not currently available. Nikah ceremonies are offered without the requirement of a hall booking.',
       'Please review the parking guidance on our Visit page before you arrive — nearby private lots actively tow unauthorized vehicles.',
     ],
-    image: images.services,
+    image: images.aboutBySlug.facility,
     parentLabel: 'About',
     parentHref: '/about',
     cta: { label: 'Visit & parking', href: '/visit' },
@@ -150,7 +149,7 @@ export const educationSubsections: SubsectionPage[] = educationPrograms.map((p) 
     eyebrow: 'Education',
     parentLabel: 'Education',
     parentHref: '/education',
-    image: images.education,
+    image: programImage(p.id, images.education),
     body: educationBodies[p.id],
     form: 'program-register',
   }),
@@ -161,7 +160,7 @@ export const communitySubsections: SubsectionPage[] = communityPrograms.map((p) 
     eyebrow: 'Community',
     parentLabel: 'Community',
     parentHref: '/community',
-    image: images.community,
+    image: programImage(p.id, images.community),
     body: communityBodies[p.id],
   }),
 );
@@ -172,7 +171,7 @@ export const servicesSubsections: SubsectionPage[] = lifeServices.map((s) => ({
   eyebrow: 'Services',
   description: s.summary,
   body: [s.summary],
-  image: images.services,
+  image: images.servicesBySlug[s.id] || images.services,
   parentLabel: 'Services',
   parentHref: '/services',
   contacts: 'contacts' in s ? s.contacts : undefined,
@@ -190,7 +189,7 @@ export const involveSubsections: SubsectionPage[] = [
       'Volunteers contribute across education support, events, hospitality, facilities, and day-to-day operations — every role matters.',
       'Tell us about your interests and availability and our team will follow up when an opportunity that fits opens up.',
     ],
-    image: images.community,
+    image: images.connect.volunteer,
     parentLabel: 'Get involved',
     parentHref: '/get-involved',
     form: 'volunteer',
@@ -204,7 +203,7 @@ export const involveSubsections: SubsectionPage[] = [
       'Your Zakat, Sadaqah, and Masjid Fund contributions help sustain daily prayers, full-time education programmes, and community welfare initiatives.',
       'Give securely through our online donation portal, or speak with the office about in-person giving options.',
     ],
-    image: images.about,
+    image: images.connect.donate,
     parentLabel: 'Get involved',
     parentHref: '/get-involved',
     tags: ['Zakat', 'Sadaqah', 'Masjid Fund'],

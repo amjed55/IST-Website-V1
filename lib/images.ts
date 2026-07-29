@@ -1,14 +1,18 @@
 /**
  * Local image catalog for the marketing site.
- * Atmospheric photos under /images are royalty-free stand-ins —
+ * Atmospheric photos under /images and /images/generated are royalty-free stand-ins —
  * replace with real 20 Overlea / Masjid Darus Salaam photography when available.
- * Career images are sourced from islamicsocietyoftoronto.com job postings.
  */
 
 export type SiteImage = {
   src: string;
   alt: string;
 };
+
+const g = (file: string, alt: string): SiteImage => ({
+  src: `/images/generated/${file}`,
+  alt,
+});
 
 export const images = {
   logo: {
@@ -43,6 +47,14 @@ export const images = {
     src: '/images/events.jpg',
     alt: 'Illuminated mosque dome and minaret at night',
   },
+  library: g('islamic-library.jpg', 'Islamic reference books on wooden library shelves'),
+  lectureHall: g('lecture-hall.jpg', 'Empty classroom ready for Islamic studies'),
+  quranOpen: g('quran-open.jpg', 'Open Holy Quran on a wooden rehal'),
+  courtyardDusk: g('courtyard-dusk.jpg', 'Mosque courtyard arches at dusk'),
+  tilework: g('tilework.jpg', 'Blue and gold Islamic geometric tilework'),
+  prayerAisle: g('prayer-aisle.jpg', 'Prayer hall aisle with green carpet and arches'),
+  gym: g('gym-hall.jpg', 'Empty community gymnasium with wooden floor'),
+  lounge: g('community-lounge.jpg', 'Empty community lounge with warm lamps'),
   pillars: {
     education: {
       src: '/images/pillar-education.jpg',
@@ -61,36 +73,91 @@ export const images = {
       alt: 'Mosque entrance for visitors',
     },
   },
+  hubs: {
+    sisters: g('community-lounge.jpg', 'Welcoming sisters gathering space'),
+    youth: g('gym-hall.jpg', 'Youth programmes and sports hall'),
+    seniors: g('community-lounge.jpg', 'Quiet lounge for seniors companionship'),
+  },
   eventsById: {
     jummah: {
       src: '/images/event-jummah.jpg',
-      alt: 'Congregation preparing for Jummah',
+      alt: 'Prayer hall prepared for Jummah',
     },
-    'youth-friday': {
-      src: '/images/event-youth.jpg',
-      alt: 'Youth connecting as a group',
-    },
-    'brothers-basketball': {
-      src: '/images/event-youth.jpg',
-      alt: 'Brothers basketball at IST',
-    },
-    'sisters-volleyball': {
-      src: '/images/event-youth.jpg',
-      alt: 'Sisters volleyball at IST',
-    },
-    'badminton-dropin': {
-      src: '/images/events.jpg',
-      alt: 'Badminton drop-in at IST',
-    },
+    'youth-friday': g('gym-hall.jpg', 'Youth Friday programme space'),
+    'brothers-basketball': g('gym-hall.jpg', 'IST gym for basketball'),
+    'sisters-volleyball': g('gym-hall.jpg', 'IST gym for sisters volleyball'),
+    'badminton-dropin': g('gym-hall.jpg', 'IST gym for badminton'),
     'operating-donate': {
       src: '/images/event-donate.jpg',
       alt: 'Supporting the masjid community',
     },
     'careers-open': {
       src: '/images/event-careers.jpg',
-      alt: 'Team collaboration and careers',
+      alt: 'Careers at the Islamic Society of Toronto',
+    },
+    'youth-quran-circle': g('quran-open.jpg', 'Youth Quran circle'),
+    'youth-leadership': g('lecture-hall.jpg', 'Youth leadership workshop'),
+    'sisters-halaqa': g('community-lounge.jpg', "Sisters' halaqa space"),
+    'sisters-fitness': g('gym-hall.jpg', 'Sisters fitness space'),
+    'seniors-tea': g('community-lounge.jpg', 'Seniors tea lounge'),
+    'seniors-quran': g('quran-open.jpg', 'Seniors Quran listening'),
+    'family-picnic': g('courtyard-dusk.jpg', 'Community outdoor gathering'),
+    'open-house': {
+      src: '/images/visit.jpg',
+      alt: 'Masjid open house entrance',
+    },
+    'new-muslim-circle': g('lecture-hall.jpg', 'New Muslim circle classroom'),
+  } as Record<string, SiteImage>,
+  programsById: {
+    madressa: g('lecture-hall.jpg', 'Evening Madressa classroom'),
+    sunday: g('quran-open.jpg', 'Sunday Madrasah Quran study'),
+    hifz: g('islamic-library.jpg', 'Hifz programme study space'),
+    alim: g('islamic-library.jpg', 'Alim programme library'),
+    essentials: g('lecture-hall.jpg', 'Islamic Essentials classroom'),
+    adults: g('quran-open.jpg', 'Adult Tajweed class materials'),
+    'kids-story': g('lecture-hall.jpg', 'Kids seerah story hour'),
+    'youth-mentorship': g('courtyard-dusk.jpg', 'Youth mentorship'),
+    youth: g('gym-hall.jpg', 'Youth Hub'),
+    sisters: g('community-lounge.jpg', "Sisters' Hub"),
+    seniors: g('community-lounge.jpg', 'Seniors Hub'),
+    weekly: g('prayer-aisle.jpg', 'Weekly gathering in the prayer hall'),
+    'sisters-tajweed': g('quran-open.jpg', 'Sisters Tajweed'),
+    'sisters-arabic': g('islamic-library.jpg', 'Sisters Arabic foundations'),
+    'sisters-parenting': g('community-lounge.jpg', 'Sisters parenting circle'),
+    'youth-sports-league': g('gym-hall.jpg', 'Youth sports league'),
+    'youth-dawah': g('lecture-hall.jpg', 'Youth dawah and media'),
+    'seniors-fiqh': g('quran-open.jpg', 'Seniors fiqh circle'),
+    'seniors-transport': g('courtyard-dusk.jpg', 'Seniors ride assistance'),
+    'convert-care': g('lecture-hall.jpg', 'Convert care programme'),
+    'family-night': g('courtyard-dusk.jpg', 'Monthly family night'),
+    'nikah-service': g('tilework.jpg', 'Nikah ceremony space'),
+    'counselling-service': g('community-lounge.jpg', 'Pastoral counselling space'),
+    'janazah-service': g('prayer-aisle.jpg', 'Janazah facilities'),
+  } as Record<string, SiteImage>,
+  aboutBySlug: {
+    story: g('courtyard-dusk.jpg', 'Masjid Darus Salaam courtyard'),
+    leadership: g('prayer-aisle.jpg', 'Prayer hall for leadership and worship'),
+    facility: {
+      src: '/images/visit.jpg',
+      alt: 'Masjid facility entrance',
     },
   } as Record<string, SiteImage>,
+  servicesBySlug: {
+    nikah: g('tilework.jpg', 'Nikah — marriage ceremony'),
+    counselling: g('community-lounge.jpg', 'Marriage counselling space'),
+    janazah: g('prayer-aisle.jpg', 'Funeral and Janazah facilities'),
+  } as Record<string, SiteImage>,
+  connect: {
+    volunteer: g('courtyard-dusk.jpg', 'Volunteer at the masjid'),
+    donate: {
+      src: '/images/event-donate.jpg',
+      alt: 'Support the masjid with your donation',
+    },
+    careers: {
+      src: '/images/event-careers.jpg',
+      alt: 'Careers at IST',
+    },
+  },
   careers: {
     'maktab-male-teacher': {
       src: '/images/careers/maktab-male-teacher.png',
@@ -114,4 +181,19 @@ export function pillarImage(title: string): SiteImage {
   };
   const key = title.toLowerCase().replace(/\s+/g, '');
   return map[key] || images.pillars.visit;
+}
+
+export function programImage(id: string, fallback: SiteImage = images.education): SiteImage {
+  return images.programsById[id] || fallback;
+}
+
+export function hubImage(id: string): SiteImage {
+  if (id === 'sisters') return images.hubs.sisters;
+  if (id === 'youth') return images.hubs.youth;
+  if (id === 'seniors') return images.hubs.seniors;
+  return images.community;
+}
+
+export function eventThumb(id: string): SiteImage {
+  return images.eventsById[id] || images.events;
 }
