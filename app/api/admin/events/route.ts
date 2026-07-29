@@ -51,10 +51,13 @@ export async function POST(req: Request) {
       .toLowerCase()
       .replace(/[^a-z0-9-]+/g, '-') || `event-${Date.now()}`;
 
+  const hubRaw = String(body.hub || '').trim().toLowerCase();
+  const hub = hubRaw === 'youth' || hubRaw === 'sisters' || hubRaw === 'seniors' ? hubRaw : null;
+
   getDb()
     .prepare(
-      `INSERT INTO events (id, title, date_label, summary, badge, location, status, recurring, details_json, schedule_kind, image_src, starts_at, ends_at, sort_order, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+      `INSERT INTO events (id, title, date_label, summary, badge, location, status, recurring, details_json, schedule_kind, image_src, starts_at, ends_at, hub, sort_order, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
     )
     .run(
       id,
@@ -70,6 +73,7 @@ export async function POST(req: Request) {
       imageSrc,
       body.startsAt || body.starts_at || null,
       body.endsAt || body.ends_at || null,
+      hub,
       Number(body.sortOrder ?? body.sort_order ?? 0),
     );
 
@@ -111,12 +115,15 @@ export async function PUT(req: Request) {
 
   const finalImage = imageSrc === undefined ? existing.image_src : imageSrc;
 
+  const hubRaw = String(body.hub || '').trim().toLowerCase();
+  const hub = hubRaw === 'youth' || hubRaw === 'sisters' || hubRaw === 'seniors' ? hubRaw : null;
+
   getDb()
     .prepare(
       `UPDATE events SET
         title = ?, date_label = ?, summary = ?, badge = ?, location = ?, status = ?,
         recurring = ?, details_json = ?, schedule_kind = ?, image_src = ?,
-        starts_at = ?, ends_at = ?, sort_order = ?, updated_at = datetime('now')
+        starts_at = ?, ends_at = ?, hub = ?, sort_order = ?, updated_at = datetime('now')
        WHERE id = ?`,
     )
     .run(
@@ -132,6 +139,7 @@ export async function PUT(req: Request) {
       finalImage,
       body.startsAt || body.starts_at || null,
       body.endsAt || body.ends_at || null,
+      hub,
       Number(body.sortOrder ?? body.sort_order ?? 0),
       id,
     );

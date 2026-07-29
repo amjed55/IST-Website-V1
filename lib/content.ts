@@ -250,6 +250,7 @@ export type EventItem = {
   imageSrc?: string;
   startsAt?: string;
   endsAt?: string;
+  hub?: 'youth' | 'sisters' | 'seniors';
 };
 
 export const events: EventItem[] = [
@@ -259,10 +260,11 @@ export const events: EventItem[] = [
     dateLabel: 'Every Friday after Isha',
     summary:
       'Small talk with refreshments, followed by basketball — a weekly night for youth to connect after Isha.',
-    badge: 'Weekly',
+    badge: 'Youth',
     location: 'Masjid Darus Salaam',
     status: 'upcoming',
     recurring: true,
+    hub: 'youth',
     details: [
       'Starts after Isha prayer',
       'Short talk with refreshments',
@@ -275,11 +277,12 @@ export const events: EventItem[] = [
     dateLabel: 'Every Saturday · Zuhr iqamah to +3 hours',
     summary:
       'Ages 16–25 · 8 weeks · Seerah talks of the Prophet ﷺ · 5v5 full-court games with scoreboard. No late entries — gym closes 30 minutes after Zuhr iqamah.',
-    badge: 'Sports',
+    badge: 'Youth',
     location: 'IST Gym',
     status: 'upcoming',
     recurring: true,
     scheduleKind: 'zuhr-window',
+    hub: 'youth',
     details: [
       'Ages 16–25',
       '8-week programme',
@@ -291,11 +294,12 @@ export const events: EventItem[] = [
   {
     id: 'sisters-volleyball',
     title: 'Sisters Drop-in Volleyball',
-    dateLabel: 'Wednesday, July 29 · 8:00–10:00 PM',
+    dateLabel: 'Wednesday, August 12 · 8:00–10:00 PM',
     summary: 'Sisters-only drop-in volleyball. Come play and connect.',
     badge: 'Sisters',
     location: 'IST Gym',
     status: 'upcoming',
+    hub: 'sisters',
     details: ['Sisters only', 'Drop-in', '8:00 PM – 10:00 PM'],
   },
   {

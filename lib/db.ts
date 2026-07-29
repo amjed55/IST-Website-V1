@@ -2,7 +2,8 @@ import Database from 'better-sqlite3';
 import fs from 'fs';
 import path from 'path';
 import bcrypt from 'bcryptjs';
-import { events as seedEvents, educationPrograms, communityPrograms, notices } from './content';
+import { notices } from './content';
+import { seedAnnouncementsExtra, seedEventsExtra, seedProgramsExtra } from './seed-data';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DB_PATH = path.join(DATA_DIR, 'ist.db');
@@ -21,6 +22,7 @@ export type DbEvent = {
   image_src: string | null;
   starts_at: string | null;
   ends_at: string | null;
+  hub: string | null;
   sort_order: number;
   updated_at: string;
 };
@@ -33,6 +35,7 @@ export type DbProgram = {
   schedule: string | null;
   tags_json: string | null;
   image_src: string | null;
+  hub: string | null;
   sort_order: number;
   updated_at: string;
 };
@@ -177,7 +180,9 @@ function schema(db: Database.Database) {
   ensureColumn(db, 'events', 'image_src', 'TEXT');
   ensureColumn(db, 'events', 'starts_at', 'TEXT');
   ensureColumn(db, 'events', 'ends_at', 'TEXT');
+  ensureColumn(db, 'events', 'hub', 'TEXT');
   ensureColumn(db, 'programs', 'image_src', 'TEXT');
+  ensureColumn(db, 'programs', 'hub', 'TEXT');
   ensureColumn(db, 'site_settings', 'updated_at', 'TEXT');
 
   // Backfill role if null after migration
@@ -185,6 +190,150 @@ function schema(db: Database.Database) {
     db.prepare(`UPDATE admins SET role = 'admin' WHERE role IS NULL OR role = ''`).run();
   } catch {
     /* ignore */
+  }
+}
+
+function enrichDemoContent(db: Database.Database) {
+  const versionRow = db.prepare(`SELECT value FROM site_settings WHERE key = 'demo_seed_version'`).get() as
+    | { value: string }
+    | undefined;
+  const currentVersion = Number(versionRow?.value || 0);
+  const TARGET_VERSION = 3;
+  const refreshDemo = currentVersion < TARGET_VERSION;
+
+  const insertEvent = db.prepare(`
+    INSERT OR IGNORE INTO events
+      (id, title, date_label, summary, badge, location, status, recurring, details_json, schedule_kind, starts_at, ends_at, hub, sort_order)
+    VALUES
+      (@id, @title, @date_label, @summary, @badge, @location, @status, @recurring, @details_json, @schedule_kind, @starts_at, @ends_at, @hub, @sort_order)
+  `);
+  const refreshEvent = db.prepare(`
+    UPDATE events SET
+      title = @title,
+      date_label = @date_label,
+      summary = @summary,
+      badge = @badge,
+      location = @location,
+      status = @status,
+      recurring = @recurring,
+      details_json = @details_json,
+      schedule_kind = @schedule_kind,
+      starts_at = @starts_at,
+      ends_at = @ends_at,
+      hub = COALESCE(@hub, hub),
+      sort_order = @sort_order,
+      updated_at = datetime('now')
+    WHERE id = @id
+  `);
+
+  seedEventsExtra.forEach((e, i) => {
+    const row = {
+      id: e.id,
+      title: e.title,
+      date_label: e.dateLabel,
+      summary: e.summary,
+      badge: e.badge || null,
+      location: e.location || null,
+      status: e.status,
+      recurring: e.recurring ? 1 : 0,
+      details_json: e.details ? JSON.stringify(e.details) : null,
+      schedule_kind: e.scheduleKind || null,
+      starts_at: e.startsAt || null,
+      ends_at: e.endsAt || null,
+      hub: e.hub || null,
+      sort_order: e.sortOrder ?? i,
+    };
+    insertEvent.run(row);
+    if (refreshDemo) refreshEvent.run(row);
+    else if (e.hub) {
+      db.prepare(`UPDATE events SET hub = COALESCE(hub, ?) WHERE id = ?`).run(e.hub, e.id);
+    }
+  });
+
+  const insertProgram = db.prepare(`
+    INSERT OR IGNORE INTO programs
+      (id, category, title, summary, schedule, tags_json, hub, sort_order)
+    VALUES
+      (@id, @category, @title, @summary, @schedule, @tags_json, @hub, @sort_order)
+  `);
+  const refreshProgram = db.prepare(`
+    UPDATE programs SET
+      category = @category,
+      title = @title,
+      summary = @summary,
+      schedule = @schedule,
+      tags_json = @tags_json,
+      hub = COALESCE(@hub, hub),
+      sort_order = @sort_order,
+      updated_at = datetime('now')
+    WHERE id = @id
+  `);
+
+  seedProgramsExtra.forEach((p, i) => {
+    const row = {
+      id: p.id,
+      category: p.category,
+      title: p.title,
+      summary: p.summary,
+      schedule: p.schedule || null,
+      tags_json: p.tags ? JSON.stringify(p.tags) : null,
+      hub: p.hub || null,
+      sort_order: p.sortOrder ?? i,
+    };
+    insertProgram.run(row);
+    if (refreshDemo) refreshProgram.run(row);
+    else if (p.hub) {
+      db.prepare(`UPDATE programs SET hub = COALESCE(hub, ?) WHERE id = ?`).run(p.hub, p.id);
+    }
+  });
+
+  const updateHubProgram = db.prepare(`UPDATE programs SET hub = COALESCE(hub, ?) WHERE id = ?`);
+  const updateHubEvent = db.prepare(`UPDATE events SET hub = COALESCE(hub, ?) WHERE id = ?`);
+  updateHubProgram.run('youth', 'youth');
+  updateHubProgram.run('sisters', 'sisters');
+  updateHubProgram.run('seniors', 'seniors');
+  for (const id of [
+    'youth-friday',
+    'brothers-basketball',
+    'youth-quran-circle',
+    'youth-leadership',
+    'youth-camp-past',
+    'youth-qiyam-past',
+  ]) {
+    updateHubEvent.run('youth', id);
+  }
+  for (const id of [
+    'sisters-volleyball',
+    'sisters-halaqa',
+    'sisters-fitness',
+    'sisters-book-club',
+    'sisters-iftar-past',
+    'sisters-self-care',
+    'sisters-retreat-past',
+  ]) {
+    updateHubEvent.run('sisters', id);
+  }
+  for (const id of ['seniors-tea', 'seniors-health', 'seniors-quran', 'seniors-outing-past']) {
+    updateHubEvent.run('seniors', id);
+  }
+
+  const existing = new Set(
+    (db.prepare('SELECT message FROM announcements').all() as { message: string }[]).map(
+      (r) => r.message,
+    ),
+  );
+  const insertAnn = db.prepare(
+    `INSERT INTO announcements (message, is_active, sort_order, source) VALUES (?, 1, ?, 'local')`,
+  );
+  seedAnnouncementsExtra.forEach((msg, i) => {
+    if (!existing.has(msg)) insertAnn.run(msg, 100 + i);
+  });
+
+  if (refreshDemo) {
+    db.prepare(
+      `INSERT INTO site_settings (key, value, updated_at) VALUES ('demo_seed_version', ?, datetime('now'))
+       ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = datetime('now')`,
+    ).run(String(TARGET_VERSION));
   }
 }
 
@@ -197,77 +346,6 @@ function seed(db: Database.Database) {
     db.prepare(
       `INSERT INTO admins (username, password_hash, display_name, role) VALUES (?, ?, ?, 'admin')`,
     ).run(username, hash, 'Site Admin');
-  }
-
-  const eventCount = db.prepare('SELECT COUNT(*) as c FROM events').get() as { c: number };
-  if (eventCount.c === 0) {
-    const insert = db.prepare(`
-      INSERT INTO events (id, title, date_label, summary, badge, location, status, recurring, details_json, schedule_kind, starts_at, ends_at, sort_order)
-      VALUES (@id, @title, @date_label, @summary, @badge, @location, @status, @recurring, @details_json, @schedule_kind, @starts_at, @ends_at, @sort_order)
-    `);
-    const endsMap: Record<string, { starts?: string; ends?: string }> = {
-      'sisters-volleyball': {
-        starts: '2026-07-29T20:00:00-04:00',
-        ends: '2026-07-29T22:00:00-04:00',
-      },
-      'badminton-dropin': {
-        starts: '2026-07-28T20:00:00-04:00',
-        ends: '2026-07-28T22:00:00-04:00',
-      },
-    };
-    seedEvents.forEach((e, i) => {
-      const times = endsMap[e.id] || {};
-      insert.run({
-        id: e.id,
-        title: e.title,
-        date_label: e.dateLabel,
-        summary: e.summary,
-        badge: e.badge || null,
-        location: e.location || null,
-        status: e.status,
-        recurring: e.recurring ? 1 : 0,
-        details_json: e.details ? JSON.stringify(e.details) : null,
-        schedule_kind: e.scheduleKind || null,
-        starts_at: times.starts || null,
-        ends_at: times.ends || null,
-        sort_order: i,
-      });
-    });
-  } else {
-    // Backfill ends_at for known one-off events if missing
-    const patch = db.prepare(`UPDATE events SET starts_at = COALESCE(starts_at, ?), ends_at = COALESCE(ends_at, ?) WHERE id = ?`);
-    patch.run('2026-07-29T20:00:00-04:00', '2026-07-29T22:00:00-04:00', 'sisters-volleyball');
-    patch.run('2026-07-28T20:00:00-04:00', '2026-07-28T22:00:00-04:00', 'badminton-dropin');
-  }
-
-  const programCount = db.prepare('SELECT COUNT(*) as c FROM programs').get() as { c: number };
-  if (programCount.c === 0) {
-    const insert = db.prepare(`
-      INSERT INTO programs (id, category, title, summary, schedule, tags_json, sort_order)
-      VALUES (@id, @category, @title, @summary, @schedule, @tags_json, @sort_order)
-    `);
-    educationPrograms.forEach((p, i) => {
-      insert.run({
-        id: p.id,
-        category: 'education',
-        title: p.title,
-        summary: p.summary,
-        schedule: p.schedule || null,
-        tags_json: p.tags ? JSON.stringify(p.tags) : null,
-        sort_order: i,
-      });
-    });
-    communityPrograms.forEach((p, i) => {
-      insert.run({
-        id: p.id,
-        category: 'community',
-        title: p.title,
-        summary: p.summary,
-        schedule: p.schedule || null,
-        tags_json: p.tags ? JSON.stringify(p.tags) : null,
-        sort_order: i,
-      });
-    });
   }
 
   const mediaCount = db.prepare('SELECT COUNT(*) as c FROM media').get() as { c: number };
@@ -297,9 +375,7 @@ function seed(db: Database.Database) {
 
   const settingsCount = db.prepare('SELECT COUNT(*) as c FROM site_settings').get() as { c: number };
   if (settingsCount.c === 0) {
-    const insert = db.prepare(
-      `INSERT INTO site_settings (key, value) VALUES (?, ?)`,
-    );
+    const insert = db.prepare(`INSERT INTO site_settings (key, value) VALUES (?, ?)`);
     insert.run('hero_eyebrow', 'Masjid Darus Salaam');
     insert.run('hero_title', 'Islamic Society of Toronto');
     insert.run(
@@ -307,8 +383,13 @@ function seed(db: Database.Database) {
       "Faith, knowledge, and community — serving Toronto's Muslim families since 1995.",
     );
     insert.run('maintenance_mode', '0');
-    insert.run('maintenance_message', 'The website is undergoing maintenance. Please check back shortly.');
+    insert.run(
+      'maintenance_message',
+      'The website is undergoing maintenance. Please check back shortly.',
+    );
   }
+
+  enrichDemoContent(db);
 }
 
 /** Mark non-recurring events past when ends_at (or starts_at) has passed. */
@@ -391,6 +472,21 @@ export function listPrograms(category?: string) {
       .all(category) as DbProgram[];
   }
   return db.prepare('SELECT * FROM programs ORDER BY category, sort_order ASC').all() as DbProgram[];
+}
+
+export function listEventsByHub(hub: string) {
+  expirePastEvents();
+  return getDb()
+    .prepare(
+      `SELECT * FROM events WHERE hub = ? ORDER BY status ASC, sort_order ASC, updated_at DESC`,
+    )
+    .all(hub) as DbEvent[];
+}
+
+export function listProgramsByHub(hub: string) {
+  return getDb()
+    .prepare(`SELECT * FROM programs WHERE hub = ? ORDER BY sort_order ASC`)
+    .all(hub) as DbProgram[];
 }
 
 export function listMedia() {

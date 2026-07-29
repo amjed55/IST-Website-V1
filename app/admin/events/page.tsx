@@ -17,6 +17,7 @@ type EventRow = {
   image_src: string | null;
   starts_at: string | null;
   ends_at: string | null;
+  hub: string | null;
   sort_order: number;
 };
 
@@ -33,6 +34,7 @@ const emptyForm = {
   schedule_kind: '',
   starts_at: '',
   ends_at: '',
+  hub: '',
   sort_order: 0,
   image_src: '',
 };
@@ -90,6 +92,7 @@ export default function AdminEventsPage() {
       schedule_kind: ev.schedule_kind || '',
       starts_at: toLocalInput(ev.starts_at),
       ends_at: toLocalInput(ev.ends_at),
+      hub: ev.hub || '',
       sort_order: ev.sort_order || 0,
       image_src: ev.image_src || '',
     });
@@ -203,6 +206,16 @@ export default function AdminEventsPage() {
             <option value="">No special schedule</option>
             <option value="zuhr-window">Zuhr iqamah window</option>
           </select>
+          <select
+            value={form.hub}
+            onChange={(e) => setForm({ ...form, hub: e.target.value })}
+            className="border border-white/15 bg-black/20 px-3 py-2"
+          >
+            <option value="">No hub</option>
+            <option value="youth">Youth Hub</option>
+            <option value="sisters">Sisters&apos; Hub</option>
+            <option value="seniors">Seniors Hub</option>
+          </select>
           <label className="flex items-center gap-2 text-sm text-white/70">
             <input
               type="checkbox"
@@ -265,6 +278,7 @@ export default function AdminEventsPage() {
                 <div>
                   <p className="text-xs uppercase tracking-wider text-ist-teal-light">
                     {ev.status} {ev.recurring ? '· recurring' : ''} {ev.badge ? `· ${ev.badge}` : ''}
+                    {ev.hub ? ` · ${ev.hub}` : ''}
                   </p>
                   <h3 className="mt-1 font-display text-xl">{ev.title}</h3>
                   <p className="text-sm text-white/55">{ev.date_label}</p>

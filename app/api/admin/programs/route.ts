@@ -41,10 +41,13 @@ export async function POST(req: Request) {
   const category =
     body.category === 'community' || body.category === 'service' ? body.category : 'education';
 
+  const hubRaw = String(body.hub || '').trim().toLowerCase();
+  const hub = hubRaw === 'youth' || hubRaw === 'sisters' || hubRaw === 'seniors' ? hubRaw : null;
+
   getDb()
     .prepare(
-      `INSERT INTO programs (id, category, title, summary, schedule, tags_json, image_src, sort_order, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+      `INSERT INTO programs (id, category, title, summary, schedule, tags_json, image_src, hub, sort_order, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
     )
     .run(
       id,
@@ -63,6 +66,7 @@ export async function POST(req: Request) {
           )
         : null,
       imageSrc,
+      hub,
       Number(body.sortOrder ?? body.sort_order ?? 0),
     );
 
@@ -106,10 +110,13 @@ export async function PUT(req: Request) {
   const category =
     body.category === 'community' || body.category === 'service' ? body.category : 'education';
 
+  const hubRaw = String(body.hub || '').trim().toLowerCase();
+  const hub = hubRaw === 'youth' || hubRaw === 'sisters' || hubRaw === 'seniors' ? hubRaw : null;
+
   getDb()
     .prepare(
       `UPDATE programs SET category = ?, title = ?, summary = ?, schedule = ?, tags_json = ?,
-       image_src = ?, sort_order = ?, updated_at = datetime('now') WHERE id = ?`,
+       image_src = ?, hub = ?, sort_order = ?, updated_at = datetime('now') WHERE id = ?`,
     )
     .run(
       category,
@@ -127,6 +134,7 @@ export async function PUT(req: Request) {
           )
         : null,
       finalImage,
+      hub,
       Number(body.sortOrder ?? body.sort_order ?? 0),
       id,
     );

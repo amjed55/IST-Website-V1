@@ -11,6 +11,7 @@ type Program = {
   schedule: string | null;
   tags_json: string | null;
   image_src: string | null;
+  hub: string | null;
   sort_order: number;
 };
 
@@ -21,6 +22,7 @@ const empty = {
   summary: '',
   schedule: '',
   tags: '',
+  hub: '',
   image_src: '',
   sort_order: 0,
 };
@@ -56,6 +58,7 @@ export default function AdminProgramsPage() {
       summary: p.summary,
       schedule: p.schedule || '',
       tags: p.tags_json ? (JSON.parse(p.tags_json) as string[]).join(', ') : '',
+      hub: p.hub || '',
       image_src: p.image_src || '',
       sort_order: p.sort_order || 0,
     });
@@ -129,6 +132,16 @@ export default function AdminProgramsPage() {
             onChange={(e) => setForm({ ...form, tags: e.target.value })}
             className="border border-white/15 bg-black/20 px-3 py-2"
           />
+          <select
+            value={form.hub}
+            onChange={(e) => setForm({ ...form, hub: e.target.value })}
+            className="border border-white/15 bg-black/20 px-3 py-2"
+          >
+            <option value="">No hub</option>
+            <option value="youth">Youth Hub</option>
+            <option value="sisters">Sisters&apos; Hub</option>
+            <option value="seniors">Seniors Hub</option>
+          </select>
           <label className="text-sm text-white/70 md:col-span-2">
             Poster / picture
             <input
@@ -171,7 +184,10 @@ export default function AdminProgramsPage() {
                   <img src={p.image_src} alt="" className="hidden h-20 w-20 object-cover sm:block" />
                 )}
                 <div>
-                  <p className="text-xs uppercase tracking-wider text-ist-teal-light">{p.category}</p>
+                  <p className="text-xs uppercase tracking-wider text-ist-teal-light">
+                    {p.category}
+                    {p.hub ? ` · ${p.hub}` : ''}
+                  </p>
                   <h3 className="mt-1 font-display text-xl">{p.title}</h3>
                   {p.schedule && <p className="text-sm text-ist-gold/90">{p.schedule}</p>}
                   <p className="mt-2 max-w-2xl text-sm text-white/70">{p.summary}</p>
