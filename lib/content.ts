@@ -26,11 +26,11 @@ export const links = {
     'https://www.instagram.com/islamicsocietyoftoronto',
   prayerClock:
     process.env.NEXT_PUBLIC_PRAYER_CLOCK_EMBED_URL ||
-    'http://localhost:5000/classic',
+    'http://142.93.61.217/classic',
   prayerApi:
     process.env.NEXT_PUBLIC_PRAYER_CLOCK_API_URL ||
     process.env.NEXT_PUBLIC_PRAYER_CLOCK_EMBED_URL?.replace(/\/classic\/?$/, '') ||
-    'http://localhost:5000',
+    'http://142.93.61.217',
 };
 
 export type NavItem = {

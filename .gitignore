@@ -29,3 +29,5 @@
 
 # typescript
 next-env.d.ts
+data/
+public/uploads/

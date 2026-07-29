@@ -5,36 +5,38 @@ Marketing site for **Islamic Society of Toronto (Masjid Darus Salaam)**.
 ## Stack
 
 - Next.js (App Router) + TypeScript + Tailwind CSS + Framer Motion
+- SQLite database (`data/ist.db`) for events, programmes, media, announcements
+- Admin CMS at `/admin` (events, programmes, pictures)
 - Forms → `POST /api/forms` → email `mamjed@myist.org` (Resend when configured)
-- Prayer times embed: `http://142.93.61.217/classic`
+- Prayer times + Classic widget from central Prayer Clock: `http://142.93.61.217`
 
 ## Setup
 
 ```bash
-cd "C:\Users\Moham\Desktop\Tech Projects\IST-Website-V1"
 npm install
-copy .env.example .env.local
+cp .env.example .env.local
 npm run dev
 ```
 
 Open **http://localhost:3000**
 
-### Prayer Clock (local widget)
+### Admin
 
-The `/prayer-times` page embeds the Classic board from your Prayer Clock app:
+- URL: `/admin/login`
+- Default credentials (change in `.env.local`): `admin` / `ist-admin-2026`
 
-```bash
-cd "C:\Users\Moham\Desktop\Tech Projects\Prayer-Clock\Widget\backend"
-.\.venv\Scripts\activate
-python run.py
+### Prayer Clock
+
+The sticky iqamah banner and `/prayer-times` Classic embed read from the central Prayer Clock API:
+
+```
+NEXT_PUBLIC_PRAYER_CLOCK_API_URL=http://142.93.61.217
+NEXT_PUBLIC_PRAYER_CLOCK_EMBED_URL=http://142.93.61.217/classic
 ```
 
-Board URL: `http://localhost:5000/classic`  
-Set `NEXT_PUBLIC_PRAYER_CLOCK_EMBED_URL` in `.env.local` if your clock runs elsewhere.
+Repo reference: https://github.com/amjed55/prayer-clock
 
 ### Email (production)
-
-Set in `.env.local`:
 
 ```
 FORM_TO_EMAIL=mamjed@myist.org
@@ -42,8 +44,6 @@ RESEND_API_KEY=re_xxx
 RESEND_FROM_EMAIL=IST Website <your-verified-sender>
 ```
 
-Without `RESEND_API_KEY`, forms still succeed locally and log to the server console.
-
 ## Key routes
 
-`/`, `/prayer-times`, `/about`, `/education`, `/community`, `/services`, `/events`, `/careers`, `/get-involved`, `/contact`, `/visit`, `/privacy`
+`/`, `/prayer-times`, `/about`, `/education`, `/community`, `/services`, `/events`, `/careers`, `/get-involved`, `/contact`, `/visit`, `/privacy`, `/admin`

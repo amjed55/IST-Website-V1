@@ -17,48 +17,48 @@ export const images = {
   },
   hero: {
     src: '/images/hero.jpg',
-    alt: 'Peaceful mosque interior with soft light',
+    alt: 'Empty mosque prayer hall with arched columns and warm light',
   },
   visit: {
     src: '/images/visit.jpg',
-    alt: 'Welcoming path toward a house of worship',
+    alt: 'Ornate mosque doorway with Islamic geometric carving',
   },
   education: {
     src: '/images/education.jpg',
-    alt: 'Open Qur’an for Islamic education',
+    alt: 'Holy Quran with gold calligraphy on a wooden stand',
   },
   community: {
     src: '/images/community.jpg',
-    alt: 'Community gathering in fellowship',
+    alt: 'Mosque exterior and empty courtyard at golden hour',
   },
   services: {
     src: '/images/services.jpg',
-    alt: 'Quiet mosque hall ready for prayer',
+    alt: 'Mosque mihrab niche with geometric tilework',
   },
   about: {
     src: '/images/about.jpg',
-    alt: 'Architectural detail of a mosque dome',
+    alt: 'Holy Quran with ornate gold cover',
   },
   events: {
     src: '/images/events.jpg',
-    alt: 'People collaborating on community work',
+    alt: 'Illuminated mosque dome and minaret at night',
   },
   pillars: {
     education: {
       src: '/images/pillar-education.jpg',
-      alt: 'Learning and mentorship',
+      alt: 'Holy Quran for Islamic education',
     },
     community: {
       src: '/images/pillar-community.jpg',
-      alt: 'Friends and community together',
+      alt: 'Mosque exterior representing community',
     },
     services: {
       src: '/images/pillar-services.jpg',
-      alt: 'Calm morning light for reflection',
+      alt: 'Mihrab architecture for life services',
     },
     visit: {
       src: '/images/pillar-visit.jpg',
-      alt: 'Journey and arrival',
+      alt: 'Mosque entrance for visitors',
     },
   },
   eventsById: {

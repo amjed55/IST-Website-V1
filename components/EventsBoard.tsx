@@ -106,12 +106,28 @@ function EventCard({ item, muted }: { item: EventItem; muted?: boolean }) {
 
 export function EventsBoard({ showHeader = true }: { showHeader?: boolean }) {
   const [tab, setTab] = useState<Tab>('upcoming');
+  const [dbEvents, setDbEvents] = useState<EventItem[] | null>(null);
 
-  const upcoming = useMemo(
-    () => events.filter((e) => e.status === 'upcoming'),
-    [],
-  );
-  const past = useMemo(() => events.filter((e) => e.status === 'past'), []);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/content/events');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled && Array.isArray(data.events)) setDbEvents(data.events);
+      } catch {
+        /* fall back to static */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const all = dbEvents || events;
+  const upcoming = useMemo(() => all.filter((e) => e.status === 'upcoming'), [all]);
+  const past = useMemo(() => all.filter((e) => e.status === 'past'), [all]);
   const list = tab === 'upcoming' ? upcoming : past;
 
   return (

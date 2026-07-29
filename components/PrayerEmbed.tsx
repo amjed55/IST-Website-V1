@@ -62,7 +62,7 @@ export function PrayerEmbed() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ist-teal-light">
             Live Classic board
           </p>
-          <p className="text-sm text-white/70">Masjid Prayer Clock · local widget</p>
+          <p className="text-sm text-white/70">Masjid Prayer Clock · central board</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button href={embed} variant="teal" external className="!px-4 !py-2 text-xs">
@@ -90,9 +90,9 @@ export function PrayerEmbed() {
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 p-6 text-center text-white">
             <h2 className="font-display text-3xl">Prayer Clock not reachable</h2>
             <p className="max-w-md text-sm text-white/75">
-              Start the Prayer Clock app on port 5000, then retry. From{' '}
-              <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">Prayer-Clock/Widget/backend</code>{' '}
-              run <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">python run.py</code>.
+              The Classic widget is served from the central Prayer Clock at{' '}
+              <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">{embed}</code>. Check
+              connectivity, then retry.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Button href={embed} variant="teal" external>

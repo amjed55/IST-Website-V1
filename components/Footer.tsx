@@ -114,6 +114,9 @@ export function Footer() {
           <Link href="/privacy" className="text-xs text-white/35 transition hover:text-white/65">
             Privacy policy
           </Link>
+          <Link href="/admin/login" className="text-xs text-white/25 transition hover:text-white/55">
+            Admin
+          </Link>
         </div>
       </div>
     </footer>

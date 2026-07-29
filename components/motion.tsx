@@ -33,8 +33,8 @@ export function FadeUp({
     <motion.div
       id={id}
       className={className}
-      initial={{ opacity: 0, y: reduce ? 0 : y }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: reduce ? 0 : y, filter: reduce ? 'none' : 'blur(6px)' }}
+      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
       viewport={{ once: true, amount: 0.1 }}
       transition={{ duration: reduce ? 0 : duration, delay: reduce ? 0 : delay, ease }}
     >
@@ -224,7 +224,17 @@ export function AnimatedCounter({
 }
 
 export function PageTransition({ children }: { children: ReactNode }) {
-  return <>{children}</>;
+  const reduce = useReducedMotion();
+  return (
+    <motion.div
+      className="reveal-on-load"
+      initial={reduce ? false : { opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reduce ? 0 : 0.65, ease }}
+    >
+      {children}
+    </motion.div>
+  );
 }
 
 /** --- Scroll progress bar ---------------------------------------------- */
