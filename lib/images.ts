@@ -70,6 +70,18 @@ export const images = {
       src: '/images/event-youth.jpg',
       alt: 'Youth connecting as a group',
     },
+    'brothers-basketball': {
+      src: '/images/event-youth.jpg',
+      alt: 'Brothers basketball at IST',
+    },
+    'sisters-volleyball': {
+      src: '/images/event-youth.jpg',
+      alt: 'Sisters volleyball at IST',
+    },
+    'badminton-dropin': {
+      src: '/images/events.jpg',
+      alt: 'Badminton drop-in at IST',
+    },
     'operating-donate': {
       src: '/images/event-donate.jpg',
       alt: 'Supporting the masjid community',
@@ -92,12 +104,14 @@ export const images = {
 } as const;
 
 export function pillarImage(title: string): SiteImage {
-  const key = title.toLowerCase().replace(/\s+/g, '') as keyof typeof images.pillars;
   const map: Record<string, SiteImage> = {
+    marriageservices: images.pillars.services,
+    funeralservices: images.pillars.services,
     education: images.pillars.education,
     community: images.pillars.community,
     lifeservices: images.pillars.services,
     visit: images.pillars.visit,
   };
+  const key = title.toLowerCase().replace(/\s+/g, '');
   return map[key] || images.pillars.visit;
 }

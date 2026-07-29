@@ -1,21 +1,15 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
-import { links, site } from '@/lib/content';
+import { links, primaryNav, site } from '@/lib/content';
 import { connectLinks } from '@/lib/links';
 import { connectIcons, IconPrayer } from './icons';
-import { FadeUp, Stagger, StaggerItem } from './motion';
+import { FadeUp } from './motion';
 
-const quickLinks = [
-  ['Prayer Times', '/prayer-times'],
-  ['Visit & Parking', '/visit'],
-  ['Events', '/events'],
-  ['Education', '/education'],
-  ['Community', '/community'],
-  ['Careers', '/careers'],
-  ['Get Involved', '/get-involved'],
-  ['Contact', '/contact'],
+const menuLinks = [
+  ...primaryNav.map((item) => [item.label, item.href] as const),
+  ['Prayer Times', '/prayer-times'] as const,
+  ['Careers', '/careers'] as const,
 ];
 
 export function Footer() {
@@ -31,13 +25,9 @@ export function Footer() {
         <FadeUp y={32} className="grid gap-12 py-16 md:grid-cols-3">
           {/* Brand */}
           <div>
-            <Image
-              src="/brand/ist-logo.png"
-              alt="Islamic Society of Toronto"
-              width={100}
-              height={100}
-              className="h-16 w-auto rounded-lg bg-white object-contain p-2"
-            />
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ist-teal-light">
+              Contact
+            </p>
             <p className="mt-5 font-display text-2xl leading-snug">{site.name}</p>
             <p className="mt-1 text-sm text-white/55">{site.masjid}</p>
             <div className="mt-5 space-y-1.5 text-sm text-white/60">
@@ -55,15 +45,15 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Quick links */}
+          {/* Menu */}
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ist-teal-light">
-              Quick links
+              Menu
             </p>
-            <nav className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2.5">
-              {quickLinks.map(([label, href]) => (
+            <nav className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2.5" aria-label="Footer menu">
+              {menuLinks.map(([label, href]) => (
                 <Link
-                  key={href}
+                  key={`${label}-${href}`}
                   href={href}
                   className="text-sm text-white/65 transition hover:text-white"
                 >

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { programSnapshot } from '@/lib/content';
 import { educationSubsections } from '@/lib/subsections';
 import { images } from '@/lib/images';
 import { Badge, Button, Section } from '@/components/ui';
@@ -18,6 +19,34 @@ export default function EducationPage() {
         title="Islamic Education at IST"
         description="From evening Madressa to full-time Hifz and Alim programmes — select a programme below to learn more or register your interest."
       />
+
+      {/* Mirrored from homepage: complete Islamic education snapshot */}
+      <section className="section-band-green">
+        <div className="container-ist py-14 sm:py-16">
+          <FadeUp>
+            <span className="text-xs font-semibold uppercase tracking-[0.22em] text-ist-teal-light">
+              Education &amp; programmes
+            </span>
+            <h2 className="mt-4 font-display text-4xl text-white sm:text-5xl">
+              A complete Islamic education
+            </h2>
+            <p className="mt-3 max-w-xl text-base text-white/65 leading-relaxed">
+              From evening Madressa and Sunday classes to full-time Hifz, the multi-year Alim programme, and year-round community outreach.
+            </p>
+          </FadeUp>
+
+          <Stagger staggerDelay={0.06} className="mt-10 grid gap-px sm:grid-cols-2 lg:grid-cols-3 bg-white/10">
+            {programSnapshot.map((title) => (
+              <StaggerItem key={title}>
+                <div className="flex items-center gap-3 bg-ist-green px-5 py-4 transition hover:bg-ist-green-deep/80">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-ist-gold" />
+                  <span className="text-base font-medium text-white/90">{title}</span>
+                </div>
+              </StaggerItem>
+            ))}
+          </Stagger>
+        </div>
+      </section>
 
       <Section>
         <Stagger staggerDelay={0.07} className="divide-y divide-ist-green/8">

@@ -12,6 +12,7 @@ type Props = {
   title: ReactNode;
   description?: string;
   actions?: ReactNode;
+  siteMap?: ReactNode;
   compact?: boolean;
   align?: 'left' | 'center';
   showScrollCue?: boolean;
@@ -59,6 +60,7 @@ export function PageHero({
   title,
   description,
   actions,
+  siteMap,
   compact = false,
   align = 'left',
   showScrollCue,
@@ -83,11 +85,12 @@ export function PageHero({
   } max-w-3xl`;
 
   const contentClass = `container-ist relative z-10 flex flex-col justify-end ${
-    compact ? 'py-12 sm:py-14' : 'pb-20 pt-28 sm:pb-28 sm:pt-36'
+    compact ? 'py-12 sm:py-14' : 'pb-16 pt-24 sm:pb-24 sm:pt-32'
   } ${align === 'center' ? 'items-center text-center' : ''}`;
 
   const descDelay = titleIsString ? 0.3 + wordCount * 0.12 + 0.1 : 0.5;
   const actionsDelay = descDelay + 0.15;
+  const mapDelay = actionsDelay + 0.12;
 
   return (
     <section
@@ -170,6 +173,18 @@ export function PageHero({
             className={`mt-8 flex flex-wrap gap-4 ${align === 'center' ? 'justify-center' : ''}`}
           >
             {actions}
+          </motion.div>
+        )}
+
+        {/* Site map / quick links */}
+        {siteMap && (
+          <motion.div
+            initial={{ opacity: 0, y: reduce ? 0 : 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: reduce ? 0 : mapDelay, duration: 0.7, ease }}
+            className="mt-10 w-full max-w-4xl"
+          >
+            {siteMap}
           </motion.div>
         )}
       </motion.div>

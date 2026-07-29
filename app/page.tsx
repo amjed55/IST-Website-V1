@@ -1,13 +1,16 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import {
+  connectThroughIst,
+  hubs,
   links,
   pillars,
   programSnapshot,
   site,
+  siteMapLinks,
 } from '@/lib/content';
 import { images, pillarImage } from '@/lib/images';
-import { Button, Badge, Section } from '@/components/ui';
+import { Button, Section } from '@/components/ui';
 import {
   AnimatedCounter,
   FadeUp,
@@ -15,8 +18,7 @@ import {
   Stagger,
   StaggerItem,
 } from '@/components/motion';
-import { EventsCarousel } from '@/components/EventsCarousel';
-import { QrConnectStrip } from '@/components/QrConnectStrip';
+import { EventsBoard } from '@/components/EventsBoard';
 import { PageHero } from '@/components/PageHero';
 import { NoticeStrip } from '@/components/NoticeStrip';
 import { MediaBand } from '@/components/MediaBand';
@@ -25,7 +27,7 @@ const yearsServing = new Date().getFullYear() - 1995;
 
 const stats = [
   { value: yearsServing, suffix: '+', label: 'Years serving the community' },
-  { value: 5, suffix: '', label: 'Daily prayers, every day' },
+  { value: 5, suffix: 'k+', label: 'Congregants per week' },
   { value: programSnapshot.length, suffix: '+', label: 'Active programmes' },
 ];
 
@@ -48,10 +50,35 @@ export default function HomePage() {
             </Button>
           </>
         }
+        siteMap={
+          <nav aria-label="Site map">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/55">
+              Explore IST
+            </p>
+            <ul className="mt-3 flex flex-wrap gap-x-1 gap-y-2">
+              {siteMapLinks.map((item, i) => (
+                <li key={item.href} className="flex items-center text-sm">
+                  {i > 0 && <span className="mx-2 text-white/25" aria-hidden>|</span>}
+                  <Link
+                    href={item.href}
+                    className="text-white/80 underline-offset-4 transition hover:text-white hover:underline"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        }
       />
 
+      {/* ── Events (directly below banner) ───────────────────────────── */}
+      <Section className="section-band !pt-12">
+        <EventsBoard />
+      </Section>
+
       {/* ── Stats bar ────────────────────────────────────────────────── */}
-      <div className="border-b border-ist-green/8 bg-white">
+      <div className="border-y border-ist-green/8 bg-white">
         <div className="container-ist">
           <Stagger staggerDelay={0.1} className="grid divide-x divide-ist-green/8 sm:grid-cols-3">
             {stats.map((s) => (
@@ -75,16 +102,6 @@ export default function HomePage() {
         <NoticeStrip />
       </Section>
 
-      {/* ── Events ───────────────────────────────────────────────────── */}
-      <Section className="section-band">
-        <EventsCarousel />
-        <FadeUp delay={0.08} className="mt-6 text-right">
-          <Link href="/events" className="text-sm font-semibold text-ist-teal hover:underline">
-            View all events →
-          </Link>
-        </FadeUp>
-      </Section>
-
       {/* ── Pillars ──────────────────────────────────────────────────── */}
       <Section>
         <FadeUp>
@@ -93,7 +110,7 @@ export default function HomePage() {
             How we serve our community
           </h2>
           <p className="mt-3 max-w-2xl text-base text-ist-ink/65 leading-relaxed">
-            From Islamic education and youth programmes to life services and directions to 20 Overlea Blvd.
+            Marriage and funeral services, Islamic education, and community programmes for every stage of life.
           </p>
         </FadeUp>
 
@@ -103,7 +120,6 @@ export default function HomePage() {
             return (
               <StaggerItem key={p.href}>
                 <Link href={p.href} className="group block">
-                  {/* Image */}
                   <div className="relative aspect-[4/3] overflow-hidden">
                     <Image
                       src={img.src}
@@ -113,7 +129,6 @@ export default function HomePage() {
                       className="object-cover transition duration-700 group-hover:scale-[1.06]"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-ist-green-deep/80 via-ist-green-deep/15 to-transparent" />
-                    {/* Hover arrow */}
                     <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/0 text-white/0 transition duration-300 group-hover:bg-white/15 group-hover:text-white/90">
                       →
                     </span>
@@ -121,7 +136,6 @@ export default function HomePage() {
                       {p.title}
                     </h3>
                   </div>
-                  {/* Body */}
                   <div className="border-x border-b border-ist-green/8 bg-white px-4 py-4">
                     <p className="text-sm leading-relaxed text-ist-ink/65">{p.body}</p>
                     <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-ist-teal transition-all duration-200 group-hover:gap-2">
@@ -132,6 +146,36 @@ export default function HomePage() {
               </StaggerItem>
             );
           })}
+        </Stagger>
+      </Section>
+
+      {/* ── Hubs ─────────────────────────────────────────────────────── */}
+      <Section className="section-band">
+        <FadeUp>
+          <span className="eyebrow">Community hubs</span>
+          <h2 className="mt-4 font-display text-4xl text-ist-green sm:text-5xl">Hubs</h2>
+          <p className="mt-3 max-w-xl text-base text-ist-ink/65 leading-relaxed">
+            Dedicated spaces for sisters, youth, and seniors.
+          </p>
+        </FadeUp>
+
+        <Stagger staggerDelay={0.1} className="mt-10 grid gap-6 md:grid-cols-3">
+          {hubs.map((hub) => (
+            <StaggerItem key={hub.id}>
+              <Link
+                href={hub.href}
+                className="group block border-t-2 border-ist-gold/60 pt-5 transition hover:border-ist-teal"
+              >
+                <h3 className="font-display text-2xl text-ist-green group-hover:text-ist-teal">
+                  {hub.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-ist-ink/65">{hub.body}</p>
+                <span className="mt-4 inline-flex text-sm font-semibold text-ist-teal">
+                  Visit hub →
+                </span>
+              </Link>
+            </StaggerItem>
+          ))}
         </Stagger>
       </Section>
 
@@ -169,13 +213,62 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Connect (QR) ─────────────────────────────────────────────── */}
-      <Section className="section-band">
-        <QrConnectStrip />
+      {/* ── Connect through IST ──────────────────────────────────────── */}
+      <Section id="connect">
+        <FadeUp>
+          <span className="eyebrow">Get involved</span>
+          <h2 className="mt-4 font-display text-4xl text-ist-green sm:text-5xl">
+            Connect through IST
+          </h2>
+          <p className="mt-3 max-w-xl text-base text-ist-ink/65 leading-relaxed">
+            Volunteer, donate, or explore careers — three ways to strengthen the masjid.
+          </p>
+        </FadeUp>
+
+        <Stagger staggerDelay={0.1} className="mt-10 grid gap-8 md:grid-cols-3">
+          {connectThroughIst.map((item) => {
+            const href = item.external ? item.externalHref || links.donate : item.href;
+            const className = 'group block';
+            const body = (
+              <>
+                <h3 className="font-display text-3xl text-ist-green transition group-hover:text-ist-teal">
+                  {item.title}
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-ist-ink/65">{item.body}</p>
+                <span className="mt-4 inline-flex text-sm font-semibold text-ist-teal">
+                  {item.title === 'Donate' ? 'Donate now →' : `Open ${item.title.toLowerCase()} →`}
+                </span>
+              </>
+            );
+
+            if (item.external) {
+              return (
+                <StaggerItem key={item.title}>
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={className}
+                  >
+                    {body}
+                  </a>
+                </StaggerItem>
+              );
+            }
+
+            return (
+              <StaggerItem key={item.title}>
+                <Link href={href} className={className}>
+                  {body}
+                </Link>
+              </StaggerItem>
+            );
+          })}
+        </Stagger>
       </Section>
 
       {/* ── Visit / Map ──────────────────────────────────────────────── */}
-      <Section>
+      <Section className="section-band">
         <MediaBand image={images.visit} eyebrow="Visit us" title="Join us at 20 Overlea Blvd">
           <p className="text-ist-ink/70">{site.address}</p>
           <p className="text-sm font-medium text-ist-gold">
