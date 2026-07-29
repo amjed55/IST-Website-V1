@@ -10,6 +10,7 @@ import {
   siteMapLinks,
 } from '@/lib/content';
 import { images, pillarImage } from '@/lib/images';
+import { getMediaByKey, getSiteSettings } from '@/lib/db';
 import { Button, Section } from '@/components/ui';
 import {
   AnimatedCounter,
@@ -32,14 +33,43 @@ const stats = [
 ];
 
 export default function HomePage() {
+  const settings = getSiteSettings();
+  const heroMedia = getMediaByKey('hero');
+  const heroImage = heroMedia
+    ? { src: heroMedia.src, alt: heroMedia.alt }
+    : images.hero;
+
+  if (settings.maintenance_mode === '1') {
+    return (
+      <PageTransition>
+        <section className="container-ist flex min-h-[70vh] flex-col items-center justify-center py-20 text-center">
+          <p className="eyebrow justify-center">Maintenance</p>
+          <h1 className="mt-4 font-display text-4xl text-ist-green sm:text-5xl">
+            We&apos;ll be right back
+          </h1>
+          <p className="mt-4 max-w-xl text-ist-ink/65">
+            {settings.maintenance_message ||
+              'The website is undergoing maintenance. Please check back shortly.'}
+          </p>
+          <Button href="/prayer-times" variant="primary" className="mt-8">
+            View prayer times
+          </Button>
+        </section>
+      </PageTransition>
+    );
+  }
+
   return (
     <PageTransition>
       {/* ── Hero ─────────────────────────────────────────────────────── */}
       <PageHero
-        image={images.hero}
-        eyebrow={site.masjid}
-        title={site.name}
-        description="Faith, knowledge, and community — serving Toronto's Muslim families since 1995."
+        image={heroImage}
+        eyebrow={settings.hero_eyebrow || site.masjid}
+        title={settings.hero_title || site.name}
+        description={
+          settings.hero_description ||
+          "Faith, knowledge, and community — serving Toronto's Muslim families since 1995."
+        }
         actions={
           <>
             <Button href="/visit" variant="light">

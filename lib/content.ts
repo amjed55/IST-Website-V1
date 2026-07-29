@@ -247,6 +247,9 @@ export type EventItem = {
   details?: string[];
   /** When set, schedule window is derived from today's Zuhr iqamah */
   scheduleKind?: 'zuhr-window';
+  imageSrc?: string;
+  startsAt?: string;
+  endsAt?: string;
 };
 
 export const events: EventItem[] = [

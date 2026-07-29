@@ -8,6 +8,10 @@ const links = [
   { href: '/admin/events', label: 'Events' },
   { href: '/admin/programs', label: 'Programs' },
   { href: '/admin/media', label: 'Pictures' },
+  { href: '/admin/announcements', label: 'Announcements' },
+  { href: '/admin/settings', label: 'Site' },
+  { href: '/admin/users', label: 'Users' },
+  { href: '/admin/logs', label: 'Logs' },
 ];
 
 export function AdminNav({ title, username }: { title: string; username: string }) {

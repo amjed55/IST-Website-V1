@@ -18,6 +18,8 @@ export async function GET(req: Request) {
     details: e.details_json ? (JSON.parse(e.details_json) as string[]) : undefined,
     scheduleKind: e.schedule_kind || undefined,
     imageSrc: e.image_src || undefined,
+    startsAt: e.starts_at || undefined,
+    endsAt: e.ends_at || undefined,
   }));
   return NextResponse.json({ events });
 }

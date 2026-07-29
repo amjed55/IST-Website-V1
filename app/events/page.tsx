@@ -16,7 +16,7 @@ export default function EventsPage() {
         image={images.events}
         eyebrow="Events"
         title="Events &amp; announcements"
-        description="Upcoming and recurring programmes, plus past events in a separate tab."
+        description="Browse the carousel for upcoming programmes, or open Past for greyed finished events."
       />
 
       <Section>

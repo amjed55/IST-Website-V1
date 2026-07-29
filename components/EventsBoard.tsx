@@ -30,7 +30,7 @@ function ZuhrWindowNote() {
           `Today’s window: ${format12(iqamah)} – ${format12(end)} · Gym entry closes ${format12(close)}`,
         );
       } catch {
-        /* Prayer clock optional */
+        /* optional */
       }
     })();
     return () => {
@@ -45,40 +45,39 @@ function ZuhrWindowNote() {
       </p>
     );
   }
-
   return <p className="mt-2 text-sm font-medium text-ist-teal">{label}</p>;
 }
 
-function EventCard({ item, muted }: { item: EventItem; muted?: boolean }) {
-  const thumb = images.eventsById[item.id] || images.events;
+function eventImage(item: EventItem) {
+  if (item.imageSrc) return { src: item.imageSrc, alt: item.title };
+  return images.eventsById[item.id] || images.events;
+}
 
+function EventSlide({ item, muted }: { item: EventItem; muted?: boolean }) {
+  const thumb = eventImage(item);
   return (
-    <article
-      id={item.id}
-      className={`grid gap-6 border-b border-ist-green/8 py-8 last:border-0 md:grid-cols-[180px_1fr] ${
-        muted ? 'opacity-55 grayscale' : ''
-      }`}
+    <div
+      className={`grid gap-6 md:grid-cols-[240px_1fr] ${muted ? 'opacity-55 grayscale' : ''}`}
     >
-      <div className="relative hidden aspect-square overflow-hidden md:block">
-        <Image src={thumb.src} alt={thumb.alt} fill className="object-cover" sizes="180px" />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ist-green-deep/95 to-transparent px-3 pb-3 pt-6">
-          <p className="font-display text-lg leading-tight text-white">{item.dateLabel}</p>
+      <div className="relative aspect-[4/3] overflow-hidden md:aspect-auto md:min-h-[220px]">
+        <Image src={thumb.src} alt={thumb.alt} fill sizes="240px" className="object-cover" />
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ist-green-deep/95 to-transparent px-4 pb-4 pt-8 text-white">
+          <p className="text-[10px] uppercase tracking-[0.18em] text-white/55">Date</p>
+          <p className="mt-0.5 font-display text-xl leading-tight">{item.dateLabel}</p>
         </div>
       </div>
-
-      <div>
+      <div className="flex flex-col justify-center">
         <div className="flex flex-wrap items-center gap-2">
           {item.badge && <Badge>{item.badge}</Badge>}
           {item.recurring && <Badge className="bg-ist-gold/20 text-ist-green">Recurring</Badge>}
           {muted && <Badge className="bg-ist-green/10 text-ist-muted">Past</Badge>}
         </div>
         <h3 className="mt-3 font-display text-2xl text-ist-green sm:text-3xl">{item.title}</h3>
-        <p className="mt-1 text-sm font-medium text-ist-teal md:hidden">{item.dateLabel}</p>
-        <p className="mt-3 leading-relaxed text-ist-ink/65">{item.summary}</p>
+        <p className="mt-3 max-w-xl leading-relaxed text-ist-ink/65">{item.summary}</p>
         {item.scheduleKind === 'zuhr-window' && !muted && <ZuhrWindowNote />}
         {item.details && item.details.length > 0 && (
           <ul className="mt-3 space-y-1 text-sm text-ist-ink/60">
-            {item.details.map((d) => (
+            {item.details.slice(0, 3).map((d) => (
               <li key={d} className="flex gap-2">
                 <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-ist-gold" />
                 <span>{d}</span>
@@ -87,26 +86,23 @@ function EventCard({ item, muted }: { item: EventItem; muted?: boolean }) {
           </ul>
         )}
         {item.location && (
-          <p className="mt-3 flex items-center gap-1.5 text-sm text-ist-teal">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
-              <path
-                d="M7 1a4 4 0 0 1 4 4c0 3-4 8-4 8S3 8 3 5a4 4 0 0 1 4-4z"
-                stroke="currentColor"
-                strokeWidth="1.25"
-              />
-              <circle cx="7" cy="5" r="1.25" stroke="currentColor" strokeWidth="1.25" />
-            </svg>
-            {item.location}
-          </p>
+          <p className="mt-3 text-sm text-ist-teal">{item.location}</p>
         )}
+        <Link
+          href={`/events#${item.id}`}
+          className="mt-5 inline-flex text-sm font-semibold text-ist-teal underline-offset-4 hover:underline"
+        >
+          Learn more →
+        </Link>
       </div>
-    </article>
+    </div>
   );
 }
 
 export function EventsBoard({ showHeader = true }: { showHeader?: boolean }) {
   const [tab, setTab] = useState<Tab>('upcoming');
   const [dbEvents, setDbEvents] = useState<EventItem[] | null>(null);
+  const [index, setIndex] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -117,7 +113,7 @@ export function EventsBoard({ showHeader = true }: { showHeader?: boolean }) {
         const data = await res.json();
         if (!cancelled && Array.isArray(data.events)) setDbEvents(data.events);
       } catch {
-        /* fall back to static */
+        /* static fallback */
       }
     })();
     return () => {
@@ -130,9 +126,56 @@ export function EventsBoard({ showHeader = true }: { showHeader?: boolean }) {
   const past = useMemo(() => all.filter((e) => e.status === 'past'), [all]);
   const list = tab === 'upcoming' ? upcoming : past;
 
+  useEffect(() => {
+    setIndex(0);
+  }, [tab, list.length]);
+
+  useEffect(() => {
+    if (list.length < 2 || tab === 'past') return;
+    const t = setInterval(() => setIndex((i) => (i + 1) % list.length), 7000);
+    return () => clearInterval(t);
+  }, [list, tab]);
+
+  const item = list[index] || list[0];
+
+  function prev() {
+    setIndex((i) => (i - 1 + list.length) % list.length);
+  }
+  function next() {
+    setIndex((i) => (i + 1) % list.length);
+  }
+
+  const tabs = (
+    <div
+      className="inline-flex rounded-full border border-ist-green/12 bg-white p-1"
+      role="tablist"
+      aria-label="Event timeframe"
+    >
+      {(
+        [
+          ['upcoming', 'Upcoming'],
+          ['past', 'Past'],
+        ] as const
+      ).map(([id, label]) => (
+        <button
+          key={id}
+          type="button"
+          role="tab"
+          aria-selected={tab === id}
+          onClick={() => setTab(id)}
+          className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+            tab === id ? 'bg-ist-green text-white' : 'text-ist-muted hover:text-ist-green'
+          }`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
     <div id="sports">
-      {showHeader && (
+      {showHeader ? (
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <span className="eyebrow">Calendar</span>
@@ -140,84 +183,80 @@ export function EventsBoard({ showHeader = true }: { showHeader?: boolean }) {
               Upcoming events
             </h2>
             <p className="mt-2 max-w-xl text-sm text-ist-ink/60">
-              Recurring programmes and one-off gatherings — past events live in a separate tab.
+              Swipe through programmes — past events are greyed in a separate tab.
             </p>
           </div>
-          <div
-            className="inline-flex rounded-full border border-ist-green/12 bg-white p-1"
-            role="tablist"
-            aria-label="Event timeframe"
-          >
-            {(
-              [
-                ['upcoming', 'Upcoming'],
-                ['past', 'Past'],
-              ] as const
-            ).map(([id, label]) => (
+          {tabs}
+        </div>
+      ) : (
+        <div className="mb-6">{tabs}</div>
+      )}
+
+      <div className="mt-6">
+        {list.length === 0 || !item ? (
+          <p className="py-10 text-sm text-ist-muted">No {tab} events right now.</p>
+        ) : tab === 'upcoming' ? (
+          <div>
+            <div className="flex items-center justify-end gap-2">
               <button
-                key={id}
                 type="button"
-                role="tab"
-                aria-selected={tab === id}
-                onClick={() => setTab(id)}
-                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  tab === id
-                    ? 'bg-ist-green text-white'
-                    : 'text-ist-muted hover:text-ist-green'
-                }`}
+                onClick={prev}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-ist-green/15 text-ist-green/60 transition hover:border-ist-teal hover:text-ist-teal"
+                aria-label="Previous event"
               >
-                {label}
+                ‹
               </button>
+              <span className="min-w-[2.5rem] text-center text-sm text-ist-muted tabular-nums">
+                {index + 1}/{list.length}
+              </span>
+              <button
+                type="button"
+                onClick={next}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-ist-green/15 text-ist-green/60 transition hover:border-ist-teal hover:text-ist-teal"
+                aria-label="Next event"
+              >
+                ›
+              </button>
+            </div>
+
+            <div className="relative mt-4 min-h-[220px]" aria-live="polite">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, x: 28 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -28 }}
+                  transition={{ duration: 0.3, ease }}
+                >
+                  <EventSlide item={item} />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            <div className="mt-6 flex items-center gap-2" role="tablist" aria-label="Event slides">
+              {list.map((e, i) => (
+                <button
+                  key={e.id}
+                  type="button"
+                  aria-label={`Show ${e.title}`}
+                  onClick={() => setIndex(i)}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    i === index ? 'w-8 bg-ist-teal' : 'w-2 bg-ist-green/20 hover:bg-ist-green/40'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="divide-y divide-ist-green/8">
+            {list.map((e) => (
+              <div key={e.id} className="py-6">
+                <EventSlide item={e} muted />
+              </div>
             ))}
           </div>
-        </div>
-      )}
-
-      {!showHeader && (
-        <div
-          className="mb-6 inline-flex rounded-full border border-ist-green/12 bg-white p-1"
-          role="tablist"
-          aria-label="Event timeframe"
-        >
-          {(
-            [
-              ['upcoming', 'Upcoming'],
-              ['past', 'Past'],
-            ] as const
-          ).map(([id, label]) => (
-            <button
-              key={id}
-              type="button"
-              role="tab"
-              aria-selected={tab === id}
-              onClick={() => setTab(id)}
-              className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                tab === id ? 'bg-ist-green text-white' : 'text-ist-muted hover:text-ist-green'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={tab}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.28, ease }}
-          className="mt-6"
-          role="tabpanel"
-        >
-          {list.length === 0 ? (
-            <p className="py-10 text-sm text-ist-muted">No {tab} events right now.</p>
-          ) : (
-            list.map((item) => <EventCard key={item.id} item={item} muted={tab === 'past'} />)
-          )}
-        </motion.div>
-      </AnimatePresence>
+        )}
+      </div>
 
       {showHeader && (
         <div className="mt-6 text-right">

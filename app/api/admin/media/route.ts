@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { getAdminSession } from '@/lib/auth';
-import { getDb, listMedia } from '@/lib/db';
+import { getDb, listMedia, writeAudit } from '@/lib/db';
 
 async function guard() {
   return getAdminSession();
@@ -14,7 +14,8 @@ export async function GET() {
 }
 
 export async function PUT(req: Request) {
-  if (!(await guard())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await guard();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const body = await req.json();
   const key = String(body.keyName || body.key_name || '').trim();
   if (!key) return NextResponse.json({ error: 'key_name required' }, { status: 400 });
@@ -33,11 +34,13 @@ export async function PUT(req: Request) {
       `INSERT INTO media (id, key_name, src, alt, updated_at) VALUES (?, ?, ?, ?, datetime('now'))`,
     ).run(key, key, src, alt);
   }
+  writeAudit(session.username, 'update', 'media', key, alt || src);
   return NextResponse.json({ ok: true });
 }
 
 export async function POST(req: Request) {
-  if (!(await guard())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const session = await guard();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const form = await req.formData();
   const file = form.get('file');
   const keyName = String(form.get('key_name') || form.get('keyName') || '').trim();
@@ -70,5 +73,6 @@ export async function POST(req: Request) {
     ).run(safe, safe, src, alt);
   }
 
+  writeAudit(session.username, 'upload', 'media', safe, src);
   return NextResponse.json({ ok: true, src, key_name: safe });
 }

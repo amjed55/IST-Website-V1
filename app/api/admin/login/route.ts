@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminSession, verifyAdminCredentials } from '@/lib/auth';
+import { writeAudit } from '@/lib/db';
 
 export async function POST(req: Request) {
   try {
@@ -14,6 +15,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
     await createAdminSession(user.username);
+    writeAudit(user.username, 'login', 'auth', null, 'Admin signed in');
     return NextResponse.json({ ok: true, username: user.username });
   } catch (e) {
     console.error(e);
