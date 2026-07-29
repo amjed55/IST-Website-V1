@@ -9,6 +9,7 @@ const links = [
   { href: '/admin/programs', label: 'Programs' },
   { href: '/admin/media', label: 'Pictures' },
   { href: '/admin/announcements', label: 'Announcements' },
+  { href: '/admin/instagram', label: 'Instagram' },
   { href: '/admin/settings', label: 'Site' },
   { href: '/admin/users', label: 'Users' },
   { href: '/admin/logs', label: 'Logs' },

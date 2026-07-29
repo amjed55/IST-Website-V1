@@ -4,6 +4,7 @@ import path from 'path';
 import bcrypt from 'bcryptjs';
 import { notices } from './content';
 import { seedAnnouncementsExtra, seedEventsExtra, seedProgramsExtra } from './seed-data';
+import { seedInstagramPosts } from './instagram';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DB_PATH = path.join(DATA_DIR, 'ist.db');
@@ -74,6 +75,18 @@ export type DbAuditLog = {
   entity_id: string | null;
   detail: string | null;
   created_at: string;
+};
+
+export type DbInstagramPost = {
+  id: string;
+  permalink: string;
+  media_type: 'image' | 'video' | 'reel' | 'carousel';
+  caption: string | null;
+  poster_src: string | null;
+  video_src: string | null;
+  is_active: number;
+  sort_order: number;
+  updated_at: string;
 };
 
 let _db: Database.Database | null = null;
@@ -171,6 +184,18 @@ function schema(db: Database.Database) {
       detail TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
+
+    CREATE TABLE IF NOT EXISTS instagram_posts (
+      id TEXT PRIMARY KEY,
+      permalink TEXT NOT NULL,
+      media_type TEXT NOT NULL DEFAULT 'image',
+      caption TEXT,
+      poster_src TEXT,
+      video_src TEXT,
+      is_active INTEGER NOT NULL DEFAULT 1,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
   `);
 
   // Migrations for older DBs — only constant-safe column defs
@@ -198,7 +223,7 @@ function enrichDemoContent(db: Database.Database) {
     | { value: string }
     | undefined;
   const currentVersion = Number(versionRow?.value || 0);
-  const TARGET_VERSION = 3;
+  const TARGET_VERSION = 4;
   const refreshDemo = currentVersion < TARGET_VERSION;
 
   const insertEvent = db.prepare(`
@@ -327,6 +352,56 @@ function enrichDemoContent(db: Database.Database) {
   );
   seedAnnouncementsExtra.forEach((msg, i) => {
     if (!existing.has(msg)) insertAnn.run(msg, 100 + i);
+  });
+
+  const insertIg = db.prepare(`
+    INSERT OR IGNORE INTO instagram_posts
+      (id, permalink, media_type, caption, poster_src, video_src, is_active, sort_order)
+    VALUES
+      (@id, @permalink, @media_type, @caption, @poster_src, @video_src, 1, @sort_order)
+  `);
+  const refreshIg = db.prepare(`
+    UPDATE instagram_posts SET
+      permalink = @permalink,
+      media_type = @media_type,
+      caption = @caption,
+      poster_src = COALESCE(@poster_src, poster_src),
+      video_src = COALESCE(@video_src, video_src),
+      sort_order = @sort_order,
+      updated_at = datetime('now')
+    WHERE id = @id
+  `);
+  for (const post of seedInstagramPosts) {
+    const row = {
+      id: post.id,
+      permalink: post.permalink,
+      media_type: post.media_type,
+      caption: post.caption,
+      poster_src: post.poster_src,
+      video_src: post.video_src || null,
+      sort_order: post.sort_order,
+    };
+    insertIg.run(row);
+    if (refreshDemo) refreshIg.run(row);
+  }
+
+  // Env-configured post URLs (comma-separated) — preferred live embeds
+  const envPosts = (process.env.NEXT_PUBLIC_INSTAGRAM_POSTS || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  envPosts.forEach((url, i) => {
+    const id = `env-ig-${i + 1}`;
+    const media_type = /\/reel\//i.test(url) ? 'reel' : /\/p\//i.test(url) ? 'carousel' : 'image';
+    insertIg.run({
+      id,
+      permalink: url.endsWith('/') ? url : `${url}/`,
+      media_type,
+      caption: null,
+      poster_src: null,
+      video_src: null,
+      sort_order: i,
+    });
   });
 
   if (refreshDemo) {
@@ -521,6 +596,20 @@ export function listAuditLogs(limit = 100) {
   return getDb()
     .prepare(`SELECT * FROM audit_logs ORDER BY id DESC LIMIT ?`)
     .all(limit) as DbAuditLog[];
+}
+
+export function listInstagramPosts(activeOnly = true) {
+  const db = getDb();
+  if (activeOnly) {
+    return db
+      .prepare(
+        `SELECT * FROM instagram_posts WHERE is_active = 1 ORDER BY sort_order ASC, updated_at DESC`,
+      )
+      .all() as DbInstagramPost[];
+  }
+  return db
+    .prepare(`SELECT * FROM instagram_posts ORDER BY sort_order ASC, updated_at DESC`)
+    .all() as DbInstagramPost[];
 }
 
 export function getSiteSettings() {
