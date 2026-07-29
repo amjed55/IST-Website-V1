@@ -22,7 +22,7 @@ export function Footer() {
             'calc(var(--mobile-cta-h, 0px) + var(--prayer-bar-h, 0px) + 2rem + env(safe-area-inset-bottom))',
         }}
       >
-        <FadeUp y={32} className="grid gap-12 py-16 md:grid-cols-3">
+        <FadeUp y={28} className="grid gap-12 py-16 md:grid-cols-3">
           {/* Brand */}
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ist-teal-light">

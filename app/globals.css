@@ -124,13 +124,9 @@ body {
   animation: float-soft 5s ease-in-out infinite;
 }
 
-.reveal-on-load {
-  animation: fade-rise 0.9s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
-}
-
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .shimmer, .float-soft, .reveal-on-load { animation: none !important; }
+  .shimmer, .float-soft { animation: none !important; }
 }
 
 @layer components {
