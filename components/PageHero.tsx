@@ -14,6 +14,8 @@ type Props = {
   actions?: ReactNode;
   siteMap?: ReactNode;
   compact?: boolean;
+  /** Medium banner — shorter than full-screen, taller than compact */
+  banner?: boolean;
   align?: 'left' | 'center';
   showScrollCue?: boolean;
 };
@@ -62,6 +64,7 @@ export function PageHero({
   actions,
   siteMap,
   compact = false,
+  banner = false,
   align = 'left',
   showScrollCue,
 }: Props) {
@@ -72,32 +75,44 @@ export function PageHero({
     target: sectionRef,
     offset: ['start start', 'end start'],
   });
-  const imageY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
-  const textY = useTransform(scrollYProgress, [0, 1], ['0%', compact ? '8%' : '15%']);
+  const imageY = useTransform(scrollYProgress, [0, 1], ['0%', banner || compact ? '18%' : '30%']);
+  const textY = useTransform(scrollYProgress, [0, 1], ['0%', compact ? '8%' : banner ? '10%' : '15%']);
   const textOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
-  const cue = showScrollCue ?? !compact;
+  const cue = showScrollCue ?? (!compact && !banner);
   const titleIsString = typeof title === 'string';
   const wordCount = titleIsString ? title.split(' ').length : 0;
 
   const titleClass = `mt-3 font-display leading-[1.05] drop-shadow-sm ${
-    compact ? 'text-4xl sm:text-5xl' : 'text-4xl sm:text-5xl lg:text-7xl'
+    compact
+      ? 'text-4xl sm:text-5xl'
+      : banner
+        ? 'text-4xl sm:text-5xl lg:text-6xl'
+        : 'text-4xl sm:text-5xl lg:text-7xl'
   } max-w-3xl`;
 
   const contentClass = `container-ist relative z-10 flex flex-col justify-end ${
-    compact ? 'py-12 sm:py-14' : 'pb-16 pt-24 sm:pb-24 sm:pt-32'
+    compact
+      ? 'py-12 sm:py-14'
+      : banner
+        ? 'pb-10 pt-20 sm:pb-12 sm:pt-24'
+        : 'pb-16 pt-24 sm:pb-24 sm:pt-32'
   } ${align === 'center' ? 'items-center text-center' : ''}`;
 
   const descDelay = titleIsString ? 0.3 + wordCount * 0.12 + 0.1 : 0.5;
   const actionsDelay = descDelay + 0.15;
   const mapDelay = actionsDelay + 0.12;
 
+  const heightClass = compact
+    ? 'min-h-[280px] sm:min-h-[320px]'
+    : banner
+      ? 'min-h-[auto]'
+      : 'min-h-[88vh] sm:min-h-screen';
+
   return (
     <section
       ref={sectionRef}
-      className={`relative overflow-hidden text-white ${
-        compact ? 'min-h-[280px] sm:min-h-[320px]' : 'min-h-[88vh] sm:min-h-screen'
-      }`}
+      className={`relative overflow-hidden text-white ${heightClass}`}
     >
       {/* Parallax background */}
       <motion.div
@@ -170,7 +185,7 @@ export function PageHero({
             initial={{ opacity: 0, y: reduce ? 0 : 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: reduce ? 0 : actionsDelay, duration: 0.7, ease }}
-            className={`mt-8 flex flex-wrap gap-4 ${align === 'center' ? 'justify-center' : ''}`}
+            className={`mt-5 flex flex-wrap gap-3 ${align === 'center' ? 'justify-center' : ''}`}
           >
             {actions}
           </motion.div>
@@ -182,7 +197,7 @@ export function PageHero({
             initial={{ opacity: 0, y: reduce ? 0 : 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: reduce ? 0 : mapDelay, duration: 0.7, ease }}
-            className="mt-10 w-full max-w-4xl"
+            className={`mt-8 w-full ${banner ? 'max-w-none' : 'max-w-4xl'}`}
           >
             {siteMap}
           </motion.div>

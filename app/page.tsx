@@ -7,7 +7,6 @@ import {
   pillars,
   programSnapshot,
   site,
-  siteMapLinks,
 } from '@/lib/content';
 import { images, pillarImage } from '@/lib/images';
 import { getMediaByKey, getSiteSettings } from '@/lib/db';
@@ -23,6 +22,7 @@ import { EventsBoard } from '@/components/EventsBoard';
 import { PageHero } from '@/components/PageHero';
 import { NoticeStrip } from '@/components/NoticeStrip';
 import { MediaBand } from '@/components/MediaBand';
+import { HeroNavTiles } from '@/components/HeroNavTiles';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,6 +65,8 @@ export default function HomePage() {
     <PageTransition>
       {/* ── Hero ─────────────────────────────────────────────────────── */}
       <PageHero
+        banner
+        showScrollCue={false}
         image={heroImage}
         eyebrow={settings.hero_eyebrow || site.masjid}
         title={settings.hero_title || site.name}
@@ -82,26 +84,7 @@ export default function HomePage() {
             </Button>
           </>
         }
-        siteMap={
-          <nav aria-label="Site map">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/55">
-              Explore IST
-            </p>
-            <ul className="mt-3 flex flex-wrap gap-x-1 gap-y-2">
-              {siteMapLinks.map((item, i) => (
-                <li key={item.href} className="flex items-center text-sm">
-                  {i > 0 && <span className="mx-2 text-white/25" aria-hidden>|</span>}
-                  <Link
-                    href={item.href}
-                    className="text-white/80 underline-offset-4 transition hover:text-white hover:underline"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        }
+        siteMap={<HeroNavTiles />}
       />
 
       {/* ── Events (directly below banner) ───────────────────────────── */}
