@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getCareerById, careers } from '@/lib/content';
+import { getCareerById, listPublicCareers } from '@/lib/careers';
 import { images } from '@/lib/images';
 import { Badge, Button, Section } from '@/components/ui';
 import { FadeIn, PageTransition, SlideInLeft, SlideInRight } from '@/components/motion';
@@ -10,8 +10,14 @@ import { PageHero } from '@/components/PageHero';
 
 type Props = { params: Promise<{ id: string }> };
 
-export function generateStaticParams() {
-  return careers.map((c) => ({ id: c.id }));
+export const dynamic = 'force-dynamic';
+
+export async function generateStaticParams() {
+  try {
+    return listPublicCareers().map((c) => ({ id: c.id }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -25,7 +31,8 @@ export default async function CareerDetailPage({ params }: Props) {
   const job = getCareerById(id);
   if (!job) notFound();
 
-  const poster = images.careers[job.id];
+  const posterSrc = job.imageSrc || images.careers[job.id]?.src;
+  const posterAlt = images.careers[job.id]?.alt || `${job.title} posting`;
 
   return (
     <PageTransition>
@@ -131,11 +138,11 @@ export default async function CareerDetailPage({ params }: Props) {
                 </p>
               </div>
 
-              {poster && (
+              {posterSrc && (
                 <div className="relative aspect-[3/4] overflow-hidden rounded-[1.5rem] border border-ist-green/10 bg-[#f4f1ea]">
                   <Image
-                    src={poster.src}
-                    alt={poster.alt}
+                    src={posterSrc}
+                    alt={posterAlt}
                     fill
                     className="object-contain object-top p-4"
                     sizes="(max-width: 1024px) 100vw, 36vw"

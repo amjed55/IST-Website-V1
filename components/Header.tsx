@@ -99,7 +99,7 @@ export function Header() {
         {/* Desktop nav — middle column always present so CTAs stay right */}
         <div className="min-w-0">
           <nav
-            className="hidden min-w-0 items-center justify-center gap-0.5 xl:flex"
+            className="hidden min-w-0 items-center justify-center gap-0.5 lg:flex"
             aria-label="Primary"
             onMouseLeave={() => setDrop(null)}
           >
@@ -178,7 +178,7 @@ export function Header() {
 
         {/* Right actions — CTAs desktop / menu mobile */}
         <div className="flex shrink-0 items-center justify-end gap-2">
-          <div className="hidden items-center gap-2 xl:flex">
+          <div className="hidden items-center gap-2 lg:flex">
             <Link
               href="/prayer-times"
               className="inline-flex items-center gap-2 rounded-full bg-ist-teal px-4 py-2 text-xs font-semibold tracking-wide text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-ist-teal-light"
@@ -197,7 +197,7 @@ export function Header() {
             </a>
           </div>
 
-          <div className="flex items-center gap-2 xl:hidden">
+          <div className="flex items-center gap-2 lg:hidden">
             <button
               type="button"
               className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-ist-green/12 bg-white text-ist-green shadow-sm"
@@ -233,7 +233,7 @@ export function Header() {
         {open && (
           <motion.div
             id={menuId}
-            className="fixed inset-0 z-[60] xl:hidden"
+            className="fixed inset-0 z-[60] lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

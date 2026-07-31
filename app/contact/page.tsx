@@ -6,6 +6,7 @@ import { FadeUp, PageTransition, SlideInLeft, SlideInRight } from '@/components/
 import { SiteForm } from '@/components/SiteForm';
 import { QrConnectStrip } from '@/components/QrConnectStrip';
 import { PageHero } from '@/components/PageHero';
+import { InstagramFeed } from '@/components/InstagramFeed';
 
 export const metadata: Metadata = { title: 'Contact' };
 
@@ -77,6 +78,10 @@ export default function ContactPage() {
         <FadeUp delay={0.1} className="mt-16 border-t border-ist-green/8 pt-16">
           <QrConnectStrip title="Prefer WhatsApp or Instagram?" />
         </FadeUp>
+      </Section>
+
+      <Section id="social" className="section-band !pt-0">
+        <InstagramFeed />
       </Section>
     </PageTransition>
   );

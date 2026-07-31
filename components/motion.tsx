@@ -1,42 +1,71 @@
 'use client';
 
 import {
+  Children,
+  isValidElement,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
+import {
   motion,
   useReducedMotion,
   useScroll,
   useSpring,
   useTransform,
+  type HTMLMotionProps,
   type Variants,
 } from 'framer-motion';
-import { useEffect, useRef, useState, ReactNode } from 'react';
 
 export const ease = [0.21, 0.47, 0.32, 0.98] as const;
 
-/** --- FadeUp / FadeIn -------------------------------------------------- */
+const revealViewport = { once: true, amount: 0.12, margin: '0px 0px -8% 0px' } as const;
+
+type RevealProps = {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+  duration?: number;
+  y?: number;
+  id?: string;
+  /** When true, animate on mount instead of waiting for scroll (above-the-fold) */
+  immediate?: boolean;
+};
+
+/** Shared fade-up used for scroll and load reveals */
 export function FadeUp({
   children,
   delay = 0,
-  duration = 0.7,
+  duration = 0.65,
   className = '',
-  y = 40,
+  y = 36,
   id,
-}: {
-  children: ReactNode;
-  delay?: number;
-  duration?: number;
-  className?: string;
-  y?: number;
-  id?: string;
-}) {
+  immediate = false,
+}: RevealProps) {
   const reduce = useReducedMotion();
+  const hidden = {
+    opacity: 0,
+    y: reduce ? 0 : y,
+  };
+  const visible = {
+    opacity: 1,
+    y: 0,
+  };
+
   return (
     <motion.div
       id={id}
       className={className}
-      initial={{ opacity: 0, y: reduce ? 0 : y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.1 }}
-      transition={{ duration: reduce ? 0 : duration, delay: reduce ? 0 : delay, ease }}
+      initial={hidden}
+      {...(immediate
+        ? { animate: visible }
+        : { whileInView: visible, viewport: revealViewport })}
+      transition={{
+        duration: reduce ? 0 : duration,
+        delay: reduce ? 0 : delay,
+        ease,
+      }}
     >
       {children}
     </motion.div>
@@ -44,6 +73,39 @@ export function FadeUp({
 }
 
 export const FadeIn = FadeUp;
+
+/** Section-level reveal (renders as <section>) */
+export function RevealSection({
+  children,
+  className = '',
+  delay = 0,
+  id,
+  y = 40,
+}: {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+  id?: string;
+  y?: number;
+}) {
+  const reduce = useReducedMotion();
+  return (
+    <motion.section
+      id={id}
+      className={className}
+      initial={{ opacity: 0, y: reduce ? 0 : y }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={revealViewport}
+      transition={{
+        duration: reduce ? 0 : 0.7,
+        delay: reduce ? 0 : delay,
+        ease,
+      }}
+    >
+      {children}
+    </motion.section>
+  );
+}
 
 /** --- Stagger container ------------------------------------------------- */
 export function Stagger({
@@ -60,7 +122,7 @@ export function Stagger({
   const variants: Variants = {
     hidden: {},
     visible: {
-      transition: { staggerChildren: reduce ? 0 : staggerDelay },
+      transition: { staggerChildren: reduce ? 0 : staggerDelay, delayChildren: reduce ? 0 : 0.05 },
     },
   };
 
@@ -69,7 +131,7 @@ export function Stagger({
       className={className}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount: 0.1 }}
+      viewport={revealViewport}
       variants={variants}
     >
       {children}
@@ -88,11 +150,11 @@ export function StaggerItem({
   const reduce = useReducedMotion();
 
   const variants: Variants = {
-    hidden: { opacity: 0, y: reduce ? 0 : 30 },
+    hidden: { opacity: 0, y: reduce ? 0 : 28 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: reduce ? 0 : 0.6, ease },
+      transition: { duration: reduce ? 0 : 0.55, ease },
     },
   };
 
@@ -116,15 +178,15 @@ export function SlideIn({
   delay?: number;
 }) {
   const reduce = useReducedMotion();
-  const x = from === 'left' ? -60 : 60;
+  const x = from === 'left' ? -48 : 48;
 
   return (
     <motion.div
       className={className}
       initial={{ opacity: 0, x: reduce ? 0 : x }}
       whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, amount: 0.1 }}
-      transition={{ duration: reduce ? 0 : 0.8, delay: reduce ? 0 : delay, ease }}
+      viewport={revealViewport}
+      transition={{ duration: reduce ? 0 : 0.7, delay: reduce ? 0 : delay, ease }}
     >
       {children}
     </motion.div>
@@ -154,10 +216,10 @@ export function ScaleIn({
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, scale: reduce ? 1 : 0.95 }}
+      initial={{ opacity: 0, scale: reduce ? 1 : 0.96 }}
       whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: reduce ? 0 : 0.7, delay: reduce ? 0 : delay, ease }}
+      viewport={revealViewport}
+      transition={{ duration: reduce ? 0 : 0.65, delay: reduce ? 0 : delay, ease }}
     >
       {children}
     </motion.div>
@@ -193,7 +255,7 @@ export function AnimatedCounter({
           io.disconnect();
         }
       },
-      { threshold: 0.4 },
+      { threshold: 0.35 },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -201,7 +263,10 @@ export function AnimatedCounter({
 
   useEffect(() => {
     if (!started) return;
-    if (reduce) { setCount(value); return; }
+    if (reduce) {
+      setCount(value);
+      return;
+    }
     let startTime: number | undefined;
     let frame = 0;
     const tick = (ts: number) => {
@@ -218,13 +283,45 @@ export function AnimatedCounter({
 
   return (
     <span ref={ref} className={className}>
-      {prefix}{value >= 1000 ? count.toLocaleString() : count}{suffix}
+      {prefix}
+      {value >= 1000 ? count.toLocaleString() : count}
+      {suffix}
     </span>
   );
 }
 
+/**
+ * Wraps each top-level page block so it fades in on load (if in view)
+ * and as the user scrolls further down the page.
+ */
 export function PageTransition({ children }: { children: ReactNode }) {
-  return <>{children}</>;
+  const reduce = useReducedMotion();
+  const blocks = Children.toArray(children);
+
+  return (
+    <>
+      {blocks.map((child, i) => {
+        const key =
+          isValidElement(child) && child.key != null ? String(child.key) : `block-${i}`;
+        const props: HTMLMotionProps<'div'> = {
+          initial: { opacity: 0, y: reduce ? 0 : 40 },
+          whileInView: { opacity: 1, y: 0 },
+          viewport: revealViewport,
+          transition: {
+            duration: reduce ? 0 : 0.7,
+            // Stagger only the first few in-view blocks on load; later blocks fade as they enter
+            delay: reduce ? 0 : (i < 4 ? i * 0.09 : 0),
+            ease,
+          },
+        };
+        return (
+          <motion.div key={key} {...props}>
+            {child}
+          </motion.div>
+        );
+      })}
+    </>
+  );
 }
 
 /** --- Scroll progress bar ---------------------------------------------- */
@@ -242,13 +339,24 @@ export function ScrollProgress() {
 }
 
 /** --- Parallax image ---------------------------------------------------- */
-export function ParallaxImage({ children, className = '' }: { children: ReactNode; className?: string }) {
+export function ParallaxImage({
+  children,
+  className = '',
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
 
-  if (reduce) return <div ref={ref} className={className}>{children}</div>;
+  if (reduce)
+    return (
+      <div ref={ref} className={className}>
+        {children}
+      </div>
+    );
   return (
     <div ref={ref} className={`overflow-hidden ${className}`}>
       <motion.div className="h-full w-full scale-[1.08] will-change-transform" style={{ y }}>
@@ -258,6 +366,18 @@ export function ParallaxImage({ children, className = '' }: { children: ReactNod
   );
 }
 
-export function MotionSection({ children, className = '', id }: { children: ReactNode; className?: string; id?: string }) {
-  return <FadeUp id={id} className={className}>{children}</FadeUp>;
+export function MotionSection({
+  children,
+  className = '',
+  id,
+}: {
+  children: ReactNode;
+  className?: string;
+  id?: string;
+}) {
+  return (
+    <FadeUp id={id} className={className}>
+      {children}
+    </FadeUp>
+  );
 }
