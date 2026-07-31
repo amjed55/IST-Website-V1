@@ -61,11 +61,16 @@ function Tile({
           alt={post.caption || 'Instagram post'}
           className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
           loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
           onError={() => setImgFailed(true)}
         />
       ) : (
-        <div className="flex h-full items-center justify-center bg-gradient-to-br from-ist-green to-ist-green-deep">
+        <div className="flex h-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-ist-green to-ist-green-deep px-3 text-center">
           <IconInstagram className="h-10 w-10 text-white/80" />
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-white/70">
+            @{USERNAME}
+          </span>
         </div>
       )}
 

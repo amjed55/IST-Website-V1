@@ -73,19 +73,36 @@ async function curlGet(url: string): Promise<{ status: number; body: string }> {
 
 /** Resolve a post thumbnail via Instagram's media redirect. */
 export async function resolveInstagramMediaUrl(code: string): Promise<string | null> {
-  const url = `https://www.instagram.com/p/${encodeURIComponent(code)}/media/?size=m`;
-  try {
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: { 'User-Agent': UA },
-      redirect: 'manual',
-      cache: 'no-store',
-    });
-    const loc = res.headers.get('location');
-    if (loc && /^https?:\/\//i.test(loc)) return loc;
-    if (res.url && /cdninstagram\.com|fbcdn\.net/i.test(res.url)) return res.url;
-  } catch {
-    /* ignore */
+  const candidates = [
+    `https://www.instagram.com/p/${encodeURIComponent(code)}/media/?size=l`,
+    `https://www.instagram.com/p/${encodeURIComponent(code)}/media/?size=m`,
+    `https://www.instagram.com/reel/${encodeURIComponent(code)}/media/?size=l`,
+    `https://www.instagram.com/reel/${encodeURIComponent(code)}/media/?size=m`,
+  ];
+
+  for (const url of candidates) {
+    try {
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'User-Agent': UA,
+          Accept: 'image/*,*/*;q=0.8',
+          Referer: 'https://www.instagram.com/',
+        },
+        redirect: 'manual',
+        cache: 'no-store',
+      });
+      const loc = res.headers.get('location');
+      if (loc && /^https?:\/\//i.test(loc) && /cdninstagram\.com|fbcdn\.net/i.test(loc)) {
+        return loc;
+      }
+      if (res.url && /cdninstagram\.com|fbcdn\.net/i.test(res.url)) return res.url;
+      // Some environments follow redirects and return the image directly
+      const type = res.headers.get('content-type') || '';
+      if (res.ok && type.startsWith('image/')) return url;
+    } catch {
+      /* try next candidate */
+    }
   }
   return null;
 }
