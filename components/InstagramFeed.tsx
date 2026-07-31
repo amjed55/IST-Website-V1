@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { links } from '@/lib/content';
 import { Button } from '@/components/ui';
 import { FadeUp, Stagger, StaggerItem } from '@/components/motion';
@@ -225,85 +226,124 @@ export function InstagramFeed({
       </FadeUp>
 
       {expanded && (
-        <div
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-ist-green-deep/85 p-3 backdrop-blur-sm sm:p-6"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Expanded Instagram post"
-          onClick={() => setExpanded(null)}
-        >
-          <div
-            className="relative flex max-h-[92vh] w-full max-w-xl flex-col overflow-hidden bg-white shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between gap-3 border-b border-ist-green/10 px-4 py-3">
-              <div className="flex min-w-0 items-center gap-2">
-                <InstagramIconBadge />
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-ist-green">@{USERNAME}</p>
-                  <p className="truncate text-xs text-ist-muted">
-                    {expanded.mediaType}
-                    {expanded.caption ? ` · ${expanded.caption}` : ''}
-                  </p>
-                </div>
-              </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <a
-                  href={expanded.permalink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hidden rounded-full border border-ist-green/15 px-3 py-1.5 text-xs font-semibold text-ist-green hover:bg-ist-green/5 sm:inline-flex"
-                >
-                  Open on Instagram
-                </a>
-                <button
-                  type="button"
-                  aria-label="Close"
-                  onClick={() => setExpanded(null)}
-                  className="rounded-full bg-ist-green p-2 text-white hover:bg-ist-green-deep"
-                >
-                  <CloseIcon />
-                </button>
-              </div>
-            </div>
-
-            <div className="min-h-0 flex-1 overflow-auto bg-[#0a1f1b]">
-              {expanded.videoSrc ? (
-                // eslint-disable-next-line jsx-a11y/media-has-caption
-                <video
-                  key={expanded.videoSrc}
-                  className="max-h-[75vh] w-full object-contain"
-                  src={expanded.videoSrc}
-                  poster={expanded.posterSrc}
-                  controls
-                  autoPlay
-                  playsInline
-                />
-              ) : expanded.embedSrc ? (
-                <iframe
-                  title={expanded.caption || 'Instagram post'}
-                  src={expanded.embedSrc}
-                  className="h-[min(75vh,720px)] w-full border-0 bg-white"
-                  allow="autoplay; encrypted-media; clipboard-write; picture-in-picture"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                />
-              ) : (
-                <div className="p-8 text-center text-white/80">
-                  <p>Preview unavailable.</p>
-                  <a
-                    href={expanded.permalink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-3 inline-block text-ist-teal-light underline"
-                  >
-                    View on Instagram
-                  </a>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <InstagramExpandModal post={expanded} onClose={() => setExpanded(null)} />
       )}
     </div>
+  );
+}
+
+function InstagramExpandModal({
+  post,
+  onClose,
+}: {
+  post: FeedPost;
+  onClose: () => void;
+}) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[200] flex items-end justify-center bg-ist-green-deep/90 p-0 backdrop-blur-sm sm:items-center sm:p-4 md:p-6"
+      style={{
+        paddingTop: 'max(0.75rem, env(safe-area-inset-top))',
+        paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))',
+      }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Expanded Instagram post"
+      onClick={onClose}
+    >
+      <div
+        className="relative flex h-[min(96dvh,960px)] w-full max-w-lg flex-col overflow-hidden bg-white shadow-2xl sm:h-[min(92dvh,900px)] sm:rounded-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-ist-green/10 px-3 py-3 sm:px-4">
+          <div className="flex min-w-0 items-center gap-2">
+            <InstagramIconBadge />
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-ist-green">@{USERNAME}</p>
+              <p className="truncate text-xs text-ist-muted">
+                {post.mediaType}
+                {post.caption ? ` · ${post.caption}` : ''}
+              </p>
+            </div>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <a
+              href={post.permalink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full border border-ist-green/15 px-3 py-1.5 text-xs font-semibold text-ist-green hover:bg-ist-green/5"
+            >
+              Open
+            </a>
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={onClose}
+              className="rounded-full bg-ist-green p-2 text-white hover:bg-ist-green-deep"
+            >
+              <CloseIcon />
+            </button>
+          </div>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-white">
+          {post.videoSrc ? (
+            // eslint-disable-next-line jsx-a11y/media-has-caption
+            <video
+              key={post.videoSrc}
+              className="max-h-full w-full bg-black object-contain"
+              src={post.videoSrc}
+              poster={post.posterSrc}
+              controls
+              autoPlay
+              playsInline
+            />
+          ) : post.embedSrc ? (
+            <iframe
+              title={post.caption || 'Instagram post'}
+              src={post.embedSrc}
+              className="block w-full border-0 bg-white"
+              style={{ height: 'min(820px, max(560px, 78dvh))', minHeight: 560 }}
+              allow="autoplay; encrypted-media; clipboard-write; picture-in-picture"
+              referrerPolicy="strict-origin-when-cross-origin"
+            />
+          ) : (
+            <div className="p-8 text-center text-ist-ink/70">
+              <p>Preview unavailable.</p>
+              <a
+                href={post.permalink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-block text-ist-teal underline"
+              >
+                View on Instagram
+              </a>
+            </div>
+          )}
+        </div>
+
+        <div className="flex shrink-0 items-center justify-between gap-3 border-t border-ist-green/10 bg-ist-cream/90 px-4 py-3">
+          <p className="truncate text-xs text-ist-muted">Scroll inside if the post is tall</p>
+          <a
+            href={post.permalink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-ist-teal hover:underline"
+          >
+            <IconInstagram className="h-3.5 w-3.5" />
+            View on Instagram
+          </a>
+        </div>
+      </div>
+    </div>,
+    document.body,
   );
 }
