@@ -25,6 +25,11 @@ export type DbEvent = {
   ends_at: string | null;
   hub: string | null;
   sort_order: number;
+  calendar_enabled: number;
+  recurrence_rule: string | null;
+  recurrence_until: string | null;
+  venue: string | null;
+  published: number;
   updated_at: string;
 };
 
@@ -38,6 +43,13 @@ export type DbProgram = {
   image_src: string | null;
   hub: string | null;
   sort_order: number;
+  calendar_enabled: number;
+  starts_at: string | null;
+  ends_at: string | null;
+  recurrence_rule: string | null;
+  recurrence_until: string | null;
+  venue: string | null;
+  published: number;
   updated_at: string;
 };
 
@@ -163,6 +175,11 @@ function schema(db: Database.Database) {
       image_src TEXT,
       starts_at TEXT,
       ends_at TEXT,
+      calendar_enabled INTEGER NOT NULL DEFAULT 0,
+      recurrence_rule TEXT,
+      recurrence_until TEXT,
+      venue TEXT,
+      published INTEGER NOT NULL DEFAULT 1,
       sort_order INTEGER NOT NULL DEFAULT 0,
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
@@ -175,6 +192,13 @@ function schema(db: Database.Database) {
       schedule TEXT,
       tags_json TEXT,
       image_src TEXT,
+      calendar_enabled INTEGER NOT NULL DEFAULT 0,
+      starts_at TEXT,
+      ends_at TEXT,
+      recurrence_rule TEXT,
+      recurrence_until TEXT,
+      venue TEXT,
+      published INTEGER NOT NULL DEFAULT 1,
       sort_order INTEGER NOT NULL DEFAULT 0,
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
@@ -255,8 +279,20 @@ function schema(db: Database.Database) {
   ensureColumn(db, 'events', 'starts_at', 'TEXT');
   ensureColumn(db, 'events', 'ends_at', 'TEXT');
   ensureColumn(db, 'events', 'hub', 'TEXT');
+  ensureColumn(db, 'events', 'calendar_enabled', 'INTEGER NOT NULL DEFAULT 0');
+  ensureColumn(db, 'events', 'recurrence_rule', 'TEXT');
+  ensureColumn(db, 'events', 'recurrence_until', 'TEXT');
+  ensureColumn(db, 'events', 'venue', 'TEXT');
+  ensureColumn(db, 'events', 'published', 'INTEGER NOT NULL DEFAULT 1');
   ensureColumn(db, 'programs', 'image_src', 'TEXT');
   ensureColumn(db, 'programs', 'hub', 'TEXT');
+  ensureColumn(db, 'programs', 'calendar_enabled', 'INTEGER NOT NULL DEFAULT 0');
+  ensureColumn(db, 'programs', 'starts_at', 'TEXT');
+  ensureColumn(db, 'programs', 'ends_at', 'TEXT');
+  ensureColumn(db, 'programs', 'recurrence_rule', 'TEXT');
+  ensureColumn(db, 'programs', 'recurrence_until', 'TEXT');
+  ensureColumn(db, 'programs', 'venue', 'TEXT');
+  ensureColumn(db, 'programs', 'published', 'INTEGER NOT NULL DEFAULT 1');
   ensureColumn(db, 'site_settings', 'updated_at', 'TEXT');
   ensureColumn(db, 'instagram_posts', 'source', "TEXT DEFAULT 'manual'");
 

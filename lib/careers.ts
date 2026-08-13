@@ -1,6 +1,6 @@
 import type { Career } from '@/lib/content';
 import { careersEmail } from '@/lib/content';
-import { getCareer, listCareers, type DbCareer } from '@/lib/db';
+import { getCareer, listCareers, type DbCareer } from '@/lib/data';
 
 function parseLines(raw: string | null | undefined): string[] {
   if (!raw) return [];
@@ -38,21 +38,25 @@ export function dbCareerToCareer(row: DbCareer): Career {
 }
 
 /** Active openings for the public site. */
-export function listPublicCareers(): Career[] {
-  return listCareers(true).map(dbCareerToCareer);
+export async function listPublicCareers(): Promise<Career[]> {
+  return (await listCareers(true)).map(dbCareerToCareer);
 }
 
-export function getCareerById(id: string | null | undefined): Career | undefined {
+export async function getCareerById(
+  id: string | null | undefined,
+): Promise<Career | undefined> {
   if (!id) return undefined;
-  const row = getCareer(id);
+  const row = await getCareer(id);
   if (!row || !row.is_active) return undefined;
   return dbCareerToCareer(row);
 }
 
 /** Admin / apply helpers — includes inactive when requested. */
-export function getCareerByIdAny(id: string | null | undefined): Career | undefined {
+export async function getCareerByIdAny(
+  id: string | null | undefined,
+): Promise<Career | undefined> {
   if (!id) return undefined;
-  const row = getCareer(id);
+  const row = await getCareer(id);
   if (!row) return undefined;
   return dbCareerToCareer(row);
 }

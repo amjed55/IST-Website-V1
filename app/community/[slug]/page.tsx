@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { communitySubsections, findSubsection } from '@/lib/subsections';
-import { listEventsByHub, listProgramsByHub } from '@/lib/db';
+import { listEventsByHub, listProgramsByHub } from '@/lib/data';
 import { SubsectionLayout } from '@/components/SubsectionLayout';
 import { HubRelatedContent } from '@/components/HubRelatedContent';
 import { Section } from '@/components/ui';
@@ -28,8 +28,9 @@ export default async function CommunitySubsectionPage({ params }: Props) {
   if (!page) notFound();
 
   const isHub = HUB_SLUGS.has(slug);
-  const events = isHub ? listEventsByHub(slug) : [];
-  const programs = isHub ? listProgramsByHub(slug) : [];
+  const [events, programs] = isHub
+    ? await Promise.all([listEventsByHub(slug), listProgramsByHub(slug)])
+    : [[], []];
 
   return (
     <SubsectionLayout page={page}>

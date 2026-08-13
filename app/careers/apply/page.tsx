@@ -17,8 +17,8 @@ export const dynamic = 'force-dynamic';
 
 export default async function CareerApplyPage({ searchParams }: Props) {
   const { job: jobId } = await searchParams;
-  const job = getCareerById(jobId);
-  const careers = listPublicCareers();
+  const job = await getCareerById(jobId);
+  const careers = await listPublicCareers();
 
   if (!jobId) {
     return (

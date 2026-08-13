@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminSession, verifyAdminCredentials } from '@/lib/auth';
-import { writeAudit } from '@/lib/db';
+import { writeAudit } from '@/lib/data';
 
 const attempts = new Map<string, { count: number; resetAt: number }>();
 const WINDOW_MS = 15 * 60 * 1000;
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     }
     attempts.delete(attemptKey);
     await createAdminSession(user.username);
-    writeAudit(user.username, 'login', 'auth', null, 'Admin signed in');
+    await writeAudit(user.username, 'login', 'auth', null, 'Admin signed in');
     return NextResponse.json({ ok: true, username: user.username });
   } catch (e) {
     console.error(e);

@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/auth';
-import { getSiteSettings, setSiteSetting, writeAudit } from '@/lib/db';
+import { getSiteSettings, setSiteSetting, writeAudit } from '@/lib/data';
 
 export async function GET() {
   if (!(await getAdminSession())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  return NextResponse.json({ settings: getSiteSettings() });
+  return NextResponse.json({ settings: await getSiteSettings() });
 }
 
 export async function PUT(req: Request) {
@@ -16,9 +16,9 @@ export async function PUT(req: Request) {
   const entries = Object.entries(body.settings || body);
   for (const [key, value] of entries) {
     if (typeof key === 'string' && (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean')) {
-      setSiteSetting(key, String(value));
+      await setSiteSetting(key, String(value));
     }
   }
-  writeAudit(session.username, 'update', 'settings', null, `Updated ${entries.length} setting(s)`);
-  return NextResponse.json({ ok: true, settings: getSiteSettings() });
+  await writeAudit(session.username, 'update', 'settings', null, `Updated ${entries.length} setting(s)`);
+  return NextResponse.json({ ok: true, settings: await getSiteSettings() });
 }

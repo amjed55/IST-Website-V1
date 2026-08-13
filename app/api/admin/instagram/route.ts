@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/auth';
-import { getDb, listInstagramPosts, writeAudit } from '@/lib/db';
+import { listInstagramPosts, writeAudit } from '@/lib/data';
+import { dbGet, dbRun } from '@/lib/database';
 import { detectMediaType, normalizeInstagramPermalink } from '@/lib/instagram';
 import { saveUploadedFile } from '@/lib/uploads';
 
@@ -10,7 +11,7 @@ async function guard() {
 
 export async function GET() {
   if (!(await guard())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  return NextResponse.json({ posts: listInstagramPosts(false) });
+  return NextResponse.json({ posts: await listInstagramPosts(false) });
 }
 
 export async function POST(req: Request) {
@@ -67,13 +68,11 @@ export async function POST(req: Request) {
       ? body.media_type
       : detectMediaType(permalink);
 
-  getDb()
-    .prepare(
+  await dbRun(
       `INSERT INTO instagram_posts
         (id, permalink, media_type, caption, poster_src, video_src, is_active, sort_order, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
-    )
-    .run(
+    [
       id,
       permalink,
       mediaType,
@@ -82,9 +81,10 @@ export async function POST(req: Request) {
       videoSrc,
       body.is_active === false || body.is_active === '0' ? 0 : 1,
       Number(body.sort_order ?? body.sortOrder ?? 0),
-    );
+    ],
+  );
 
-  writeAudit(session.username, 'create', 'instagram_post', id, permalink);
+  await writeAudit(session.username, 'create', 'instagram_post', id, permalink);
   return NextResponse.json({ ok: true, id });
 }
 
@@ -125,15 +125,11 @@ export async function PUT(req: Request) {
   const id = String(body.id || '');
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
 
-  const existing = getDb()
-    .prepare('SELECT * FROM instagram_posts WHERE id = ?')
-    .get(id) as
-    | {
-        poster_src: string | null;
-        video_src: string | null;
-        permalink: string;
-      }
-    | undefined;
+  const existing = await dbGet<{
+    poster_src: string | null;
+    video_src: string | null;
+    permalink: string;
+  }>('SELECT * FROM instagram_posts WHERE id = ?', [id]);
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const rawPermalink = String(body.permalink || existing.permalink).trim();
@@ -149,15 +145,13 @@ export async function PUT(req: Request) {
       ? body.media_type
       : detectMediaType(permalink);
 
-  getDb()
-    .prepare(
+  await dbRun(
       `UPDATE instagram_posts SET
         permalink = ?, media_type = ?, caption = ?,
         poster_src = ?, video_src = ?, is_active = ?, sort_order = ?,
         updated_at = datetime('now')
        WHERE id = ?`,
-    )
-    .run(
+    [
       permalink,
       mediaType,
       body.caption ? String(body.caption) : null,
@@ -166,9 +160,10 @@ export async function PUT(req: Request) {
       body.is_active === false || body.is_active === '0' ? 0 : 1,
       Number(body.sort_order ?? body.sortOrder ?? 0),
       id,
-    );
+    ],
+  );
 
-  writeAudit(session.username, 'update', 'instagram_post', id, permalink);
+  await writeAudit(session.username, 'update', 'instagram_post', id, permalink);
   return NextResponse.json({ ok: true });
 }
 
@@ -177,7 +172,7 @@ export async function DELETE(req: Request) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const id = new URL(req.url).searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
-  getDb().prepare('DELETE FROM instagram_posts WHERE id = ?').run(id);
-  writeAudit(session.username, 'delete', 'instagram_post', id);
+  await dbRun('DELETE FROM instagram_posts WHERE id = ?', [id]);
+  await writeAudit(session.username, 'delete', 'instagram_post', id);
   return NextResponse.json({ ok: true });
 }

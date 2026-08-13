@@ -1,14 +1,14 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
-import { getDb } from './db';
+import { dbGet } from './database';
 import { ADMIN_COOKIE, ADMIN_SESSION_MAX_AGE, adminJwtSecret } from './admin-session';
 
 export async function verifyAdminCredentials(username: string, password: string) {
-  const db = getDb();
-  const row = db
-    .prepare('SELECT id, username, password_hash FROM admins WHERE username = ?')
-    .get(username) as { id: number; username: string; password_hash: string } | undefined;
+  const row = await dbGet<{ id: number; username: string; password_hash: string }>(
+    'SELECT id, username, password_hash FROM admins WHERE username = ?',
+    [username],
+  );
   if (!row) return null;
   const ok = await bcrypt.compare(password, row.password_hash);
   if (!ok) return null;

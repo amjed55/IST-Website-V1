@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/auth';
-import { getDb, listMedia, writeAudit } from '@/lib/db';
+import { listMedia, writeAudit } from '@/lib/data';
+import { dbGet, dbRun } from '@/lib/database';
 import { saveUploadedImage } from '@/lib/uploads';
 
 async function guard() {
@@ -9,7 +10,7 @@ async function guard() {
 
 export async function GET() {
   if (!(await guard())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  return NextResponse.json({ media: listMedia() });
+  return NextResponse.json({ media: await listMedia() });
 }
 
 export async function PUT(req: Request) {
@@ -23,20 +24,22 @@ export async function PUT(req: Request) {
   const src = String(body.src || '').trim().slice(0, 1000);
   const alt = String(body.alt || '').trim().slice(0, 300);
   if (!src) return NextResponse.json({ error: 'src required' }, { status: 400 });
-  const db = getDb();
-  const existing = db.prepare('SELECT id FROM media WHERE key_name = ?').get(key) as
-    | { id: string }
-    | undefined;
+  const existing = await dbGet<{ id: string }>(
+    'SELECT id FROM media WHERE key_name = ?',
+    [key],
+  );
   if (existing) {
-    db.prepare(
+    await dbRun(
       `UPDATE media SET src = ?, alt = ?, updated_at = datetime('now') WHERE key_name = ?`,
-    ).run(src, alt, key);
+      [src, alt, key],
+    );
   } else {
-    db.prepare(
+    await dbRun(
       `INSERT INTO media (id, key_name, src, alt, updated_at) VALUES (?, ?, ?, ?, datetime('now'))`,
-    ).run(key, key, src, alt);
+      [key, key, src, alt],
+    );
   }
-  writeAudit(session.username, 'update', 'media', key, alt || src);
+  await writeAudit(session.username, 'update', 'media', key, alt || src);
   return NextResponse.json({ ok: true });
 }
 
@@ -67,20 +70,22 @@ export async function POST(req: Request) {
     );
   }
 
-  const db = getDb();
-  const existing = db.prepare('SELECT id FROM media WHERE key_name = ?').get(safe) as
-    | { id: string }
-    | undefined;
+  const existing = await dbGet<{ id: string }>(
+    'SELECT id FROM media WHERE key_name = ?',
+    [safe],
+  );
   if (existing) {
-    db.prepare(
+    await dbRun(
       `UPDATE media SET src = ?, alt = ?, updated_at = datetime('now') WHERE key_name = ?`,
-    ).run(src, alt, safe);
+      [src, alt, safe],
+    );
   } else {
-    db.prepare(
+    await dbRun(
       `INSERT INTO media (id, key_name, src, alt, updated_at) VALUES (?, ?, ?, ?, datetime('now'))`,
-    ).run(safe, safe, src, alt);
+      [safe, safe, src, alt],
+    );
   }
 
-  writeAudit(session.username, 'upload', 'media', safe, src);
+  await writeAudit(session.username, 'upload', 'media', safe, src);
   return NextResponse.json({ ok: true, src, key_name: safe });
 }

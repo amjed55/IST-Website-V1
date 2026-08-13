@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { listPrograms, listProgramsByHub } from '@/lib/db';
+import { listPrograms, listProgramsByHub } from '@/lib/data';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,7 +7,7 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const category = searchParams.get('category') || undefined;
   const hub = searchParams.get('hub') || undefined;
-  const rows = hub ? listProgramsByHub(hub) : listPrograms(category || undefined);
+  const rows = await (hub ? listProgramsByHub(hub) : listPrograms(category || undefined));
   const programs = rows.map((p) => ({
     id: p.id,
     category: p.category,

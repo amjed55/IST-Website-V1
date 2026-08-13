@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 
 export async function generateStaticParams() {
   try {
-    return listPublicCareers().map((c) => ({ id: c.id }));
+    return (await listPublicCareers()).map((c) => ({ id: c.id }));
   } catch {
     return [];
   }
@@ -22,13 +22,13 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const job = getCareerById(id);
+  const job = await getCareerById(id);
   return { title: job ? job.title : 'Role not found' };
 }
 
 export default async function CareerDetailPage({ params }: Props) {
   const { id } = await params;
-  const job = getCareerById(id);
+  const job = await getCareerById(id);
   if (!job) notFound();
 
   const posterSrc = job.imageSrc || images.careers[job.id]?.src;

@@ -12,8 +12,8 @@ import { IconBriefcase } from '@/components/icons';
 export const metadata: Metadata = { title: 'Careers' };
 export const dynamic = 'force-dynamic';
 
-export default function CareersPage() {
-  const careers = listPublicCareers();
+export default async function CareersPage() {
+  const careers = await listPublicCareers();
 
   return (
     <PageTransition>

@@ -10,20 +10,23 @@ import {
   listMedia,
   listPrograms,
   listAdmins,
-} from '@/lib/db';
+} from '@/lib/data';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
   const session = await requireAdminPage();
-  const events = listEvents();
-  const programs = listPrograms();
-  const media = listMedia();
-  const announcements = listAnnouncements(false);
-  const careers = listCareers(false);
-  const users = listAdmins();
-  const logs = listAuditLogs(8);
-  const settings = getSiteSettings();
+  const [events, programs, media, announcements, careers, users, logs, settings] =
+    await Promise.all([
+      listEvents(),
+      listPrograms(),
+      listMedia(),
+      listAnnouncements(false),
+      listCareers(false),
+      listAdmins(),
+      listAuditLogs(8),
+      getSiteSettings(),
+    ]);
 
   const cards = [
     { label: 'Events', value: events.length, href: '/admin/events' },

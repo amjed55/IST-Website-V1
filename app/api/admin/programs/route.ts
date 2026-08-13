@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/auth';
-import { getDb, listPrograms, writeAudit } from '@/lib/db';
+import { listPrograms, writeAudit } from '@/lib/data';
+import { dbGet, dbRun } from '@/lib/database';
 import { saveUploadedImage } from '@/lib/uploads';
 
 async function guard() {
@@ -9,7 +10,7 @@ async function guard() {
 
 export async function GET() {
   if (!(await guard())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  return NextResponse.json({ programs: listPrograms() });
+  return NextResponse.json({ programs: await listPrograms() });
 }
 
 export async function POST(req: Request) {
@@ -44,12 +45,10 @@ export async function POST(req: Request) {
   const hubRaw = String(body.hub || '').trim().toLowerCase();
   const hub = hubRaw === 'youth' || hubRaw === 'sisters' || hubRaw === 'seniors' ? hubRaw : null;
 
-  getDb()
-    .prepare(
+  await dbRun(
       `INSERT INTO programs (id, category, title, summary, schedule, tags_json, image_src, hub, sort_order, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
-    )
-    .run(
+    [
       id,
       category,
       String(body.title || 'Untitled'),
@@ -68,9 +67,10 @@ export async function POST(req: Request) {
       imageSrc,
       hub,
       Number(body.sortOrder ?? body.sort_order ?? 0),
-    );
+    ],
+  );
 
-  writeAudit(session.username, 'create', 'program', id, String(body.title || id));
+  await writeAudit(session.username, 'create', 'program', id, String(body.title || id));
   return NextResponse.json({ ok: true, id, imageSrc });
 }
 
@@ -101,9 +101,10 @@ export async function PUT(req: Request) {
   const id = String(body.id || '');
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
 
-  const existing = getDb().prepare('SELECT image_src FROM programs WHERE id = ?').get(id) as
-    | { image_src: string | null }
-    | undefined;
+  const existing = await dbGet<{ image_src: string | null }>(
+    'SELECT image_src FROM programs WHERE id = ?',
+    [id],
+  );
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const finalImage = imageSrc === undefined ? existing.image_src : imageSrc;
@@ -113,12 +114,10 @@ export async function PUT(req: Request) {
   const hubRaw = String(body.hub || '').trim().toLowerCase();
   const hub = hubRaw === 'youth' || hubRaw === 'sisters' || hubRaw === 'seniors' ? hubRaw : null;
 
-  getDb()
-    .prepare(
+  await dbRun(
       `UPDATE programs SET category = ?, title = ?, summary = ?, schedule = ?, tags_json = ?,
        image_src = ?, hub = ?, sort_order = ?, updated_at = datetime('now') WHERE id = ?`,
-    )
-    .run(
+    [
       category,
       String(body.title || ''),
       String(body.summary || ''),
@@ -137,9 +136,10 @@ export async function PUT(req: Request) {
       hub,
       Number(body.sortOrder ?? body.sort_order ?? 0),
       id,
-    );
+    ],
+  );
 
-  writeAudit(session.username, 'update', 'program', id, String(body.title || id));
+  await writeAudit(session.username, 'update', 'program', id, String(body.title || id));
   return NextResponse.json({ ok: true, imageSrc: finalImage });
 }
 
@@ -148,7 +148,7 @@ export async function DELETE(req: Request) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const id = new URL(req.url).searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
-  getDb().prepare('DELETE FROM programs WHERE id = ?').run(id);
-  writeAudit(session.username, 'delete', 'program', id);
+  await dbRun('DELETE FROM programs WHERE id = ?', [id]);
+  await writeAudit(session.username, 'delete', 'program', id);
   return NextResponse.json({ ok: true });
 }

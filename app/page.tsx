@@ -9,7 +9,7 @@ import {
   site,
 } from '@/lib/content';
 import { images, pillarImage, hubImage } from '@/lib/images';
-import { getMediaByKey, getSiteSettings } from '@/lib/db';
+import { getMediaByKey, getSiteSettings } from '@/lib/data';
 import { Button, Section } from '@/components/ui';
 import {
   AnimatedCounter,
@@ -44,9 +44,11 @@ const stats = [
   { value: programSnapshot.length, suffix: '+', label: 'Active programmes' },
 ];
 
-export default function HomePage() {
-  const settings = getSiteSettings();
-  const heroMedia = getMediaByKey('hero');
+export default async function HomePage() {
+  const [settings, heroMedia] = await Promise.all([
+    getSiteSettings(),
+    getMediaByKey('hero'),
+  ]);
   const heroImage = heroMedia
     ? { src: heroMedia.src, alt: heroMedia.alt }
     : images.hero;

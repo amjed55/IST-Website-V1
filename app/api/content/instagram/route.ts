@@ -4,7 +4,7 @@ import {
   listInstagramPosts,
   setInstagramSyncMeta,
   upsertLiveInstagramPosts,
-} from '@/lib/db';
+} from '@/lib/data';
 import { isEmbeddablePost, instagramEmbedSrc } from '@/lib/instagram';
 import { fetchLiveInstagramPosts, mediaProxyPath } from '@/lib/instagram-live';
 
@@ -13,8 +13,8 @@ export const maxDuration = 60;
 
 const CACHE_MS = 30 * 60 * 1000;
 
-function mapRows() {
-  const rows = listInstagramPosts(true).filter((p) => isEmbeddablePost(p.permalink));
+async function mapRows() {
+  const rows = (await listInstagramPosts(true)).filter((p) => isEmbeddablePost(p.permalink));
   return rows.map((p) => {
     const code = p.permalink.match(/\/(p|reel|tv)\/([A-Za-z0-9_-]+)/i)?.[2];
     return {
@@ -32,17 +32,17 @@ function mapRows() {
 }
 
 async function syncLive(force = false) {
-  const meta = getInstagramSyncMeta();
+  const meta = await getInstagramSyncMeta();
   const syncedAt = meta.syncedAt ? Date.parse(meta.syncedAt) : 0;
   const fresh = syncedAt && Date.now() - syncedAt < CACHE_MS;
-  const existingLive = mapRows();
+  const existingLive = await mapRows();
   if (fresh && !force && existingLive.length) {
     return { synced: false, source: meta.source || 'cache', count: existingLive.length };
   }
 
   const live = await fetchLiveInstagramPosts(12);
   if (live.posts.length) {
-    upsertLiveInstagramPosts(
+    await upsertLiveInstagramPosts(
       live.posts.map((p, i) => ({
         id: p.id,
         permalink: p.permalink,
@@ -52,7 +52,7 @@ async function syncLive(force = false) {
         sort_order: i,
       })),
     );
-    setInstagramSyncMeta(live.source);
+    await setInstagramSyncMeta(live.source);
   }
   return { synced: true, source: live.source, error: live.error, count: live.posts.length };
 }
@@ -77,7 +77,7 @@ export async function GET(req: Request) {
     };
   }
 
-  const posts = mapRows();
+  const posts = await mapRows();
   return NextResponse.json(
     {
       posts,

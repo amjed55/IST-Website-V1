@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { getAdminSession } from '@/lib/auth';
-import { getDb, listAdmins, writeAudit } from '@/lib/db';
+import { listAdmins, writeAudit } from '@/lib/data';
+import { dbGet, dbRun } from '@/lib/database';
 
 async function guard() {
   return getAdminSession();
@@ -9,7 +10,7 @@ async function guard() {
 
 export async function GET() {
   if (!(await guard())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  return NextResponse.json({ users: listAdmins() });
+  return NextResponse.json({ users: await listAdmins() });
 }
 
 export async function POST(req: Request) {
@@ -32,14 +33,13 @@ export async function POST(req: Request) {
 
   const hash = bcrypt.hashSync(password, 10);
   try {
-    const result = getDb()
-      .prepare(
-        `INSERT INTO admins (username, password_hash, display_name, role, updated_at)
-         VALUES (?, ?, ?, ?, datetime('now'))`,
-      )
-      .run(username, hash, displayName, role);
-    writeAudit(session.username, 'create', 'user', String(result.lastInsertRowid), username);
-    return NextResponse.json({ ok: true, id: result.lastInsertRowid });
+    const created = await dbGet<{ id: number }>(
+      `INSERT INTO admins (username, password_hash, display_name, role, updated_at)
+       VALUES (?, ?, ?, ?, datetime('now')) RETURNING id`,
+      [username, hash, displayName, role],
+    );
+    await writeAudit(session.username, 'create', 'user', String(created.id), username);
+    return NextResponse.json({ ok: true, id: created.id });
   } catch {
     return NextResponse.json({ error: 'Username already exists' }, { status: 409 });
   }
@@ -61,20 +61,18 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 });
     }
     const hash = bcrypt.hashSync(password, 10);
-    getDb()
-      .prepare(
+    await dbRun(
         `UPDATE admins SET display_name = ?, role = ?, password_hash = ?, updated_at = datetime('now') WHERE id = ?`,
-      )
-      .run(displayName, role, hash, id);
+      [displayName, role, hash, id],
+    );
   } else {
-    getDb()
-      .prepare(
+    await dbRun(
         `UPDATE admins SET display_name = ?, role = ?, updated_at = datetime('now') WHERE id = ?`,
-      )
-      .run(displayName, role, id);
+      [displayName, role, id],
+    );
   }
 
-  writeAudit(session.username, 'update', 'user', String(id), displayName || String(id));
+  await writeAudit(session.username, 'update', 'user', String(id), displayName || String(id));
   return NextResponse.json({ ok: true });
 }
 
@@ -84,20 +82,23 @@ export async function DELETE(req: Request) {
   const id = Number(new URL(req.url).searchParams.get('id'));
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
 
-  const row = getDb()
-    .prepare(`SELECT username FROM admins WHERE id = ?`)
-    .get(id) as { username: string } | undefined;
+  const row = await dbGet<{ username: string }>(
+    `SELECT username FROM admins WHERE id = ?`,
+    [id],
+  );
   if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   if (row.username === session.username) {
     return NextResponse.json({ error: 'You cannot delete your own account' }, { status: 400 });
   }
 
-  const count = getDb().prepare(`SELECT COUNT(*) as c FROM admins`).get() as { c: number };
-  if (count.c <= 1) {
+  const count = await dbGet<{ c: number | string }>(
+    `SELECT COUNT(*) as c FROM admins`,
+  );
+  if (Number(count.c) <= 1) {
     return NextResponse.json({ error: 'Cannot delete the last admin user' }, { status: 400 });
   }
 
-  getDb().prepare(`DELETE FROM admins WHERE id = ?`).run(id);
-  writeAudit(session.username, 'delete', 'user', String(id), row.username);
+  await dbRun(`DELETE FROM admins WHERE id = ?`, [id]);
+  await writeAudit(session.username, 'delete', 'user', String(id), row.username);
   return NextResponse.json({ ok: true });
 }

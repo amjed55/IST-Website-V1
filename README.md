@@ -5,7 +5,8 @@ Marketing site for **Islamic Society of Toronto (Masjid Darus Salaam)**.
 ## Stack
 
 - Next.js (App Router) + TypeScript + Tailwind CSS + Framer Motion
-- SQLite database (`data/ist.db`) for events, programmes, media, announcements
+- PostgreSQL in production with a zero-config SQLite fallback (`data/ist.db`) for local development
+- S3-compatible media storage in production with `public/uploads` fallback locally
 - Admin CMS at `/admin` (events, programmes, pictures, careers/jobs, Instagram)
 - Forms → `POST /api/forms` → email `mamjed@myist.org` (Resend when configured)
 - Prayer times + Classic widget from the server-side central Prayer Clock proxy
@@ -19,6 +20,32 @@ npm run dev
 ```
 
 Open **http://localhost:3000**
+
+### Optional local PostgreSQL + S3-compatible storage
+
+The application needs no external services for normal local development. To test
+the production adapters, start PostgreSQL and MinIO:
+
+```bash
+docker compose up -d
+```
+
+Then add these values to `.env.local`:
+
+```dotenv
+DATABASE_URL=postgres://ist:ist-local@localhost:5432/ist
+S3_BUCKET=ist-media
+S3_REGION=us-east-1
+S3_ENDPOINT=http://localhost:9000
+S3_PUBLIC_URL=http://localhost:9000/ist-media
+S3_ACCESS_KEY_ID=ist
+S3_SECRET_ACCESS_KEY=ist-local-secret
+S3_FORCE_PATH_STYLE=true
+```
+
+`DATABASE_URL` switches all CMS reads and writes to PostgreSQL. `S3_BUCKET`
+switches uploads to S3/MinIO; `S3_PUBLIC_URL` must be a browser-readable base URL.
+The included credentials are local-only and must never be reused in production.
 
 ### Admin
 

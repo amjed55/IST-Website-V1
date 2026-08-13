@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getAdminSession } from '@/lib/auth';
 import { careersEmail } from '@/lib/content';
-import { getCareer, getDb, listCareers, writeAudit } from '@/lib/db';
+import { getCareer, listCareers, writeAudit } from '@/lib/data';
+import { dbRun } from '@/lib/database';
 import { saveUploadedImage } from '@/lib/uploads';
 
 async function guard() {
@@ -66,7 +67,7 @@ function readBody(body: Record<string, unknown>) {
 
 export async function GET() {
   if (!(await guard())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  return NextResponse.json({ careers: listCareers(false) });
+  return NextResponse.json({ careers: await listCareers(false) });
 }
 
 export async function POST(req: Request) {
@@ -100,18 +101,16 @@ export async function POST(req: Request) {
   const id =
     slugify(String(body.id || '')) || slugify(fields.title) || `career-${Date.now()}`;
 
-  if (getCareer(id)) {
+  if (await getCareer(id)) {
     return NextResponse.json({ error: `A role with id "${id}" already exists` }, { status: 409 });
   }
 
-  getDb()
-    .prepare(
+  await dbRun(
       `INSERT INTO careers
         (id, title, type, department, summary, schedule, location, deadline, start_date, contract,
          apply_email, apply_subject, responsibilities_json, requirements_json, image_src, is_active, sort_order, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
-    )
-    .run(
+    [
       id,
       fields.title,
       fields.type,
@@ -129,9 +128,10 @@ export async function POST(req: Request) {
       imageSrc,
       fields.is_active,
       fields.sort_order,
-    );
+    ],
+  );
 
-  writeAudit(session.username, 'create', 'career', id, fields.title);
+  await writeAudit(session.username, 'create', 'career', id, fields.title);
   return NextResponse.json({ ok: true, id, imageSrc });
 }
 
@@ -162,7 +162,7 @@ export async function PUT(req: Request) {
   const id = String(body.id || '');
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
 
-  const existing = getCareer(id);
+  const existing = await getCareer(id);
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const fields = readBody({
@@ -178,16 +178,14 @@ export async function PUT(req: Request) {
 
   const finalImage = imageSrc === undefined ? existing.image_src : imageSrc;
 
-  getDb()
-    .prepare(
+  await dbRun(
       `UPDATE careers SET
         title = ?, type = ?, department = ?, summary = ?, schedule = ?, location = ?,
         deadline = ?, start_date = ?, contract = ?, apply_email = ?, apply_subject = ?,
         responsibilities_json = ?, requirements_json = ?, image_src = ?, is_active = ?,
         sort_order = ?, updated_at = datetime('now')
        WHERE id = ?`,
-    )
-    .run(
+    [
       fields.title,
       fields.type,
       fields.department,
@@ -205,9 +203,10 @@ export async function PUT(req: Request) {
       fields.is_active,
       fields.sort_order,
       id,
-    );
+    ],
+  );
 
-  writeAudit(session.username, 'update', 'career', id, fields.title);
+  await writeAudit(session.username, 'update', 'career', id, fields.title);
   return NextResponse.json({ ok: true, imageSrc: finalImage });
 }
 
@@ -216,7 +215,7 @@ export async function DELETE(req: Request) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const id = new URL(req.url).searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
-  getDb().prepare('DELETE FROM careers WHERE id = ?').run(id);
-  writeAudit(session.username, 'delete', 'career', id);
+  await dbRun('DELETE FROM careers WHERE id = ?', [id]);
+  await writeAudit(session.username, 'delete', 'career', id);
   return NextResponse.json({ ok: true });
 }

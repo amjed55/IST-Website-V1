@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { listEvents, listEventsByHub } from '@/lib/db';
+import { listEvents, listEventsByHub } from '@/lib/data';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,7 +7,7 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const status = searchParams.get('status') as 'upcoming' | 'past' | null;
   const hub = searchParams.get('hub');
-  const rows = hub ? listEventsByHub(hub) : listEvents(status || undefined);
+  const rows = await (hub ? listEventsByHub(hub) : listEvents(status || undefined));
   const events = rows
     .filter((e) => !status || e.status === status)
     .map((e) => ({
