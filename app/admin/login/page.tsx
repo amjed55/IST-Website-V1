@@ -49,7 +49,6 @@ export default function AdminLoginPage() {
               required
               autoComplete="username"
               className="mt-1.5 w-full border border-white/15 bg-black/20 px-3 py-2.5 text-white outline-none focus:border-ist-teal"
-              defaultValue="admin"
             />
           </label>
           <label className="block text-sm">
@@ -62,7 +61,11 @@ export default function AdminLoginPage() {
               className="mt-1.5 w-full border border-white/15 bg-black/20 px-3 py-2.5 text-white outline-none focus:border-ist-teal"
             />
           </label>
-          {error && <p className="text-sm text-red-300">{error}</p>}
+          {error && (
+            <p className="text-sm text-red-300" role="alert" aria-live="polite">
+              {error}
+            </p>
+          )}
           <button
             type="submit"
             disabled={loading}

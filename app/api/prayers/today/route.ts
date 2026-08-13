@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { prayerClockOrigin, type PrayerSettings, type TodayPrayersResponse } from '@/lib/prayer';
+import type { PrayerSettings, TodayPrayersResponse } from '@/lib/prayer';
+import { prayerClockOrigin } from '@/lib/prayer-server';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -37,7 +38,6 @@ export async function GET() {
         ...today,
         settings: settings || undefined,
         announcements: activeAnnouncements,
-        source: base,
       },
       {
         headers: {
@@ -52,7 +52,6 @@ export async function GET() {
         date: '',
         prayers: null,
         announcements: [],
-        source: base,
       },
       { status: 503 },
     );

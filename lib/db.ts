@@ -523,7 +523,12 @@ function seed(db: Database.Database) {
   const adminCount = db.prepare('SELECT COUNT(*) as c FROM admins').get() as { c: number };
   if (adminCount.c === 0) {
     const username = process.env.ADMIN_USERNAME || 'admin';
-    const password = process.env.ADMIN_PASSWORD || 'ist-admin-2026';
+    const password =
+      process.env.ADMIN_PASSWORD ||
+      (process.env.NODE_ENV === 'production' ? '' : 'ist-admin-local');
+    if (!password) {
+      throw new Error('ADMIN_PASSWORD is required when initializing the production database.');
+    }
     const hash = bcrypt.hashSync(password, 10);
     db.prepare(
       `INSERT INTO admins (username, password_hash, display_name, role) VALUES (?, ?, ?, 'admin')`,

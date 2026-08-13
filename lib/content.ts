@@ -11,7 +11,6 @@ export const site = {
   formTo: 'mamjed@myist.org',
   mapEmbed:
     'https://www.google.com/maps?q=20+Overlea+Blvd,+Toronto,+ON+M4H+1A4&output=embed',
-  mixlr: 'https://mixlr.com/',
 };
 
 export const links = {
@@ -24,13 +23,7 @@ export const links = {
   instagram:
     process.env.NEXT_PUBLIC_INSTAGRAM_URL ||
     'https://www.instagram.com/islamicsocietyoftoronto',
-  prayerClock:
-    process.env.NEXT_PUBLIC_PRAYER_CLOCK_EMBED_URL ||
-    'http://142.93.61.217/classic',
-  prayerApi:
-    process.env.NEXT_PUBLIC_PRAYER_CLOCK_API_URL ||
-    process.env.NEXT_PUBLIC_PRAYER_CLOCK_EMBED_URL?.replace(/\/classic\/?$/, '') ||
-    'http://142.93.61.217',
+  prayerClock: '/prayer-times',
 };
 
 export type NavItem = {

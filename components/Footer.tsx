@@ -101,17 +101,15 @@ export function Footer() {
                 </span>
                 Instagram feed
               </a>
-              <a
+              <Link
                 href={links.prayerClock}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="flex items-center gap-3 text-sm text-white/65 transition hover:text-white"
               >
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15">
                   <IconPrayer className="h-3.5 w-3.5" />
                 </span>
                 Live prayer board
-              </a>
+              </Link>
             </div>
           </div>
         </FadeUp>

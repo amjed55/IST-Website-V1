@@ -187,16 +187,3 @@ export function shouldShowJummah(
   }
   return friday;
 }
-
-export function prayerClockOrigin() {
-  const embed =
-    process.env.NEXT_PUBLIC_PRAYER_CLOCK_API_URL ||
-    process.env.NEXT_PUBLIC_PRAYER_CLOCK_EMBED_URL ||
-    'http://142.93.61.217/classic';
-  try {
-    const u = new URL(embed);
-    return `${u.protocol}//${u.host}`;
-  } catch {
-    return 'http://142.93.61.217';
-  }
-}

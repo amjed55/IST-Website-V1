@@ -9,7 +9,6 @@ import {
   getJummahAdhan,
   hm2min,
   isFriday,
-  prayerClockOrigin,
   shouldShowJummah,
   type PrayerKey,
   type PrayerRow,
@@ -143,10 +142,7 @@ function weatherClass(code?: number) {
 
 function ensureAbsoluteUrl(url?: string | null) {
   if (!url) return '';
-  if (/^https?:\/\//i.test(url)) return url;
-  if (url.startsWith('//')) return `http:${url}`;
-  const base = prayerClockOrigin();
-  return `${base}${url.startsWith('/') ? '' : '/'}${url}`;
+  return `/api/prayers/asset?src=${encodeURIComponent(url)}`;
 }
 
 function normalizeQrUrl(url: string) {
@@ -353,6 +349,7 @@ export function ClassicPrayerBoard() {
   const [weather, setWeather] = useState<WeatherCurrent | null>(null);
   const [error, setError] = useState(false);
   const [ready, setReady] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   const fit = useCallback(() => {
     const el = shellRef.current;
@@ -421,7 +418,7 @@ export function ClassicPrayerBoard() {
       cancelled = true;
       window.clearInterval(poll);
     };
-  }, []);
+  }, [reloadKey]);
 
   useEffect(() => {
     if (!settings?.show_weather && settings?.show_weather !== undefined) return;
@@ -481,8 +478,8 @@ export function ClassicPrayerBoard() {
           <p className="text-sm text-white/70">Native Prayer Clock · same layout as masjid TVs</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button href={links.prayerClock} variant="teal" external className="!px-4 !py-2 text-xs">
-            Open TV board
+          <Button href={links.prayerClock} variant="teal" className="!px-4 !py-2 text-xs">
+            Prayer details
           </Button>
           <Button href="/visit" variant="ghost" className="!px-4 !py-2 text-xs text-white">
             Visit & parking
@@ -501,8 +498,16 @@ export function ClassicPrayerBoard() {
             <p className="max-w-md text-sm text-white/75">
               Live times come from the central Prayer Clock API. Check connectivity, then refresh.
             </p>
-            <Button href={links.prayerClock} variant="teal" external>
-              Open external board
+            <Button
+              type="button"
+              variant="teal"
+              onClick={() => {
+                setReady(false);
+                setError(false);
+                setReloadKey((value) => value + 1);
+              }}
+            >
+              Retry
             </Button>
           </div>
         ) : (

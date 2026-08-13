@@ -42,6 +42,7 @@ function clean(value: unknown, max = 500) {
 
 async function verifyTurnstile(token: string, ip: string) {
   const secret = getTurnstileSecretKey();
+  if (!secret) return null;
   if (!token) return false;
   const verify = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
     method: 'POST',
@@ -98,6 +99,12 @@ export async function POST(req: NextRequest) {
 
     const token = clean(body.turnstileToken, 2048);
     const captchaOk = await verifyTurnstile(token, ip);
+    if (captchaOk === null) {
+      return NextResponse.json(
+        { error: 'This form is temporarily unavailable.' },
+        { status: 503 },
+      );
+    }
     if (!captchaOk) {
       return NextResponse.json({ error: 'Captcha failed. Please try again.' }, { status: 400 });
     }
@@ -163,11 +170,17 @@ export async function POST(req: NextRequest) {
 
     const apiKey = process.env.RESEND_API_KEY;
     if (apiKey) {
+      const from = process.env.RESEND_FROM_EMAIL;
+      if (!from && process.env.NODE_ENV === 'production') {
+        return NextResponse.json(
+          { error: 'Email delivery is not configured.' },
+          { status: 503 },
+        );
+      }
       const { Resend } = await import('resend');
       const resend = new Resend(apiKey);
-      const from = process.env.RESEND_FROM_EMAIL || 'IST Website <onboarding@resend.dev>';
       const result = await resend.emails.send({
-        from,
+        from: from || 'IST Website <onboarding@resend.dev>',
         to: [to],
         replyTo: email,
         subject,
@@ -186,13 +199,18 @@ export async function POST(req: NextRequest) {
         console.error(result.error);
         return NextResponse.json({ error: 'Email provider error.' }, { status: 502 });
       }
-    } else {
+    } else if (process.env.NODE_ENV !== 'production') {
       console.log('[IST form]', {
         to,
         subject,
         text,
         attachment: attachment?.filename,
       });
+    } else {
+      return NextResponse.json(
+        { error: 'Email delivery is not configured.' },
+        { status: 503 },
+      );
     }
 
     return NextResponse.json({ ok: true });

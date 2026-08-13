@@ -2,14 +2,7 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 import { getDb } from './db';
-
-const COOKIE = 'ist_admin_session';
-const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
-
-function secret() {
-  const s = process.env.ADMIN_JWT_SECRET || 'ist-dev-secret-change-in-production';
-  return new TextEncoder().encode(s);
-}
+import { ADMIN_COOKIE, ADMIN_SESSION_MAX_AGE, adminJwtSecret } from './admin-session';
 
 export async function verifyAdminCredentials(username: string, password: string) {
   const db = getDb();
@@ -26,30 +19,30 @@ export async function createAdminSession(username: string) {
   const token = await new SignJWT({ role: 'admin', username })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime(`${MAX_AGE}s`)
-    .sign(secret());
+    .setExpirationTime(`${ADMIN_SESSION_MAX_AGE}s`)
+    .sign(adminJwtSecret());
 
   const jar = await cookies();
-  jar.set(COOKIE, token, {
+  jar.set(ADMIN_COOKIE, token, {
     httpOnly: true,
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
     path: '/',
-    maxAge: MAX_AGE,
+    maxAge: ADMIN_SESSION_MAX_AGE,
   });
 }
 
 export async function clearAdminSession() {
   const jar = await cookies();
-  jar.delete(COOKIE);
+  jar.delete(ADMIN_COOKIE);
 }
 
 export async function getAdminSession() {
   const jar = await cookies();
-  const token = jar.get(COOKIE)?.value;
+  const token = jar.get(ADMIN_COOKIE)?.value;
   if (!token) return null;
   try {
-    const { payload } = await jwtVerify(token, secret());
+    const { payload } = await jwtVerify(token, adminJwtSecret());
     if (payload.role !== 'admin' || typeof payload.username !== 'string') return null;
     return { username: payload.username };
   } catch {

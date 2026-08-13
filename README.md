@@ -8,7 +8,7 @@ Marketing site for **Islamic Society of Toronto (Masjid Darus Salaam)**.
 - SQLite database (`data/ist.db`) for events, programmes, media, announcements
 - Admin CMS at `/admin` (events, programmes, pictures, careers/jobs, Instagram)
 - Forms → `POST /api/forms` → email `mamjed@myist.org` (Resend when configured)
-- Prayer times + Classic widget from central Prayer Clock: `http://142.93.61.217`
+- Prayer times + Classic widget from the server-side central Prayer Clock proxy
 
 ## Setup
 
@@ -23,7 +23,8 @@ Open **http://localhost:3000**
 ### Admin
 
 - URL: `/admin/login`
-- Default credentials (change in `.env.local`): `admin` / `ist-admin-2026`
+- Local fallback credentials when env values are omitted: `admin` / `ist-admin-local`
+- Production startup requires `ADMIN_USERNAME`, `ADMIN_PASSWORD`, and a 32+ character `ADMIN_JWT_SECRET`
 - Manage events, programmes, **careers/jobs**, pictures, announcements, Instagram, users, and site settings
 
 ### Prayer Clock
@@ -31,11 +32,11 @@ Open **http://localhost:3000**
 The sticky iqamah banner and `/prayer-times` native Classic board read from the central Prayer Clock API (no iframe):
 
 ```
-NEXT_PUBLIC_PRAYER_CLOCK_API_URL=http://142.93.61.217
-NEXT_PUBLIC_PRAYER_CLOCK_EMBED_URL=http://142.93.61.217/classic
+PRAYER_CLOCK_API_URL=http://142.93.61.217
 ```
 
-`/prayer-times` renders the Classic TV layout natively in the page. The embed URL remains available as an optional fullscreen TV link.
+`/prayer-times` renders the Classic TV layout natively. Browsers call the same-origin
+`/api/prayers` routes, so the upstream HTTP host is never embedded into HTTPS pages.
 
 Repo reference: https://github.com/amjed55/prayer-clock
 
@@ -46,6 +47,10 @@ FORM_TO_EMAIL=mamjed@myist.org
 RESEND_API_KEY=re_xxx
 RESEND_FROM_EMAIL=IST Website <your-verified-sender>
 ```
+
+Production forms fail closed with a temporary-unavailable response when Resend or
+real Cloudflare Turnstile credentials are missing. Development uses Turnstile test
+keys and logs form payloads only when Resend is omitted.
 
 ## Key routes
 
