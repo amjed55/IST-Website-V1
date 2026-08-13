@@ -97,7 +97,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   };
 
   return (
-    <html lang={locale} dir={rtlLocales.has(locale) ? 'rtl' : 'ltr'}>
+    <html
+      lang={locale}
+      dir={rtlLocales.has(locale) ? 'rtl' : 'ltr'}
+      data-scroll-behavior="smooth"
+    >
       <body
         className={`${displayFont.variable} ${sansFont.variable} ${arabicFont.variable} pattern-mesh ${
           rtlLocales.has(locale) ? 'font-arabic' : ''

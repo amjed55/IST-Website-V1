@@ -21,7 +21,6 @@ const navKeys: Record<string, string> = {
 
 const menuLinks = [
   ...primaryNav.map((item) => [item.label, item.href] as const),
-  ['Prayer Times', '/prayer-times'] as const,
   ['Careers', '/careers'] as const,
 ];
 
