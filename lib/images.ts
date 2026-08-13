@@ -16,7 +16,7 @@ const g = (file: string, alt: string): SiteImage => ({
 
 export const images = {
   logo: {
-    src: '/brand/ist-logo.png',
+    src: '/brand/ist-logo.svg',
     alt: 'Islamic Society of Toronto logo',
   },
   hero: {

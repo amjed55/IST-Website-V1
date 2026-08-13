@@ -9,7 +9,11 @@ import { FadeUp, PageTransition, Stagger, StaggerItem } from '@/components/motio
 import { PageHero } from '@/components/PageHero';
 import { IconBriefcase } from '@/components/icons';
 
-export const metadata: Metadata = { title: 'Careers' };
+export const metadata: Metadata = {
+  title: 'Careers',
+  description:
+    'View current employment opportunities at Islamic Society of Toronto and apply through the secure careers form.',
+};
 export const dynamic = 'force-dynamic';
 
 export default async function CareersPage() {

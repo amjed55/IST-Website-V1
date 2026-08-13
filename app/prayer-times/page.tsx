@@ -6,7 +6,11 @@ import { PageHero } from '@/components/PageHero';
 import { PrayerEmbed } from '@/components/PrayerEmbed';
 import { JummahSchedule } from '@/components/JummahSchedule';
 
-export const metadata: Metadata = { title: 'Prayer Times' };
+export const metadata: Metadata = {
+  title: 'Prayer Times',
+  description:
+    'Live daily prayer, iqamah, sunrise, and Jummah times for Masjid Darus Salaam in Toronto.',
+};
 
 export default function PrayerTimesPage() {
   return (

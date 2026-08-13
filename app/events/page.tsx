@@ -7,7 +7,11 @@ import { PageHero } from '@/components/PageHero';
 import { EventsBoard } from '@/components/EventsBoard';
 import { CalendarView } from '@/components/CalendarView';
 
-export const metadata: Metadata = { title: 'Events' };
+export const metadata: Metadata = {
+  title: 'Events & Programs',
+  description:
+    'Browse and subscribe to the Islamic Society of Toronto calendar for community events, classes, and recurring programs.',
+};
 
 export default function EventsPage() {
   return (

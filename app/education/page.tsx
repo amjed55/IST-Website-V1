@@ -8,7 +8,11 @@ import { PageHero } from '@/components/PageHero';
 import { MediaLinkRow } from '@/components/MediaLinkRow';
 import { IconEducation } from '@/components/icons';
 
-export const metadata: Metadata = { title: 'Education' };
+export const metadata: Metadata = {
+  title: 'Islamic Education',
+  description:
+    'Explore Quran, Madressa, Hifz, Alim, Sunday, youth, and adult learning programs at IST.',
+};
 
 export default function EducationPage() {
   return (

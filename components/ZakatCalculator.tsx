@@ -1,15 +1,16 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { links } from '@/lib/content';
 
 const fields = [
-  ['cash', 'Cash and bank balances'],
-  ['goldSilver', 'Gold and silver value'],
-  ['investments', 'Zakatable investments'],
-  ['business', 'Business inventory / cash'],
-  ['receivables', 'Money expected to be repaid'],
-  ['debts', 'Short-term debts due'],
+  ['cash', 'cash'],
+  ['goldSilver', 'metals'],
+  ['investments', 'investments'],
+  ['business', 'business'],
+  ['receivables', 'receivables'],
+  ['debts', 'debts'],
 ] as const;
 
 function money(value: number) {
@@ -21,6 +22,7 @@ function money(value: number) {
 }
 
 export function ZakatCalculator() {
+  const t = useTranslations('Zakat');
   const [values, setValues] = useState<Record<(typeof fields)[number][0], number>>({
     cash: 0,
     goldSilver: 0,
@@ -48,7 +50,7 @@ export function ZakatCalculator() {
       <div className="grid gap-4 rounded-3xl border border-ist-green/10 bg-white p-5 shadow-soft sm:grid-cols-2 sm:p-7">
         {fields.map(([key, label]) => (
           <label key={key} className="text-sm text-ist-ink/75">
-            <span className="mb-1.5 block font-medium text-ist-green">{label}</span>
+            <span className="mb-1.5 block font-medium text-ist-green">{t(label)}</span>
             <span className="relative block">
               <span className="pointer-events-none absolute left-4 top-3 text-ist-muted">$</span>
               <input
@@ -67,7 +69,7 @@ export function ZakatCalculator() {
         ))}
         <label className="text-sm text-ist-ink/75 sm:col-span-2">
           <span className="mb-1.5 block font-medium text-ist-green">
-            Current nisab threshold (CAD)
+            {t('nisab')}
           </span>
           <input
             type="number"
@@ -76,7 +78,7 @@ export function ZakatCalculator() {
             inputMode="decimal"
             value={nisab || ''}
             onChange={(event) => setNisab(Math.max(0, Number(event.target.value) || 0))}
-            placeholder="Enter a current threshold from a trusted scholar or source"
+            placeholder={t('nisabPlaceholder')}
             className="w-full rounded-2xl border border-ist-green/15 bg-ist-cream/40 px-4 py-3 outline-none transition focus:border-ist-teal focus:ring-2 focus:ring-ist-teal/20"
           />
         </label>
@@ -84,28 +86,28 @@ export function ZakatCalculator() {
 
       <aside className="rounded-3xl bg-ist-green p-6 text-white shadow-lift sm:p-8" aria-live="polite">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ist-teal-light">
-          Estimate
+          {t('estimate')}
         </p>
         <dl className="mt-6 space-y-4">
           <div className="flex justify-between gap-4 border-b border-white/10 pb-3">
-            <dt className="text-white/65">Total assets</dt>
+            <dt className="text-white/65">{t('totalAssets')}</dt>
             <dd className="font-semibold">{money(result.assets)}</dd>
           </div>
           <div className="flex justify-between gap-4 border-b border-white/10 pb-3">
-            <dt className="text-white/65">Net zakatable amount</dt>
+            <dt className="text-white/65">{t('net')}</dt>
             <dd className="font-semibold">{money(result.net)}</dd>
           </div>
           <div>
-            <dt className="text-white/65">Estimated Zakat at 2.5%</dt>
+            <dt className="text-white/65">{t('estimated')}</dt>
             <dd className="mt-2 font-display text-5xl text-ist-gold">{money(result.zakat)}</dd>
           </div>
         </dl>
         <p className="mt-5 text-sm leading-relaxed text-white/65">
           {!nisab
-            ? 'Enter a current nisab threshold to check eligibility.'
+            ? t('enterNisab')
             : result.eligible
-              ? 'Your net amount meets the threshold entered.'
-              : 'Your net amount is below the threshold entered.'}
+              ? t('eligible')
+              : t('below')}
         </p>
         <a
           href={links.donate}
@@ -113,7 +115,7 @@ export function ZakatCalculator() {
           rel="noopener noreferrer"
           className="mt-6 inline-flex rounded-full bg-ist-gold px-5 py-2.5 text-sm font-semibold text-ist-green-deep transition hover:-translate-y-0.5 hover:brightness-105"
         >
-          Continue to secure donation
+          {t('donate')}
         </a>
       </aside>
     </div>

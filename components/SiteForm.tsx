@@ -2,8 +2,11 @@
 
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 import { Button } from './ui';
 import { TurnstileField } from './TurnstileField';
+import { isAppLocale } from '@/i18n/routing';
 
 export type FormType =
   | 'contact'
@@ -18,7 +21,13 @@ type Props = {
   submitLabel?: string;
 };
 
-export function SiteForm({ type, prefill = {}, submitLabel = 'Send message' }: Props) {
+export function SiteForm({ type, prefill = {}, submitLabel }: Props) {
+  const t = useTranslations('Form');
+  const locale = useLocale();
+  const pathname = usePathname();
+  const privacyHref = isAppLocale(pathname.split('/').filter(Boolean)[0])
+    ? `/${locale}/privacy`
+    : '/privacy';
   const [status, setStatus] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle');
   const [error, setError] = useState('');
   const [turnstileToken, setTurnstileToken] = useState('');
@@ -74,11 +83,11 @@ export function SiteForm({ type, prefill = {}, submitLabel = 'Send message' }: P
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block text-sm">
-          <span className="mb-1.5 block font-medium text-ist-green">Name</span>
+          <span className="mb-1.5 block font-medium text-ist-green">{t('name')}</span>
           <input name="name" required maxLength={120} className={field} defaultValue={prefill.name} />
         </label>
         <label className="block text-sm">
-          <span className="mb-1.5 block font-medium text-ist-green">Email</span>
+          <span className="mb-1.5 block font-medium text-ist-green">{t('email')}</span>
           <input
             name="email"
             type="email"
@@ -95,14 +104,14 @@ export function SiteForm({ type, prefill = {}, submitLabel = 'Send message' }: P
         type === 'career-apply' ||
         type === 'event-inquiry') && (
         <label className="block text-sm">
-          <span className="mb-1.5 block font-medium text-ist-green">Phone</span>
+          <span className="mb-1.5 block font-medium text-ist-green">{t('phone')}</span>
           <input name="phone" maxLength={40} className={field} defaultValue={prefill.phone} />
         </label>
       )}
 
       {type === 'contact' && (
         <label className="block text-sm">
-          <span className="mb-1.5 block font-medium text-ist-green">Topic</span>
+          <span className="mb-1.5 block font-medium text-ist-green">{t('topic')}</span>
           <select name="topic" className={field} defaultValue={prefill.topic || 'General'}>
             {[
               'General',
@@ -113,8 +122,18 @@ export function SiteForm({ type, prefill = {}, submitLabel = 'Send message' }: P
               'Careers',
               'Events',
               'Visit',
-            ].map((t) => (
-              <option key={t}>{t}</option>
+            ].map((topic) => (
+              <option key={topic} value={topic}>
+                {(
+                  {
+                    General: t('general'),
+                    Nikah: t('nikah'),
+                    Education: t('education'),
+                    Janazah: t('janazah'),
+                    Volunteer: t('volunteer'),
+                  } as Record<string, string>
+                )[topic] || topic}
+              </option>
             ))}
           </select>
         </label>
@@ -137,7 +156,7 @@ export function SiteForm({ type, prefill = {}, submitLabel = 'Send message' }: P
       {type === 'volunteer' && (
         <>
           <label className="block text-sm">
-            <span className="mb-1.5 block font-medium text-ist-green">Preferred role</span>
+            <span className="mb-1.5 block font-medium text-ist-green">{t('role')}</span>
             <select
               name="interests"
               required
@@ -162,7 +181,7 @@ export function SiteForm({ type, prefill = {}, submitLabel = 'Send message' }: P
             </select>
           </label>
           <label className="block text-sm">
-            <span className="mb-1.5 block font-medium text-ist-green">Availability</span>
+            <span className="mb-1.5 block font-medium text-ist-green">{t('availability')}</span>
             <input
               name="availability"
               required
@@ -208,7 +227,7 @@ export function SiteForm({ type, prefill = {}, submitLabel = 'Send message' }: P
       )}
 
       <label className="block text-sm">
-        <span className="mb-1.5 block font-medium text-ist-green">Message</span>
+        <span className="mb-1.5 block font-medium text-ist-green">{t('message')}</span>
         <textarea
           name="message"
           required
@@ -222,15 +241,16 @@ export function SiteForm({ type, prefill = {}, submitLabel = 'Send message' }: P
       <TurnstileField key={captchaKey} onToken={setTurnstileToken} onExpire={() => setTurnstileToken('')} />
 
       <p className="text-xs text-ist-muted">
-        By submitting, you agree we may email your inquiry to IST staff. See our{' '}
-        <Link href="/privacy" className="text-ist-teal underline-offset-2 hover:underline">
+        {t('privacy')}{' '}
+        See our{' '}
+        <Link href={privacyHref} className="text-ist-teal underline-offset-2 hover:underline">
           Privacy
         </Link>{' '}
         page.
       </p>
 
       <Button type="submit" disabled={status === 'loading' || !turnstileToken} className="w-full sm:w-auto">
-        {status === 'loading' ? 'Sending…' : submitLabel}
+        {status === 'loading' ? t('sending') : submitLabel || t('send')}
       </Button>
 
       {status === 'ok' && (
@@ -239,7 +259,7 @@ export function SiteForm({ type, prefill = {}, submitLabel = 'Send message' }: P
           role="status"
           aria-live="polite"
         >
-          Thank you — your message was sent.
+          {t('success')}
         </p>
       )}
       {status === 'error' && (

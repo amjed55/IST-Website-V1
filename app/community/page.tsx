@@ -6,7 +6,11 @@ import { PageTransition, Stagger, StaggerItem } from '@/components/motion';
 import { PageHero } from '@/components/PageHero';
 import { MediaLinkRow } from '@/components/MediaLinkRow';
 
-export const metadata: Metadata = { title: 'Community' };
+export const metadata: Metadata = {
+  title: 'Community',
+  description:
+    'Find youth, sisters, seniors, new-Muslim, family, and weekly community programs at Masjid Darus Salaam.',
+};
 
 export default function CommunityPage() {
   return (

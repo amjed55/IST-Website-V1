@@ -10,7 +10,11 @@ import { PageHero } from '@/components/PageHero';
 import { InstagramFeed } from '@/components/InstagramFeed';
 import { topicIcons, IconBriefcase, IconHands, IconDonate } from '@/components/icons';
 
-export const metadata: Metadata = { title: 'Get Involved' };
+export const metadata: Metadata = {
+  title: 'Get Involved',
+  description:
+    'Volunteer, donate, estimate Zakat, or explore careers serving the Islamic Society of Toronto community.',
+};
 
 const hubCards = [
   ...involveSubsections.map((page) => ({

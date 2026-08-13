@@ -6,7 +6,11 @@ import { FadeUp, PageTransition, Stagger, StaggerItem } from '@/components/motio
 import { PageHero } from '@/components/PageHero';
 import { MediaLinkRow } from '@/components/MediaLinkRow';
 
-export const metadata: Metadata = { title: 'Life Services' };
+export const metadata: Metadata = {
+  title: 'Life Services',
+  description:
+    'Learn about Nikah, counselling, Janazah guidance, and pastoral services at Islamic Society of Toronto.',
+};
 
 export default function ServicesPage() {
   return (

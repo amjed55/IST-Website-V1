@@ -1,9 +1,17 @@
 import { jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
 import { ADMIN_COOKIE, adminJwtSecret } from '@/lib/admin-session';
+import { isAppLocale } from '@/i18n/routing';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const locale = pathname.split('/').filter(Boolean)[0];
+  if (isAppLocale(locale)) {
+    const headers = new Headers(request.headers);
+    headers.set('x-ist-locale', locale);
+    return NextResponse.next({ request: { headers } });
+  }
+
   if (pathname === '/admin/login') return NextResponse.next();
 
   const token = request.cookies.get(ADMIN_COOKIE)?.value;
@@ -36,5 +44,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/:locale(en|ar|ur|ps|fa-AF|fr)/:path*'],
 };

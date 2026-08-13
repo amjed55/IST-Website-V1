@@ -8,7 +8,11 @@ import { QrConnectStrip } from '@/components/QrConnectStrip';
 import { PageHero } from '@/components/PageHero';
 import { InstagramFeed } from '@/components/InstagramFeed';
 
-export const metadata: Metadata = { title: 'Contact' };
+export const metadata: Metadata = {
+  title: 'Contact',
+  description:
+    'Contact the Islamic Society of Toronto office about education, Nikah, Janazah, volunteering, events, or a first visit.',
+};
 
 type Props = { searchParams: Promise<{ topic?: string }> };
 

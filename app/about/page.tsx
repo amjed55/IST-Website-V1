@@ -9,7 +9,11 @@ import { FadeUp, PageTransition, Stagger, StaggerItem } from '@/components/motio
 import { PageHero } from '@/components/PageHero';
 import { topicIcons, IconAbout } from '@/components/icons';
 
-export const metadata: Metadata = { title: 'About' };
+export const metadata: Metadata = {
+  title: 'About',
+  description:
+    'Learn about Islamic Society of Toronto, Masjid Darus Salaam, its history, leadership, and facility at 20 Overlea Blvd.',
+};
 
 export default function AboutPage() {
   return (

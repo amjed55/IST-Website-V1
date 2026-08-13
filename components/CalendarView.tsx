@@ -2,7 +2,10 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 import type { CalendarOccurrence, CalendarSource } from '@/lib/calendar';
+import { isAppLocale } from '@/i18n/routing';
 
 const TZ = 'America/Toronto';
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -43,8 +46,8 @@ function gridDayKey(date: Date) {
   ).padStart(2, '0')}`;
 }
 
-function timeLabel(start: string, end: string) {
-  const format = new Intl.DateTimeFormat('en-CA', {
+function timeLabel(start: string, end: string, locale: string) {
+  const format = new Intl.DateTimeFormat(locale, {
     timeZone: TZ,
     hour: 'numeric',
     minute: '2-digit',
@@ -52,8 +55,8 @@ function timeLabel(start: string, end: string) {
   return `${format.format(new Date(start))}–${format.format(new Date(end))}`;
 }
 
-function longDate(value: string) {
-  return new Intl.DateTimeFormat('en-CA', {
+function longDate(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
     timeZone: TZ,
     weekday: 'long',
     month: 'long',
@@ -80,9 +83,15 @@ function CalendarItem({
   compact?: boolean;
   admin?: boolean;
 }) {
-  const detailHref = admin
+  const locale = useLocale();
+  const pathname = usePathname();
+  const t = useTranslations('Calendar');
+  const localized = isAppLocale(pathname.split('/').filter(Boolean)[0]);
+  const rawDetailHref = admin
     ? `/admin/${item.sourceType === 'event' ? 'events' : 'programs'}?edit=${encodeURIComponent(item.id)}`
     : item.href;
+  const detailHref =
+    localized && !admin ? `/${locale}${rawDetailHref === '/' ? '' : rawDetailHref}` : rawDetailHref;
   const icsHref = `/api/calendar.ics?type=${item.sourceType}&id=${encodeURIComponent(
     item.id,
   )}&start=${encodeURIComponent(item.startsAt)}`;
@@ -96,7 +105,7 @@ function CalendarItem({
       }`}
     >
       <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-ist-muted">
-        {item.sourceType} · {timeLabel(item.startsAt, item.endsAt)}
+        {t(item.sourceType)} · {timeLabel(item.startsAt, item.endsAt, locale)}
       </p>
       <h3 className={`${compact ? 'text-xs' : 'mt-1 font-display text-xl'} text-ist-green`}>
         <Link href={detailHref} className="hover:underline">
@@ -111,7 +120,7 @@ function CalendarItem({
             href={icsHref}
             className="mt-3 inline-flex text-xs font-semibold text-ist-teal hover:underline"
           >
-            Add to calendar
+            {t('add')}
           </a>
         </>
       )}
@@ -120,6 +129,8 @@ function CalendarItem({
 }
 
 export function CalendarView({ admin = false }: { admin?: boolean }) {
+  const locale = useLocale();
+  const t = useTranslations('Calendar');
   const [month, setMonth] = useState(currentTorontoMonth);
   const [view, setView] = useState<View>('month');
   const [filter, setFilter] = useState<Filter>('all');
@@ -172,7 +183,7 @@ export function CalendarView({ admin = false }: { admin?: boolean }) {
     return grouped;
   }, [items]);
 
-  const monthLabel = new Intl.DateTimeFormat('en-CA', {
+  const monthLabel = new Intl.DateTimeFormat(locale, {
     timeZone: 'UTC',
     month: 'long',
     year: 'numeric',
@@ -187,10 +198,10 @@ export function CalendarView({ admin = false }: { admin?: boolean }) {
             id="community-calendar-title"
             className="mt-3 font-display text-4xl text-ist-green sm:text-5xl"
           >
-            Events &amp; programs calendar
+            {t('title')}
           </h2>
           <p className="mt-2 max-w-2xl text-sm text-ist-ink/60">
-            Times are shown in Toronto. Subscribe once to keep your calendar updated.
+            {t('description')}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -198,7 +209,7 @@ export function CalendarView({ admin = false }: { admin?: boolean }) {
             href="/api/calendar.ics"
             className="rounded-full border border-ist-green/20 px-4 py-2 text-sm font-semibold text-ist-green transition hover:-translate-y-0.5 hover:border-ist-teal"
           >
-            Subscribe / download
+            {t('subscribe')}
           </a>
           {admin && (
             <>
@@ -226,7 +237,7 @@ export function CalendarView({ admin = false }: { admin?: boolean }) {
               type="button"
               onClick={() => setMonth(addMonths(month, -1))}
               className="calendar-control"
-              aria-label="Previous month"
+              aria-label={t('previous')}
             >
               ←
             </button>
@@ -235,13 +246,13 @@ export function CalendarView({ admin = false }: { admin?: boolean }) {
               onClick={() => setMonth(currentTorontoMonth())}
               className="calendar-control px-4"
             >
-              Today
+              {t('today')}
             </button>
             <button
               type="button"
               onClick={() => setMonth(addMonths(month, 1))}
               className="calendar-control"
-              aria-label="Next month"
+              aria-label={t('next')}
             >
               →
             </button>
@@ -259,7 +270,7 @@ export function CalendarView({ admin = false }: { admin?: boolean }) {
                     : 'border border-ist-green/15 text-ist-green hover:border-ist-teal'
                 }`}
               >
-                {value === 'all' ? 'All' : `${value}s`}
+                {t(value)}
               </button>
             ))}
             {(['month', 'agenda'] as View[]).map((value) => (
@@ -271,7 +282,7 @@ export function CalendarView({ admin = false }: { admin?: boolean }) {
                   view === value ? 'bg-ist-teal text-white' : 'text-ist-muted hover:bg-white'
                 }`}
               >
-                {value}
+                {t(value)}
               </button>
             ))}
           </div>
@@ -281,7 +292,7 @@ export function CalendarView({ admin = false }: { admin?: boolean }) {
           <div className="grid min-h-80 place-items-center" aria-busy="true">
             <div className="text-center">
               <span className="mx-auto block h-9 w-9 animate-spin rounded-full border-2 border-ist-teal/20 border-t-ist-teal" />
-              <p className="mt-3 text-sm text-ist-muted">Loading calendar…</p>
+              <p className="mt-3 text-sm text-ist-muted">{t('loading')}</p>
             </div>
           </div>
         ) : error ? (
@@ -343,7 +354,7 @@ export function CalendarView({ admin = false }: { admin?: boolean }) {
               Array.from(byDay.entries()).map(([day, dayItems]) => (
                 <div key={day} className="grid gap-3 p-4 sm:grid-cols-[12rem_1fr]">
                   <h3 className="font-display text-xl text-ist-green">
-                    {longDate(dayItems[0].startsAt)}
+                    {longDate(dayItems[0].startsAt, locale)}
                   </h3>
                   <div className="grid gap-3 lg:grid-cols-2">
                     {dayItems.map((item) => (
@@ -354,7 +365,7 @@ export function CalendarView({ admin = false }: { admin?: boolean }) {
               ))
             ) : (
               <p className="p-10 text-center text-sm text-ist-muted">
-                No scheduled events or programs in this range.
+                {t('empty')}
               </p>
             )}
           </div>

@@ -1,0 +1,151 @@
+{
+  "Nav": {
+    "home": "Home",
+    "prayerTimes": "Prayer Times",
+    "about": "About",
+    "education": "Education",
+    "community": "Community",
+    "services": "Services",
+    "events": "Events",
+    "visit": "Visit",
+    "getInvolved": "Get involved",
+    "contact": "Contact",
+    "donate": "Donate",
+    "language": "Language"
+  },
+  "Common": {
+    "learnMore": "Learn more",
+    "contactOffice": "Contact the office",
+    "planVisit": "Plan your visit",
+    "viewPrayerTimes": "View prayer times",
+    "openDonation": "Open donation portal",
+    "backHome": "Back home",
+    "torontoTime": "Times shown in Toronto"
+  },
+  "Footer": {
+    "contact": "Contact",
+    "menu": "Menu",
+    "connect": "Connect",
+    "tagline": "Faith, knowledge, and community at Masjid Darus Salaam.",
+    "prayerBoard": "Live prayer board",
+    "instagram": "Instagram feed",
+    "rights": "All rights reserved."
+  },
+  "Home": {
+    "eyebrow": "Masjid Darus Salaam",
+    "title": "Islamic Society of Toronto",
+    "description": "Faith, knowledge, and community — serving Toronto's Muslim families since 1995.",
+    "welcomeTitle": "A place to pray, learn, and belong",
+    "welcomeBody": "Find live prayer times, weekly programs, community services, and ways to connect.",
+    "jummah": "Friday Jummah times",
+    "explore": "Explore IST"
+  },
+  "Visit": {
+    "eyebrow": "Plan your visit",
+    "title": "Find us at Masjid Darus Salaam",
+    "description": "Directions, parking warnings, and what to expect before arriving at 20 Overlea Blvd.",
+    "parkingTitle": "Important parking warning",
+    "parkingBody": "Do not park at 25 Overlea Blvd or East York Town Centre. These private lots actively tow unauthorized vehicles.",
+    "firstTitle": "Your first visit",
+    "firstBody": "Arrive early for Jummah, dress modestly, silence phones, and follow on-site signs for prayer areas. Contact the office ahead for accessibility needs.",
+    "maps": "Open directions"
+  },
+  "Contact": {
+    "eyebrow": "Contact us",
+    "title": "Get in touch",
+    "description": "Ask the IST office about education, Nikah, Janazah, volunteering, events, or a first visit.",
+    "hours": "Office hours",
+    "hoursBody": "Availability changes around prayers and programs. Call or email ahead so staff can confirm a suitable time.",
+    "message": "Send a message"
+  },
+  "Prayer": {
+    "eyebrow": "Worship",
+    "title": "Prayer times",
+    "description": "Live daily prayer, iqamah, sunrise, and Jummah times for Masjid Darus Salaam.",
+    "boardNote": "The masjid board is shown below. Times are synchronized from IST's Prayer Clock."
+  },
+  "Events": {
+    "eyebrow": "Community schedule",
+    "title": "Events & programs",
+    "description": "Browse the community calendar or subscribe from your calendar app."
+  },
+  "Calendar": {
+    "title": "Events & programs calendar",
+    "description": "Times are shown in Toronto. Subscribe once to keep your calendar updated.",
+    "subscribe": "Subscribe / download",
+    "today": "Today",
+    "previous": "Previous month",
+    "next": "Next month",
+    "all": "All",
+    "event": "Events",
+    "program": "Programs",
+    "month": "Month",
+    "agenda": "Agenda",
+    "loading": "Loading calendar…",
+    "empty": "No scheduled events or programs in this range.",
+    "add": "Add to calendar"
+  },
+  "NewMuslim": {
+    "eyebrow": "You are welcome",
+    "title": "New to Islam or the masjid?",
+    "description": "Start at your pace. We welcome new Muslims, people exploring Islam, and anyone returning to faith.",
+    "visit": "Visit without pressure",
+    "visitBody": "Observe a prayer, ask questions, or simply become familiar with the masjid.",
+    "shahada": "Ask about the Shahada",
+    "shahadaBody": "An Imam can explain its meaning and help with practical next steps.",
+    "prayer": "Learn prayer gradually",
+    "prayerBody": "Begin with purification, the movements of Salah, and a few short surahs.",
+    "community": "Find community",
+    "communityBody": "The office can connect brothers and sisters with suitable classes and support."
+  },
+  "Zakat": {
+    "eyebrow": "Giving",
+    "title": "Zakat calculator",
+    "description": "A Canadian-dollar estimate to organize your figures before speaking with a qualified scholar.",
+    "disclaimer": "This tool is an estimate, not a fatwa. Confirm nisab, eligible assets, debts, and lunar-year requirements with an Imam.",
+    "cash": "Cash and bank balances",
+    "metals": "Gold and silver value",
+    "investments": "Zakatable investments",
+    "business": "Business inventory / cash",
+    "receivables": "Money expected to be repaid",
+    "debts": "Short-term debts due",
+    "nisab": "Current nisab threshold (CAD)",
+    "nisabPlaceholder": "Enter a current threshold from a trusted source",
+    "estimate": "Estimate",
+    "totalAssets": "Total assets",
+    "net": "Net zakatable amount",
+    "estimated": "Estimated Zakat at 2.5%",
+    "enterNisab": "Enter a current nisab threshold to check eligibility.",
+    "eligible": "Your net amount meets the threshold entered.",
+    "below": "Your net amount is below the threshold entered.",
+    "donate": "Continue to secure donation"
+  },
+  "Volunteer": {
+    "eyebrow": "Get involved",
+    "title": "Volunteer with IST",
+    "description": "Tell us the role that interests you and when you are available. The team will follow up when a suitable opportunity opens."
+  },
+  "Form": {
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "topic": "Topic",
+    "message": "Message",
+    "role": "Preferred role",
+    "availability": "Availability",
+    "send": "Send message",
+    "sending": "Sending…",
+    "success": "Thank you — your message was sent.",
+    "privacy": "By submitting, you agree we may email your inquiry to IST staff.",
+    "general": "General",
+    "nikah": "Nikah",
+    "education": "Education",
+    "janazah": "Janazah",
+    "volunteer": "Volunteer"
+  },
+  "NotFound": {
+    "eyebrow": "404 · Page not found",
+    "title": "Let us help you find the way",
+    "body": "The page may have moved, but prayer times, visitor information, and the IST office are still close by."
+  }
+}

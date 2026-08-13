@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   DAILY_PRAYERS,
@@ -15,6 +17,7 @@ import {
 } from '@/lib/prayer';
 import { links } from '@/lib/content';
 import { IconDonate, IconPrayer } from './icons';
+import { isAppLocale } from '@/i18n/routing';
 
 const DISMISS_KEY = 'ist-prayer-bar-dismissed';
 const CACHE_KEY = 'ist-prayer-times-cache-v1';
@@ -71,6 +74,11 @@ function formatHijri(d: Date) {
 }
 
 export function StickyPrayerBar() {
+  const locale = useLocale();
+  const pathname = usePathname();
+  const nav = useTranslations('Nav');
+  const localized = isAppLocale(pathname.split('/').filter(Boolean)[0]);
+  const prayerHref = localized ? `/${locale}/prayer-times` : '/prayer-times';
   const [dismissed, setDismissed] = useState(true);
   const [prayers, setPrayers] = useState<PrayerRow | null>(null);
   const [settings, setSettings] = useState<PrayerSettings | undefined>();
@@ -311,7 +319,7 @@ export function StickyPrayerBar() {
       {/* Iqamah row */}
       <div className="mx-auto flex max-w-7xl items-stretch gap-1 px-2 sm:gap-2 sm:px-4">
         <Link
-          href="/prayer-times"
+          href={prayerHref}
           className="hidden shrink-0 items-center gap-2 border-r border-white/15 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-ist-gold sm:flex"
         >
           <IconPrayer className="h-3.5 w-3.5" />
@@ -329,7 +337,7 @@ export function StickyPrayerBar() {
               >
                 Retry
               </button>
-              <Link href="/prayer-times" className="ml-1 underline">
+              <Link href={prayerHref} className="ml-1 underline">
                 open board
               </Link>
             </p>
@@ -381,7 +389,7 @@ export function StickyPrayerBar() {
         >
           <IconDonate className="h-4 w-4" />
           <span className="hidden text-[10px] font-semibold uppercase tracking-[0.12em] md:inline">
-            Donate
+            {nav('donate')}
           </span>
         </a>
 

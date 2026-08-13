@@ -6,7 +6,11 @@ import { FadeUp, PageTransition, SlideInLeft, SlideInRight } from '@/components/
 import { PageHero } from '@/components/PageHero';
 import { MediaBand } from '@/components/MediaBand';
 
-export const metadata: Metadata = { title: 'Visit & Parking' };
+export const metadata: Metadata = {
+  title: 'Visit & Parking',
+  description:
+    'Plan a visit to Masjid Darus Salaam at 20 Overlea Blvd with current parking warnings, transit links, and first-visit guidance.',
+};
 
 const encodedAddress = encodeURIComponent(site.address);
 

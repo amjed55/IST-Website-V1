@@ -3,11 +3,27 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useId, useState } from 'react';
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'framer-motion';
 import { links, primaryNav, site, type NavItem } from '@/lib/content';
 import { Button } from './ui';
 import { IconDonate, IconPrayer, navIcons } from './icons';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { isAppLocale } from '@/i18n/routing';
+
+const navKeys: Record<string, string> = {
+  '/': 'home',
+  '/prayer-times': 'prayerTimes',
+  '/about': 'about',
+  '/education': 'education',
+  '/community': 'community',
+  '/services': 'services',
+  '/events': 'events',
+  '/visit': 'visit',
+  '/get-involved': 'getInvolved',
+  '/contact': 'contact',
+};
 
 function Chevron({ open }: { open?: boolean }) {
   return (
@@ -41,6 +57,17 @@ function isActive(pathname: string, item: NavItem) {
 
 export function Header() {
   const pathname = usePathname();
+  const locale = useLocale();
+  const t = useTranslations('Nav');
+  const firstSegment = pathname.split('/').filter(Boolean)[0];
+  const localized = isAppLocale(firstSegment);
+  const activePath = localized
+    ? pathname.slice(`/${firstSegment}`.length) || '/'
+    : pathname;
+  const hrefFor = (href: string) =>
+    localized && href.startsWith('/')
+      ? `/${locale}${href === '/' ? '' : href}`
+      : href;
   const [open, setOpen] = useState(false);
   const [drop, setDrop] = useState<string | null>(null);
   const [mobileExpand, setMobileExpand] = useState<string | null>(null);
@@ -85,9 +112,9 @@ export function Header() {
     >
       <div className="mx-auto grid h-16 w-full max-w-7xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 sm:h-[4.5rem] sm:gap-4 sm:px-6 lg:px-8">
         {/* Brand */}
-        <Link href="/" className="relative z-10 flex shrink-0 items-center">
+        <Link href={hrefFor('/')} className="relative z-10 flex shrink-0 items-center">
           <Image
-            src="/brand/ist-logo.png"
+            src="/brand/ist-logo.svg"
             alt={site.name}
             width={140}
             height={140}
@@ -104,7 +131,7 @@ export function Header() {
             onMouseLeave={() => setDrop(null)}
           >
           {primaryNav.map((item) => {
-            const active = isActive(pathname, item);
+            const active = isActive(activePath, item);
             const isOpen = drop === item.label;
             const NavIcon = navIcons[item.label];
             return (
@@ -115,7 +142,7 @@ export function Header() {
                 onFocusCapture={() => setDrop(item.label)}
               >
                 <Link
-                  href={item.href}
+                  href={hrefFor(item.href)}
                   className={`group relative inline-flex items-center gap-1.5 px-2.5 py-2 text-[13px] font-medium tracking-wide transition ${
                     active || isOpen ? 'text-ist-green' : 'text-ist-ink/70 hover:text-ist-green'
                   }`}
@@ -127,7 +154,7 @@ export function Header() {
                       <NavIcon className="h-3.5 w-3.5" />
                     </span>
                   )}
-                  {item.label}
+                  {t(navKeys[item.href] || item.label)}
                   {item.children && <Chevron open={isOpen} />}
                   <span
                     className={`absolute inset-x-2.5 -bottom-0.5 h-0.5 origin-left rounded-full bg-ist-teal transition-transform duration-300 ${
@@ -153,7 +180,7 @@ export function Header() {
                           return (
                             <Link
                               key={child.href}
-                              href={child.href}
+                              href={hrefFor(child.href)}
                               role="menuitem"
                               className={`block rounded-xl px-3.5 py-2.5 text-sm transition ${
                                 childActive
@@ -180,11 +207,11 @@ export function Header() {
         <div className="flex shrink-0 items-center justify-end gap-2">
           <div className="hidden items-center gap-2 lg:flex">
             <Link
-              href="/prayer-times"
+              href={hrefFor('/prayer-times')}
               className="inline-flex items-center gap-2 rounded-full bg-ist-teal px-4 py-2 text-xs font-semibold tracking-wide text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-ist-teal-light"
             >
               <IconPrayer className="h-3.5 w-3.5" />
-              Prayer Times
+              {t('prayerTimes')}
             </Link>
             <a
               href={links.donate}
@@ -193,8 +220,9 @@ export function Header() {
               className="inline-flex items-center gap-1.5 rounded-full bg-ist-green px-4 py-2 text-xs font-semibold tracking-wide text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-ist-green-deep"
             >
               <IconDonate className="h-3.5 w-3.5" />
-              Donate
+              {t('donate')}
             </a>
+            <LanguageSwitcher compact />
           </div>
 
           <div className="flex items-center gap-2 lg:hidden">
@@ -255,7 +283,7 @@ export function Header() {
             >
               <div className="flex items-center justify-between border-b border-ist-green/8 px-5 py-4">
                 <Image
-                  src="/brand/ist-logo.png"
+                  src="/brand/ist-logo.svg"
                   alt=""
                   width={56}
                   height={56}
@@ -273,7 +301,7 @@ export function Header() {
               <div className="flex-1 overflow-y-auto px-3 py-3">
                 {primaryNav.map((item, i) => {
                   const expanded = mobileExpand === item.label;
-                  const active = isActive(pathname, item);
+                  const active = isActive(activePath, item);
                   const NavIcon = navIcons[item.label];
                   return (
                     <motion.div
@@ -285,7 +313,7 @@ export function Header() {
                     >
                       <div className="flex items-center gap-1">
                         <Link
-                          href={item.href}
+                          href={hrefFor(item.href)}
                           className={`flex flex-1 items-center gap-2.5 px-3 py-3.5 text-[15px] font-semibold ${
                             active ? 'text-ist-teal' : 'text-ist-green'
                           }`}
@@ -296,7 +324,7 @@ export function Header() {
                               <NavIcon className="h-4 w-4" />
                             </span>
                           )}
-                          {item.label}
+                          {t(navKeys[item.href] || item.label)}
                         </Link>
                         {item.children && (
                           <button
@@ -324,7 +352,7 @@ export function Header() {
                               {item.children.map((child) => (
                                 <Link
                                   key={child.href}
-                                  href={child.href}
+                                  href={hrefFor(child.href)}
                                   className="rounded-xl px-3 py-2.5 text-sm text-ist-muted transition hover:bg-ist-cream hover:text-ist-green"
                                   onClick={() => setOpen(false)}
                                 >
@@ -341,11 +369,12 @@ export function Header() {
               </div>
 
               <div className="grid gap-2 border-t border-ist-green/8 p-4">
-                <Button href="/prayer-times" variant="teal" className="w-full">
-                  Prayer Times
+                <LanguageSwitcher />
+                <Button href={hrefFor('/prayer-times')} variant="teal" className="w-full">
+                  {t('prayerTimes')}
                 </Button>
                 <Button href={links.donate} variant="primary" external className="w-full">
-                  Donate
+                  {t('donate')}
                 </Button>
               </div>
             </motion.aside>
