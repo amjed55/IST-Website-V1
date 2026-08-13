@@ -8,6 +8,10 @@ async function guard() {
   return getAdminSession();
 }
 
+function optionalText(value: unknown) {
+  return value === null || value === undefined || value === '' ? null : String(value);
+}
+
 export async function GET() {
   if (!(await guard())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   return NextResponse.json({ programs: await listPrograms() });
@@ -53,7 +57,7 @@ export async function POST(req: Request) {
       category,
       String(body.title || 'Untitled'),
       String(body.summary || ''),
-      body.schedule || null,
+      optionalText(body.schedule),
       body.tags
         ? JSON.stringify(
             Array.isArray(body.tags)
@@ -121,7 +125,7 @@ export async function PUT(req: Request) {
       category,
       String(body.title || ''),
       String(body.summary || ''),
-      body.schedule || null,
+      optionalText(body.schedule),
       body.tags
         ? JSON.stringify(
             Array.isArray(body.tags)

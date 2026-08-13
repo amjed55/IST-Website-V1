@@ -21,6 +21,10 @@ function parseDetails(raw: unknown) {
   return null;
 }
 
+function optionalText(value: unknown) {
+  return value === null || value === undefined || value === '' ? null : String(value);
+}
+
 export async function GET() {
   if (!(await guard())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   return NextResponse.json({ events: await listEvents() });
@@ -63,15 +67,15 @@ export async function POST(req: Request) {
       String(body.title || 'Untitled'),
       String(body.dateLabel || body.date_label || ''),
       String(body.summary || ''),
-      body.badge || null,
-      body.location || null,
+      optionalText(body.badge),
+      optionalText(body.location),
       body.status === 'past' ? 'past' : 'upcoming',
       body.recurring === true || body.recurring === 'on' || body.recurring === '1' ? 1 : 0,
       parseDetails(body.details),
-      body.scheduleKind || body.schedule_kind || null,
+      optionalText(body.scheduleKind || body.schedule_kind),
       imageSrc,
-      body.startsAt || body.starts_at || null,
-      body.endsAt || body.ends_at || null,
+      optionalText(body.startsAt || body.starts_at),
+      optionalText(body.endsAt || body.ends_at),
       hub,
       Number(body.sortOrder ?? body.sort_order ?? 0),
     ],
@@ -129,15 +133,15 @@ export async function PUT(req: Request) {
       String(body.title || ''),
       String(body.dateLabel || body.date_label || ''),
       String(body.summary || ''),
-      body.badge || null,
-      body.location || null,
+      optionalText(body.badge),
+      optionalText(body.location),
       body.status === 'past' ? 'past' : 'upcoming',
       body.recurring === true || body.recurring === 'on' || body.recurring === '1' ? 1 : 0,
       parseDetails(body.details),
-      body.scheduleKind || body.schedule_kind || null,
+      optionalText(body.scheduleKind || body.schedule_kind),
       finalImage,
-      body.startsAt || body.starts_at || null,
-      body.endsAt || body.ends_at || null,
+      optionalText(body.startsAt || body.starts_at),
+      optionalText(body.endsAt || body.ends_at),
       hub,
       Number(body.sortOrder ?? body.sort_order ?? 0),
       id,
