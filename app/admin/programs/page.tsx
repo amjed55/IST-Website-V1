@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { AdminNav } from '@/components/AdminNav';
+import { CALENDAR_WEEKDAYS, toTorontoLocalInput } from '@/lib/calendar';
 
 type Program = {
   id: string;
@@ -13,6 +14,13 @@ type Program = {
   image_src: string | null;
   hub: string | null;
   sort_order: number;
+  calendar_enabled: number;
+  starts_at: string | null;
+  ends_at: string | null;
+  recurrence_rule: string | null;
+  recurrence_until: string | null;
+  venue: string | null;
+  published: number;
 };
 
 const empty = {
@@ -25,7 +33,27 @@ const empty = {
   hub: '',
   image_src: '',
   sort_order: 0,
+  calendar_enabled: false,
+  starts_at: '',
+  ends_at: '',
+  recurrence_frequency: 'none' as 'none' | 'daily' | 'weekly',
+  recurrence_days: [] as string[],
+  recurrence_interval: 1,
+  recurrence_until: '',
+  venue: '',
+  published: true,
 };
+
+function recurrenceForm(rule: string | null) {
+  if (!rule) {
+    return { frequency: 'none' as const, days: [] as string[], interval: 1 };
+  }
+  return {
+    frequency: rule.includes('FREQ=DAILY') ? ('daily' as const) : ('weekly' as const),
+    days: rule.match(/BYDAY=([^;\r\n]+)/)?.[1]?.split(',') || [],
+    interval: Number(rule.match(/INTERVAL=(\d+)/)?.[1] || 1),
+  };
+}
 
 export default function AdminProgramsPage() {
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -41,7 +69,14 @@ export default function AdminProgramsPage() {
       return;
     }
     const data = await res.json();
-    setPrograms(data.programs || []);
+    const rows = data.programs || [];
+    setPrograms(rows);
+    const editId = new URLSearchParams(window.location.search).get('edit');
+    const target = rows.find((program: Program) => program.id === editId);
+    if (target) {
+      startEdit(target);
+      window.history.replaceState({}, '', '/admin/programs');
+    }
   }
 
   useEffect(() => {
@@ -49,6 +84,7 @@ export default function AdminProgramsPage() {
   }, []);
 
   function startEdit(p: Program) {
+    const recurrence = recurrenceForm(p.recurrence_rule);
     setEditing(true);
     setPoster(null);
     setForm({
@@ -61,6 +97,15 @@ export default function AdminProgramsPage() {
       hub: p.hub || '',
       image_src: p.image_src || '',
       sort_order: p.sort_order || 0,
+      calendar_enabled: Boolean(p.calendar_enabled),
+      starts_at: toTorontoLocalInput(p.starts_at),
+      ends_at: toTorontoLocalInput(p.ends_at),
+      recurrence_frequency: recurrence.frequency,
+      recurrence_days: recurrence.days,
+      recurrence_interval: recurrence.interval,
+      recurrence_until: p.recurrence_until || '',
+      venue: p.venue || '',
+      published: p.published !== 0,
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -74,14 +119,19 @@ export default function AdminProgramsPage() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     const fd = new FormData();
-    Object.entries(form).forEach(([k, v]) => fd.set(k, String(v)));
+    Object.entries(form).forEach(([k, v]) => {
+      if (typeof v === 'boolean') fd.set(k, v ? '1' : '0');
+      else if (Array.isArray(v)) fd.set(k, v.join(','));
+      else fd.set(k, String(v));
+    });
     if (poster) fd.set('poster', poster);
     const res = await fetch('/api/admin/programs', {
       method: editing ? 'PUT' : 'POST',
       body: fd,
     });
     if (!res.ok) {
-      setMsg('Could not save programme');
+      const data = await res.json().catch(() => ({}));
+      setMsg(data.error || 'Could not save programme');
       return;
     }
     setMsg(editing ? 'Programme updated' : 'Programme created');
@@ -142,6 +192,136 @@ export default function AdminProgramsPage() {
             <option value="sisters">Sisters&apos; Hub</option>
             <option value="seniors">Seniors Hub</option>
           </select>
+          <fieldset className="space-y-4 border border-ist-teal/30 bg-ist-green-deep/40 p-4 md:col-span-2">
+            <legend className="px-2 font-semibold text-ist-teal-light">Public calendar</legend>
+            <label className="flex items-center gap-2 text-sm text-white/80">
+              <input
+                type="checkbox"
+                checked={form.calendar_enabled}
+                onChange={(e) => setForm({ ...form, calendar_enabled: e.target.checked })}
+              />
+              Show this programme on the public calendar
+            </label>
+            {form.calendar_enabled && (
+              <div className="grid gap-3 md:grid-cols-2">
+                <label className="text-sm text-white/70">
+                  First session starts in Toronto
+                  <input
+                    required
+                    type="datetime-local"
+                    value={form.starts_at}
+                    onChange={(e) => setForm({ ...form, starts_at: e.target.value })}
+                    className="mt-1 w-full border border-white/15 bg-black/20 px-3 py-2"
+                  />
+                </label>
+                <label className="text-sm text-white/70">
+                  First session ends in Toronto
+                  <input
+                    required
+                    type="datetime-local"
+                    value={form.ends_at}
+                    onChange={(e) => setForm({ ...form, ends_at: e.target.value })}
+                    className="mt-1 w-full border border-white/15 bg-black/20 px-3 py-2"
+                  />
+                </label>
+                <label className="text-sm text-white/70">
+                  Repeats
+                  <select
+                    value={form.recurrence_frequency}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        recurrence_frequency: e.target.value as 'none' | 'daily' | 'weekly',
+                      })
+                    }
+                    className="mt-1 w-full border border-white/15 bg-black/20 px-3 py-2"
+                  >
+                    <option value="none">Does not repeat</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                  </select>
+                </label>
+                <label className="text-sm text-white/70">
+                  Venue
+                  <input
+                    value={form.venue}
+                    onChange={(e) => setForm({ ...form, venue: e.target.value })}
+                    placeholder="Classroom, gym, or prayer hall"
+                    className="mt-1 w-full border border-white/15 bg-black/20 px-3 py-2"
+                  />
+                </label>
+                {form.recurrence_frequency !== 'none' && (
+                  <>
+                    <label className="text-sm text-white/70">
+                      Repeat every
+                      <span className="mt-1 flex items-center gap-2">
+                        <input
+                          type="number"
+                          min={1}
+                          max={12}
+                          value={form.recurrence_interval}
+                          onChange={(e) =>
+                            setForm({ ...form, recurrence_interval: Number(e.target.value) })
+                          }
+                          className="w-20 border border-white/15 bg-black/20 px-3 py-2"
+                        />
+                        {form.recurrence_frequency === 'daily' ? 'day(s)' : 'week(s)'}
+                      </span>
+                    </label>
+                    <label className="text-sm text-white/70">
+                      Repeat until (optional)
+                      <input
+                        type="date"
+                        value={form.recurrence_until}
+                        onChange={(e) => setForm({ ...form, recurrence_until: e.target.value })}
+                        className="mt-1 w-full border border-white/15 bg-black/20 px-3 py-2"
+                      />
+                    </label>
+                  </>
+                )}
+                {form.recurrence_frequency === 'weekly' && (
+                  <div className="md:col-span-2">
+                    <p className="mb-2 text-sm text-white/70">Repeat on</p>
+                    <div className="flex flex-wrap gap-2">
+                      {CALENDAR_WEEKDAYS.map((day) => (
+                        <label
+                          key={day}
+                          className="flex items-center gap-1.5 border border-white/15 px-2.5 py-1.5 text-xs"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={form.recurrence_days.includes(day)}
+                            onChange={(e) =>
+                              setForm({
+                                ...form,
+                                recurrence_days: e.target.checked
+                                  ? [...form.recurrence_days, day]
+                                  : form.recurrence_days.filter((value) => value !== day),
+                              })
+                            }
+                          />
+                          {day}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <label className="flex items-center gap-2 text-sm text-white/70">
+                  <input
+                    type="checkbox"
+                    checked={form.published}
+                    onChange={(e) => setForm({ ...form, published: e.target.checked })}
+                  />
+                  Published
+                </label>
+                <p className="text-xs text-white/50 md:text-right">
+                  {form.starts_at && form.ends_at
+                    ? `${form.recurrence_frequency === 'none' ? 'Once' : `Repeats ${form.recurrence_frequency}`} · ${form.starts_at.replace('T', ' ')}`
+                    : 'Choose a start and end to preview the schedule.'}
+                </p>
+              </div>
+            )}
+          </fieldset>
           <label className="text-sm text-white/70 md:col-span-2">
             Poster / picture
             <input
@@ -172,7 +352,11 @@ export default function AdminProgramsPage() {
               </button>
             )}
           </div>
-          {msg && <p className="text-sm text-ist-teal-light md:col-span-2">{msg}</p>}
+          {msg && (
+            <p className="text-sm text-ist-teal-light md:col-span-2" role="status">
+              {msg}
+            </p>
+          )}
         </form>
 
         <div className="divide-y divide-white/10 border border-white/10">
@@ -187,6 +371,7 @@ export default function AdminProgramsPage() {
                   <p className="text-xs uppercase tracking-wider text-ist-teal-light">
                     {p.category}
                     {p.hub ? ` · ${p.hub}` : ''}
+                    {p.calendar_enabled ? ' · calendar' : ''}
                   </p>
                   <h3 className="mt-1 font-display text-xl">{p.title}</h3>
                   {p.schedule && <p className="text-sm text-ist-gold/90">{p.schedule}</p>}

@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { AdminNav } from '@/components/AdminNav';
+import { CALENDAR_WEEKDAYS, toTorontoLocalInput } from '@/lib/calendar';
 
 type EventRow = {
   id: string;
@@ -19,6 +20,11 @@ type EventRow = {
   ends_at: string | null;
   hub: string | null;
   sort_order: number;
+  calendar_enabled: number;
+  recurrence_rule: string | null;
+  recurrence_until: string | null;
+  venue: string | null;
+  published: number;
 };
 
 const emptyForm = {
@@ -37,20 +43,23 @@ const emptyForm = {
   hub: '',
   sort_order: 0,
   image_src: '',
+  calendar_enabled: false,
+  recurrence_frequency: 'none' as 'none' | 'daily' | 'weekly',
+  recurrence_days: [] as string[],
+  recurrence_interval: 1,
+  recurrence_until: '',
+  venue: '',
+  published: true,
 };
 
-function toLocalInput(iso: string | null) {
-  if (!iso) return '';
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso.slice(0, 16);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
-function fromLocalInput(value: string) {
-  if (!value) return null;
-  const d = new Date(value);
-  return Number.isNaN(d.getTime()) ? value : d.toISOString();
+function recurrenceForm(rule: string | null) {
+  if (!rule) {
+    return { frequency: 'none' as const, days: [] as string[], interval: 1 };
+  }
+  const frequency = rule.includes('FREQ=DAILY') ? ('daily' as const) : ('weekly' as const);
+  const days = rule.match(/BYDAY=([^;\r\n]+)/)?.[1]?.split(',') || [];
+  const interval = Number(rule.match(/INTERVAL=(\d+)/)?.[1] || 1);
+  return { frequency, days, interval };
 }
 
 export default function AdminEventsPage() {
@@ -67,7 +76,14 @@ export default function AdminEventsPage() {
       return;
     }
     const data = await res.json();
-    setEvents(data.events || []);
+    const rows = data.events || [];
+    setEvents(rows);
+    const editId = new URLSearchParams(window.location.search).get('edit');
+    const target = rows.find((event: EventRow) => event.id === editId);
+    if (target) {
+      startEdit(target);
+      window.history.replaceState({}, '', '/admin/events');
+    }
   }
 
   useEffect(() => {
@@ -75,6 +91,7 @@ export default function AdminEventsPage() {
   }, []);
 
   function startEdit(ev: EventRow) {
+    const recurrence = recurrenceForm(ev.recurrence_rule);
     setEditing(true);
     setPoster(null);
     setForm({
@@ -90,11 +107,18 @@ export default function AdminEventsPage() {
         ? (JSON.parse(ev.details_json) as string[]).join('\n')
         : '',
       schedule_kind: ev.schedule_kind || '',
-      starts_at: toLocalInput(ev.starts_at),
-      ends_at: toLocalInput(ev.ends_at),
+      starts_at: toTorontoLocalInput(ev.starts_at),
+      ends_at: toTorontoLocalInput(ev.ends_at),
       hub: ev.hub || '',
       sort_order: ev.sort_order || 0,
       image_src: ev.image_src || '',
+      calendar_enabled: Boolean(ev.calendar_enabled),
+      recurrence_frequency: recurrence.frequency,
+      recurrence_days: recurrence.days,
+      recurrence_interval: recurrence.interval,
+      recurrence_until: ev.recurrence_until || '',
+      venue: ev.venue || ev.location || '',
+      published: ev.published !== 0,
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -109,9 +133,8 @@ export default function AdminEventsPage() {
     e.preventDefault();
     const fd = new FormData();
     Object.entries(form).forEach(([k, v]) => {
-      if (k === 'recurring') fd.set('recurring', v ? '1' : '0');
-      else if (k === 'starts_at') fd.set('starts_at', fromLocalInput(String(v)) || '');
-      else if (k === 'ends_at') fd.set('ends_at', fromLocalInput(String(v)) || '');
+      if (typeof v === 'boolean') fd.set(k, v ? '1' : '0');
+      else if (Array.isArray(v)) fd.set(k, v.join(','));
       else fd.set(k, String(v));
     });
     fd.set('dateLabel', form.date_label);
@@ -123,7 +146,8 @@ export default function AdminEventsPage() {
       body: fd,
     });
     if (!res.ok) {
-      setMsg('Could not save event');
+      const data = await res.json().catch(() => ({}));
+      setMsg(data.error || 'Could not save event');
       return;
     }
     setMsg(editing ? 'Event updated' : 'Event created');
@@ -172,24 +196,136 @@ export default function AdminEventsPage() {
             onChange={(e) => setForm({ ...form, location: e.target.value })}
             className="border border-white/15 bg-black/20 px-3 py-2"
           />
-          <label className="text-sm text-white/70">
-            Starts at
-            <input
-              type="datetime-local"
-              value={form.starts_at}
-              onChange={(e) => setForm({ ...form, starts_at: e.target.value })}
-              className="mt-1 w-full border border-white/15 bg-black/20 px-3 py-2"
-            />
-          </label>
-          <label className="text-sm text-white/70">
-            Ends at (auto-moves to Past)
-            <input
-              type="datetime-local"
-              value={form.ends_at}
-              onChange={(e) => setForm({ ...form, ends_at: e.target.value })}
-              className="mt-1 w-full border border-white/15 bg-black/20 px-3 py-2"
-            />
-          </label>
+          <fieldset className="space-y-4 border border-ist-teal/30 bg-ist-green-deep/40 p-4 md:col-span-2">
+            <legend className="px-2 font-semibold text-ist-teal-light">Public calendar</legend>
+            <label className="flex items-center gap-2 text-sm text-white/80">
+              <input
+                type="checkbox"
+                checked={form.calendar_enabled}
+                onChange={(e) => setForm({ ...form, calendar_enabled: e.target.checked })}
+              />
+              Show this event on the public calendar
+            </label>
+            {form.calendar_enabled && (
+              <div className="grid gap-3 md:grid-cols-2">
+                <label className="text-sm text-white/70">
+                  Starts in Toronto
+                  <input
+                    required
+                    type="datetime-local"
+                    value={form.starts_at}
+                    onChange={(e) => setForm({ ...form, starts_at: e.target.value })}
+                    className="mt-1 w-full border border-white/15 bg-black/20 px-3 py-2"
+                  />
+                </label>
+                <label className="text-sm text-white/70">
+                  Ends in Toronto
+                  <input
+                    required
+                    type="datetime-local"
+                    value={form.ends_at}
+                    onChange={(e) => setForm({ ...form, ends_at: e.target.value })}
+                    className="mt-1 w-full border border-white/15 bg-black/20 px-3 py-2"
+                  />
+                </label>
+                <label className="text-sm text-white/70">
+                  Repeats
+                  <select
+                    value={form.recurrence_frequency}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        recurrence_frequency: e.target.value as 'none' | 'daily' | 'weekly',
+                      })
+                    }
+                    className="mt-1 w-full border border-white/15 bg-black/20 px-3 py-2"
+                  >
+                    <option value="none">Does not repeat</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                  </select>
+                </label>
+                <label className="text-sm text-white/70">
+                  Venue
+                  <input
+                    value={form.venue}
+                    onChange={(e) => setForm({ ...form, venue: e.target.value })}
+                    placeholder="Masjid Darus Salaam"
+                    className="mt-1 w-full border border-white/15 bg-black/20 px-3 py-2"
+                  />
+                </label>
+                {form.recurrence_frequency !== 'none' && (
+                  <>
+                    <label className="text-sm text-white/70">
+                      Repeat every
+                      <span className="mt-1 flex items-center gap-2">
+                        <input
+                          type="number"
+                          min={1}
+                          max={12}
+                          value={form.recurrence_interval}
+                          onChange={(e) =>
+                            setForm({ ...form, recurrence_interval: Number(e.target.value) })
+                          }
+                          className="w-20 border border-white/15 bg-black/20 px-3 py-2"
+                        />
+                        {form.recurrence_frequency === 'daily' ? 'day(s)' : 'week(s)'}
+                      </span>
+                    </label>
+                    <label className="text-sm text-white/70">
+                      Repeat until (optional)
+                      <input
+                        type="date"
+                        value={form.recurrence_until}
+                        onChange={(e) => setForm({ ...form, recurrence_until: e.target.value })}
+                        className="mt-1 w-full border border-white/15 bg-black/20 px-3 py-2"
+                      />
+                    </label>
+                  </>
+                )}
+                {form.recurrence_frequency === 'weekly' && (
+                  <div className="md:col-span-2">
+                    <p className="mb-2 text-sm text-white/70">Repeat on</p>
+                    <div className="flex flex-wrap gap-2">
+                      {CALENDAR_WEEKDAYS.map((day) => (
+                        <label
+                          key={day}
+                          className="flex items-center gap-1.5 border border-white/15 px-2.5 py-1.5 text-xs"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={form.recurrence_days.includes(day)}
+                            onChange={(e) =>
+                              setForm({
+                                ...form,
+                                recurrence_days: e.target.checked
+                                  ? [...form.recurrence_days, day]
+                                  : form.recurrence_days.filter((value) => value !== day),
+                              })
+                            }
+                          />
+                          {day}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <label className="flex items-center gap-2 text-sm text-white/70">
+                  <input
+                    type="checkbox"
+                    checked={form.published}
+                    onChange={(e) => setForm({ ...form, published: e.target.checked })}
+                  />
+                  Published
+                </label>
+                <p className="text-xs text-white/50 md:text-right">
+                  {form.starts_at && form.ends_at
+                    ? `${form.recurrence_frequency === 'none' ? 'Once' : `Repeats ${form.recurrence_frequency}`} · ${form.starts_at.replace('T', ' ')}–${form.ends_at.split('T')[1] || form.ends_at}`
+                    : 'Choose a start and end to preview the schedule.'}
+                </p>
+              </div>
+            )}
+          </fieldset>
           <select
             value={form.status}
             onChange={(e) => setForm({ ...form, status: e.target.value as 'upcoming' | 'past' })}
@@ -264,7 +400,11 @@ export default function AdminEventsPage() {
               </button>
             )}
           </div>
-          {msg && <p className="text-sm text-ist-teal-light md:col-span-2">{msg}</p>}
+          {msg && (
+            <p className="text-sm text-ist-teal-light md:col-span-2" role="status">
+              {msg}
+            </p>
+          )}
         </form>
 
         <div className="divide-y divide-white/10 border border-white/10">
@@ -279,6 +419,7 @@ export default function AdminEventsPage() {
                   <p className="text-xs uppercase tracking-wider text-ist-teal-light">
                     {ev.status} {ev.recurring ? '· recurring' : ''} {ev.badge ? `· ${ev.badge}` : ''}
                     {ev.hub ? ` · ${ev.hub}` : ''}
+                    {ev.calendar_enabled ? ' · calendar' : ''}
                   </p>
                   <h3 className="mt-1 font-display text-xl">{ev.title}</h3>
                   <p className="text-sm text-white/55">{ev.date_label}</p>

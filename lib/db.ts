@@ -309,7 +309,7 @@ function enrichDemoContent(db: Database.Database) {
     | { value: string }
     | undefined;
   const currentVersion = Number(versionRow?.value || 0);
-  const TARGET_VERSION = 6;
+  const TARGET_VERSION = 7;
   const refreshDemo = currentVersion < TARGET_VERSION;
 
   const insertEvent = db.prepare(`
@@ -548,6 +548,30 @@ function enrichDemoContent(db: Database.Database) {
   });
 
   if (refreshDemo) {
+    db.prepare(
+      `UPDATE events SET
+         calendar_enabled = 1,
+         starts_at = '2026-01-03T00:30:00.000Z',
+         ends_at = '2026-01-03T02:30:00.000Z',
+         recurrence_rule = ?,
+         venue = COALESCE(location, 'Masjid Darus Salaam'),
+         published = 1
+       WHERE id = 'youth-friday'`,
+    ).run(
+      'DTSTART;TZID=America/Toronto:20260102T193000\nRRULE:FREQ=WEEKLY;BYDAY=FR;INTERVAL=1',
+    );
+    db.prepare(
+      `UPDATE programs SET
+         calendar_enabled = 1,
+         starts_at = '2026-01-04T15:30:00.000Z',
+         ends_at = '2026-01-04T19:00:00.000Z',
+         recurrence_rule = ?,
+         venue = 'Masjid Darus Salaam',
+         published = 1
+       WHERE id = 'sunday'`,
+    ).run(
+      'DTSTART;TZID=America/Toronto:20260104T103000\nRRULE:FREQ=WEEKLY;BYDAY=SU;INTERVAL=1',
+    );
     db.prepare(
       `INSERT INTO site_settings (key, value, updated_at) VALUES ('demo_seed_version', ?, datetime('now'))
        ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = datetime('now')`,

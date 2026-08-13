@@ -3,6 +3,7 @@ import { getAdminSession } from '@/lib/auth';
 import { listPrograms, writeAudit } from '@/lib/data';
 import { dbGet, dbRun } from '@/lib/database';
 import { saveUploadedImage } from '@/lib/uploads';
+import { readCalendarFields } from '@/lib/calendar-admin';
 
 async function guard() {
   return getAdminSession();
@@ -36,6 +37,10 @@ export async function POST(req: Request) {
     body = await req.json();
     imageSrc = (body.imageSrc || body.image_src || null) as string | null;
   }
+  const calendar = readCalendarFields(body);
+  if (calendar.error) {
+    return NextResponse.json({ error: calendar.error }, { status: 400 });
+  }
 
   const id =
     String(body.id || '')
@@ -50,8 +55,11 @@ export async function POST(req: Request) {
   const hub = hubRaw === 'youth' || hubRaw === 'sisters' || hubRaw === 'seniors' ? hubRaw : null;
 
   await dbRun(
-      `INSERT INTO programs (id, category, title, summary, schedule, tags_json, image_src, hub, sort_order, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+      `INSERT INTO programs
+       (id, category, title, summary, schedule, tags_json, image_src, hub, sort_order,
+        calendar_enabled, starts_at, ends_at, recurrence_rule, recurrence_until, venue,
+        published, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
     [
       id,
       category,
@@ -71,6 +79,13 @@ export async function POST(req: Request) {
       imageSrc,
       hub,
       Number(body.sortOrder ?? body.sort_order ?? 0),
+      calendar.calendarEnabled,
+      calendar.startsAt,
+      calendar.endsAt,
+      calendar.recurrenceRule,
+      calendar.recurrenceUntil,
+      calendar.venue,
+      calendar.published,
     ],
   );
 
@@ -101,6 +116,10 @@ export async function PUT(req: Request) {
       imageSrc = (body.imageSrc || body.image_src || null) as string | null;
     }
   }
+  const calendar = readCalendarFields(body);
+  if (calendar.error) {
+    return NextResponse.json({ error: calendar.error }, { status: 400 });
+  }
 
   const id = String(body.id || '');
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
@@ -120,7 +139,9 @@ export async function PUT(req: Request) {
 
   await dbRun(
       `UPDATE programs SET category = ?, title = ?, summary = ?, schedule = ?, tags_json = ?,
-       image_src = ?, hub = ?, sort_order = ?, updated_at = datetime('now') WHERE id = ?`,
+       image_src = ?, hub = ?, sort_order = ?, calendar_enabled = ?, starts_at = ?,
+       ends_at = ?, recurrence_rule = ?, recurrence_until = ?, venue = ?, published = ?,
+       updated_at = datetime('now') WHERE id = ?`,
     [
       category,
       String(body.title || ''),
@@ -139,6 +160,13 @@ export async function PUT(req: Request) {
       finalImage,
       hub,
       Number(body.sortOrder ?? body.sort_order ?? 0),
+      calendar.calendarEnabled,
+      calendar.startsAt,
+      calendar.endsAt,
+      calendar.recurrenceRule,
+      calendar.recurrenceUntil,
+      calendar.venue,
+      calendar.published,
       id,
     ],
   );

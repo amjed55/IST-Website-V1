@@ -31,6 +31,13 @@ export default async function AdminDashboard() {
   const cards = [
     { label: 'Events', value: events.length, href: '/admin/events' },
     { label: 'Programs', value: programs.length, href: '/admin/programs' },
+    {
+      label: 'Calendar items',
+      value:
+        events.filter((event) => event.calendar_enabled).length +
+        programs.filter((program) => program.calendar_enabled).length,
+      href: '/admin/calendar',
+    },
     { label: 'Careers', value: careers.filter((c) => c.is_active).length, href: '/admin/careers' },
     { label: 'Pictures', value: media.length, href: '/admin/media' },
     { label: 'Announcements', value: announcements.length, href: '/admin/announcements' },

@@ -246,6 +246,29 @@ async function initializePostgres(client: Sql) {
     );
   }
 
+  await client.unsafe(
+    `UPDATE events SET
+       calendar_enabled = 1,
+       starts_at = '2026-01-03T00:30:00.000Z',
+       ends_at = '2026-01-03T02:30:00.000Z',
+       recurrence_rule = $1,
+       venue = COALESCE(location, 'Masjid Darus Salaam'),
+       published = 1
+     WHERE id = 'youth-friday' AND recurrence_rule IS NULL`,
+    ['DTSTART;TZID=America/Toronto:20260102T193000\nRRULE:FREQ=WEEKLY;BYDAY=FR;INTERVAL=1'],
+  );
+  await client.unsafe(
+    `UPDATE programs SET
+       calendar_enabled = 1,
+       starts_at = '2026-01-04T15:30:00.000Z',
+       ends_at = '2026-01-04T19:00:00.000Z',
+       recurrence_rule = $1,
+       venue = 'Masjid Darus Salaam',
+       published = 1
+     WHERE id = 'sunday' AND recurrence_rule IS NULL`,
+    ['DTSTART;TZID=America/Toronto:20260104T103000\nRRULE:FREQ=WEEKLY;BYDAY=SU;INTERVAL=1'],
+  );
+
   for (const career of careers) {
     await client.unsafe(
       `INSERT INTO careers

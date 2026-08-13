@@ -3,6 +3,7 @@ import { getAdminSession } from '@/lib/auth';
 import { listEvents, writeAudit } from '@/lib/data';
 import { dbGet, dbRun } from '@/lib/database';
 import { saveUploadedImage } from '@/lib/uploads';
+import { readCalendarFields } from '@/lib/calendar-admin';
 
 async function guard() {
   return getAdminSession();
@@ -49,6 +50,10 @@ export async function POST(req: Request) {
     body = await req.json();
     imageSrc = (body.imageSrc || body.image_src || null) as string | null;
   }
+  const calendar = readCalendarFields(body);
+  if (calendar.error) {
+    return NextResponse.json({ error: calendar.error }, { status: 400 });
+  }
 
   const id =
     String(body.id || '')
@@ -60,8 +65,11 @@ export async function POST(req: Request) {
   const hub = hubRaw === 'youth' || hubRaw === 'sisters' || hubRaw === 'seniors' ? hubRaw : null;
 
   await dbRun(
-      `INSERT INTO events (id, title, date_label, summary, badge, location, status, recurring, details_json, schedule_kind, image_src, starts_at, ends_at, hub, sort_order, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+      `INSERT INTO events
+       (id, title, date_label, summary, badge, location, status, recurring, details_json,
+        schedule_kind, image_src, starts_at, ends_at, hub, sort_order, calendar_enabled,
+        recurrence_rule, recurrence_until, venue, published, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
     [
       id,
       String(body.title || 'Untitled'),
@@ -70,14 +78,20 @@ export async function POST(req: Request) {
       optionalText(body.badge),
       optionalText(body.location),
       body.status === 'past' ? 'past' : 'upcoming',
-      body.recurring === true || body.recurring === 'on' || body.recurring === '1' ? 1 : 0,
+      calendar.recurring ||
+        (body.recurring === true || body.recurring === 'on' || body.recurring === '1' ? 1 : 0),
       parseDetails(body.details),
       optionalText(body.scheduleKind || body.schedule_kind),
       imageSrc,
-      optionalText(body.startsAt || body.starts_at),
-      optionalText(body.endsAt || body.ends_at),
+      calendar.startsAt,
+      calendar.endsAt,
       hub,
       Number(body.sortOrder ?? body.sort_order ?? 0),
+      calendar.calendarEnabled,
+      calendar.recurrenceRule,
+      calendar.recurrenceUntil,
+      calendar.venue,
+      calendar.published,
     ],
   );
 
@@ -108,6 +122,10 @@ export async function PUT(req: Request) {
       imageSrc = (body.imageSrc || body.image_src || null) as string | null;
     }
   }
+  const calendar = readCalendarFields(body);
+  if (calendar.error) {
+    return NextResponse.json({ error: calendar.error }, { status: 400 });
+  }
 
   const id = String(body.id || '');
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
@@ -127,7 +145,9 @@ export async function PUT(req: Request) {
       `UPDATE events SET
         title = ?, date_label = ?, summary = ?, badge = ?, location = ?, status = ?,
         recurring = ?, details_json = ?, schedule_kind = ?, image_src = ?,
-        starts_at = ?, ends_at = ?, hub = ?, sort_order = ?, updated_at = datetime('now')
+        starts_at = ?, ends_at = ?, hub = ?, sort_order = ?, calendar_enabled = ?,
+        recurrence_rule = ?, recurrence_until = ?, venue = ?, published = ?,
+        updated_at = datetime('now')
        WHERE id = ?`,
     [
       String(body.title || ''),
@@ -136,14 +156,20 @@ export async function PUT(req: Request) {
       optionalText(body.badge),
       optionalText(body.location),
       body.status === 'past' ? 'past' : 'upcoming',
-      body.recurring === true || body.recurring === 'on' || body.recurring === '1' ? 1 : 0,
+      calendar.recurring ||
+        (body.recurring === true || body.recurring === 'on' || body.recurring === '1' ? 1 : 0),
       parseDetails(body.details),
       optionalText(body.scheduleKind || body.schedule_kind),
       finalImage,
-      optionalText(body.startsAt || body.starts_at),
-      optionalText(body.endsAt || body.ends_at),
+      calendar.startsAt,
+      calendar.endsAt,
       hub,
       Number(body.sortOrder ?? body.sort_order ?? 0),
+      calendar.calendarEnabled,
+      calendar.recurrenceRule,
+      calendar.recurrenceUntil,
+      calendar.venue,
+      calendar.published,
       id,
     ],
   );

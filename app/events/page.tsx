@@ -5,6 +5,7 @@ import { PageTransition } from '@/components/motion';
 import { SiteForm } from '@/components/SiteForm';
 import { PageHero } from '@/components/PageHero';
 import { EventsBoard } from '@/components/EventsBoard';
+import { CalendarView } from '@/components/CalendarView';
 
 export const metadata: Metadata = { title: 'Events' };
 
@@ -15,12 +16,20 @@ export default function EventsPage() {
         compact
         image={images.events}
         eyebrow="Events"
-        title="Events &amp; announcements"
-        description="Browse the carousel for upcoming programmes, or open Past for greyed finished events."
+        title="Events & programmes"
+        description="Browse the community calendar, filter events and programmes, or subscribe from your own calendar app."
       />
 
       <Section>
-        <EventsBoard showHeader={false} />
+        <CalendarView />
+      </Section>
+
+      <Section className="!pt-0">
+        <span className="eyebrow">Featured</span>
+        <h2 className="mt-4 font-display text-3xl text-ist-green">Highlights &amp; past events</h2>
+        <div className="mt-6">
+          <EventsBoard showHeader={false} />
+        </div>
       </Section>
 
       <Section className="!pt-0">
