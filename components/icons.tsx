@@ -53,6 +53,28 @@ export function IconPrayer(props: IconProps) {
   );
 }
 
+export function IconAudio(props: IconProps) {
+  const { title, rest } = base(props);
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      aria-hidden={!title}
+      {...rest}
+    >
+      {title ? <title>{title}</title> : null}
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M4 14.5v-5a8 8 0 0116 0v5M4 14.5a2.5 2.5 0 002.5 2.5H8v-6H6.5A2.5 2.5 0 004 13.5v1zM20 14.5a2.5 2.5 0 01-2.5 2.5H16v-6h1.5a2.5 2.5 0 012.5 2.5v1z"
+      />
+      <path strokeLinecap="round" d="M16 19c-1 .7-2.3 1-4 1" />
+    </svg>
+  );
+}
+
 export function IconAbout(props: IconProps) {
   const { title, rest } = base(props);
   return (

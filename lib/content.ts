@@ -24,6 +24,11 @@ export const links = {
     process.env.NEXT_PUBLIC_INSTAGRAM_URL ||
     'https://www.instagram.com/islamicsocietyoftoronto',
   prayerClock: '/prayer-times',
+  mixlr: 'https://masjid-darus-salaam.mixlr.com/',
+  mixlrRecordings: 'https://masjid-darus-salaam.mixlr.com/recordings',
+  mixlrEmbed:
+    process.env.NEXT_PUBLIC_MIXLR_EMBED_URL ||
+    'https://mixlr.com/masjid-darus-salaam/embed?autoplay=false&color=0b3d36',
 };
 
 export type NavItem = {

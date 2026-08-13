@@ -3,7 +3,7 @@ import { headers } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
 import { links, primaryNav, site } from '@/lib/content';
 import { connectLinks } from '@/lib/links';
-import { connectIcons, IconInstagram, IconPrayer } from './icons';
+import { connectIcons, IconAudio, IconInstagram, IconPrayer } from './icons';
 import { isAppLocale } from '@/i18n/routing';
 
 const navKeys: Record<string, string> = {
@@ -122,6 +122,15 @@ export async function Footer() {
                   <IconInstagram className="h-3.5 w-3.5 text-white" />
                 </span>
                 {t('instagram')}
+              </a>
+              <a
+                href={`${hrefFor('/')}#live-audio`}
+                className="flex items-center gap-3 text-sm text-white/65 transition hover:text-white"
+              >
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ist-gold/25 text-ist-gold">
+                  <IconAudio className="h-3.5 w-3.5" />
+                </span>
+                {t('liveAudio')}
               </a>
               <Link
                 href={hrefFor(links.prayerClock)}

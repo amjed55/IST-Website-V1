@@ -28,8 +28,18 @@
     "connect": "Nous suivre",
     "tagline": "Foi, savoir et communauté à la Masjid Darus Salaam.",
     "prayerBoard": "Tableau de prière en direct",
+    "liveAudio": "Audio en direct",
     "instagram": "Instagram",
     "rights": "Tous droits réservés."
+  },
+  "LiveAudio": {
+    "eyebrow": "En direct de la mosquée",
+    "title": "Écouter sur Mixlr",
+    "description": "Écoutez en direct les conférences, annonces et certains programmes de la Masjid Darus Salaam lorsque la diffusion est active.",
+    "openChannel": "Ouvrir la chaîne Mixlr",
+    "recordings": "Parcourir les enregistrements",
+    "playerTitle": "Lecteur audio en direct de la Masjid Darus Salaam",
+    "offlineNote": "Si le lecteur est silencieux, la mosquée est peut-être hors antenne. Ouvrez la chaîne pour connaître l’état actuel."
   },
   "Home": {
     "eyebrow": "Masjid Darus Salaam",

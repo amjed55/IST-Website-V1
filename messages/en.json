@@ -28,8 +28,18 @@
     "connect": "Connect",
     "tagline": "Faith, knowledge, and community at Masjid Darus Salaam.",
     "prayerBoard": "Live prayer board",
+    "liveAudio": "Live audio",
     "instagram": "Instagram feed",
     "rights": "All rights reserved."
+  },
+  "LiveAudio": {
+    "eyebrow": "Live from the masjid",
+    "title": "Listen on Mixlr",
+    "description": "Hear live talks, announcements, and selected programs from Masjid Darus Salaam when the broadcast is on air.",
+    "openChannel": "Open Mixlr channel",
+    "recordings": "Browse recordings",
+    "playerTitle": "Masjid Darus Salaam live audio player",
+    "offlineNote": "If the player is silent, the masjid may currently be off-air. Use the channel link for the latest status."
   },
   "Home": {
     "eyebrow": "Masjid Darus Salaam",

@@ -10,6 +10,7 @@ Marketing site for **Islamic Society of Toronto (Masjid Darus Salaam)**.
 - Admin CMS at `/admin` (events, programmes, pictures, careers/jobs, Instagram)
 - Forms → `POST /api/forms` → email `mamjed@myist.org` (Resend when configured)
 - Prayer times + Classic widget from the server-side central Prayer Clock proxy
+- Embedded live audio from `https://masjid-darus-salaam.mixlr.com/`
 
 ## Setup
 
@@ -66,6 +67,19 @@ PRAYER_CLOCK_API_URL=http://142.93.61.217
 `/api/prayers` routes, so the upstream HTTP host is never embedded into HTTPS pages.
 
 Repo reference: https://github.com/amjed55/prayer-clock
+
+### Mixlr live audio
+
+The homepage embeds Masjid Darus Salaam’s Mixlr live player and links to available
+recordings. The default official player URL is built in. If Mixlr issues a new
+Live Player URL from Creator Settings, override it with:
+
+```dotenv
+NEXT_PUBLIC_MIXLR_EMBED_URL=https://mixlr.com/masjid-darus-salaam/embed?autoplay=false
+```
+
+Playback begins only after the visitor presses play; browsers do not permit
+reliable forced autoplay.
 
 ### Email (production)
 

@@ -25,6 +25,7 @@ import { MediaBand } from '@/components/MediaBand';
 import { HeroNavTiles } from '@/components/HeroNavTiles';
 import { InstagramFeed } from '@/components/InstagramFeed';
 import { JummahSchedule } from '@/components/JummahSchedule';
+import { MixlrPlayer } from '@/components/MixlrPlayer';
 import {
   IconBriefcase,
   IconDonate,
@@ -137,6 +138,10 @@ export default async function HomePage() {
 
       <Section className="!pb-0">
         <JummahSchedule />
+      </Section>
+
+      <Section className="section-band">
+        <MixlrPlayer />
       </Section>
 
       {/* ── Pillars ──────────────────────────────────────────────────── */}

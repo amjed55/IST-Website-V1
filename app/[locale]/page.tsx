@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { PageHero } from '@/components/PageHero';
 import { JummahSchedule } from '@/components/JummahSchedule';
+import { MixlrPlayer } from '@/components/MixlrPlayer';
 import { PageTransition, Stagger, StaggerItem } from '@/components/motion';
 import { Button, Section } from '@/components/ui';
 import { images } from '@/lib/images';
@@ -69,6 +70,9 @@ export default async function LocalizedHome({
       <Section className="section-band">
         <h2 className="sr-only">{t('jummah')}</h2>
         <JummahSchedule />
+      </Section>
+      <Section>
+        <MixlrPlayer />
       </Section>
     </PageTransition>
   );
