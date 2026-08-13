@@ -502,7 +502,7 @@ function enrichDemoContent(db: Database.Database) {
        apply_email, apply_subject, responsibilities_json, requirements_json, image_src, is_active, sort_order)
     VALUES
       (@id, @title, @type, @department, @summary, @schedule, @location, @deadline, @start_date, @contract,
-       @apply_email, @apply_subject, @responsibilities_json, @requirements_json, @image_src, 1, @sort_order)
+       @apply_email, @apply_subject, @responsibilities_json, @requirements_json, @image_src, @is_active, @sort_order)
   `);
   const refreshCareer = db.prepare(`
     UPDATE careers SET
@@ -520,6 +520,7 @@ function enrichDemoContent(db: Database.Database) {
       responsibilities_json = @responsibilities_json,
       requirements_json = @requirements_json,
       image_src = COALESCE(@image_src, image_src),
+      is_active = @is_active,
       sort_order = @sort_order,
       updated_at = datetime('now')
     WHERE id = @id
@@ -541,6 +542,7 @@ function enrichDemoContent(db: Database.Database) {
       responsibilities_json: JSON.stringify(c.responsibilities),
       requirements_json: JSON.stringify(c.requirements),
       image_src: CAREER_POSTERS[c.id] || c.imageSrc || null,
+      is_active: c.isActive === false ? 0 : 1,
       sort_order: i,
     };
     insertCareer.run(row);

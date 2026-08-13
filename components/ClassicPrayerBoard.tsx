@@ -547,7 +547,7 @@ export function ClassicPrayerBoard() {
                       ) : null}
                       <div className="header-prayer-title">Prayer Timings</div>
                       <div className="header-subtitle">
-                        {settings?.masjid_name?.trim() || 'Masjid Darussalam'}
+                        {settings?.masjid_name?.trim() || 'Masjid Darus Salaam'}
                       </div>
                     </div>
                   </div>

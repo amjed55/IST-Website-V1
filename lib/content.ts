@@ -224,7 +224,7 @@ export const lifeServices = [
     id: 'janazah',
     title: 'Funeral & Janazah Services',
     summary:
-      'Dedicated Janazah facilities are planned as part of our building development. This service will be announced when available.',
+      'Dedicated Janazah facilities are not yet available. If a death has occurred, contact the IST office and a licensed local funeral provider so the office can confirm what prayer or facility support is currently possible.',
     comingSoon: true,
   },
 ];
@@ -424,6 +424,7 @@ export const careers: Career[] = [
       'Fluent in English',
       'Proven ability to manage a classroom of boys aged 5–14',
     ],
+    isActive: false,
   },
   {
     id: 'social-media-coordinator',
@@ -453,6 +454,7 @@ export const careers: Career[] = [
       'Reliable, self-directed, and collaborative',
       'Genuine passion for storytelling that serves a faith-based community',
     ],
+    isActive: false,
   },
 ];
 
@@ -471,7 +473,7 @@ export const pillars = [
   {
     title: 'Funeral Services',
     href: '/services/janazah',
-    body: 'Janazah and funeral support for families in their time of need.',
+    body: 'Current Janazah guidance and office contact while dedicated facilities are planned.',
   },
   {
     title: 'Education',

@@ -41,7 +41,7 @@ const yearsServing = new Date().getFullYear() - 1995;
 
 const stats = [
   { value: yearsServing, suffix: '+', label: 'Years serving the community' },
-  { value: 5, suffix: 'k+', label: 'Congregants per week' },
+  { value: 5, suffix: '', label: 'Daily prayers, every day' },
   { value: programSnapshot.length, suffix: '+', label: 'Active programmes' },
 ];
 

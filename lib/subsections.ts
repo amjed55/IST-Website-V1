@@ -117,10 +117,11 @@ export const aboutSubsections: SubsectionPage[] = [
     title: 'Leadership',
     eyebrow: 'About',
     description:
-      'Imams, scholars, and dedicated volunteers who guide worship, education, and pastoral care at IST.',
+      'Reach the appropriate IST team for worship, education, pastoral care, and community questions.',
     body: [
-      'IST is led by a team of Imams, qualified scholars, and committed volunteers who oversee daily worship, education programmes, and pastoral care — including nikah ceremonies and counselling services.',
-      'For questions about leadership, programme registrations, or pastoral needs, please reach out to the masjid office directly.',
+      'IST’s Imams, scholars, staff, and volunteers support daily worship, Islamic education, Nikah enquiries, counselling, and community programmes.',
+      'For current Imam availability or a pastoral appointment, contact the masjid office. For class registration, use the relevant Education page; for Nikah or counselling, begin on the Services page.',
+      'Names, roles, and biographies are published only after they have been confirmed by the office so this page does not present an outdated leadership roster.',
     ],
     image: images.aboutBySlug.leadership,
     parentLabel: 'About',

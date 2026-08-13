@@ -274,7 +274,7 @@ async function initializePostgres(client: Sql) {
       `INSERT INTO careers
        (id,title,type,summary,schedule,location,deadline,start_date,contract,apply_email,
         apply_subject,responsibilities_json,requirements_json,is_active,sort_order)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,1,$14)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
        ON CONFLICT (id) DO NOTHING`,
       [
         career.id,
@@ -290,6 +290,7 @@ async function initializePostgres(client: Sql) {
         career.applySubject,
         JSON.stringify(career.responsibilities || []),
         JSON.stringify(career.requirements || []),
+        career.isActive === false ? 0 : 1,
         0,
       ],
     );
