@@ -4,6 +4,7 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 const nextConfig = {
   agentRules: false,
+  output: 'standalone',
   serverExternalPackages: ['better-sqlite3'],
   images: {
     remotePatterns: [
