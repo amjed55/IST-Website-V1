@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { links } from '@/lib/content';
+import { calculateZakat, type ZakatValues } from '@/lib/zakat';
 
 const fields = [
   ['cash', 'cash'],
@@ -23,7 +24,7 @@ function money(value: number) {
 
 export function ZakatCalculator() {
   const t = useTranslations('Zakat');
-  const [values, setValues] = useState<Record<(typeof fields)[number][0], number>>({
+  const [values, setValues] = useState<ZakatValues>({
     cash: 0,
     goldSilver: 0,
     investments: 0,
@@ -33,17 +34,7 @@ export function ZakatCalculator() {
   });
   const [nisab, setNisab] = useState(0);
 
-  const result = useMemo(() => {
-    const assets =
-      values.cash +
-      values.goldSilver +
-      values.investments +
-      values.business +
-      values.receivables;
-    const net = Math.max(0, assets - values.debts);
-    const eligible = nisab > 0 && net >= nisab;
-    return { assets, net, eligible, zakat: eligible ? net * 0.025 : 0 };
-  }, [nisab, values]);
+  const result = useMemo(() => calculateZakat(values, nisab), [nisab, values]);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
