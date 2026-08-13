@@ -3,6 +3,7 @@ const createNextIntlPlugin = require('next-intl/plugin');
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 const nextConfig = {
+  agentRules: false,
   serverExternalPackages: ['better-sqlite3'],
   images: {
     remotePatterns: [
