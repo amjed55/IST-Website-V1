@@ -13,7 +13,6 @@
   --ist-cream: #f3efe6;
   --header-h: 4.5rem;
   --prayer-bar-h: 0px;
-  --mobile-cta-h: 0px;
 }
 
 /* ── Base ───────────────────────────────────────────────────────────────── */
@@ -110,6 +109,10 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+.route-enter {
+  animation: fade-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 .shimmer {
   background: linear-gradient(90deg,
     rgba(255,255,255,0.05),
@@ -126,7 +129,13 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .shimmer, .float-soft { animation: none !important; }
+  .shimmer, .float-soft, .route-enter { animation: none !important; }
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
 
 @layer components {
@@ -160,6 +169,17 @@ body {
   }
 
   .card {
-    @apply overflow-hidden bg-white shadow-soft transition-shadow duration-300 hover:shadow-lift;
+    @apply overflow-hidden bg-white shadow-soft transition duration-300 hover:-translate-y-1 hover:shadow-lift;
+  }
+
+  .calendar-control {
+    @apply inline-flex h-9 min-w-9 items-center justify-center rounded-full border border-ist-green/15 px-2 text-sm font-semibold text-ist-green transition hover:-translate-y-0.5 hover:border-ist-teal hover:bg-white;
+  }
+}
+
+@media (hover: none) {
+  .card:active,
+  .calendar-control:active {
+    transform: scale(0.98);
   }
 }

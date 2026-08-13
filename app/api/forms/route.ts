@@ -149,6 +149,7 @@ export async function POST(req: NextRequest) {
       program: clean(body.program, 120),
       event: clean(body.event, 160),
       interests: clean(body.interests, 200),
+      availability: clean(body.availability, 200),
       jobId: clean(body.jobId, 80),
       role: clean(body.role, 160),
       linkedin: clean(body.linkedin, 300),

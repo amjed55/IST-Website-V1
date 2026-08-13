@@ -106,8 +106,9 @@ export function SiteForm({ type, prefill = {}, submitLabel = 'Send message' }: P
           <select name="topic" className={field} defaultValue={prefill.topic || 'General'}>
             {[
               'General',
-              'Registration',
               'Nikah',
+              'Education',
+              'Janazah',
               'Volunteer',
               'Careers',
               'Events',
@@ -134,10 +135,44 @@ export function SiteForm({ type, prefill = {}, submitLabel = 'Send message' }: P
       )}
 
       {type === 'volunteer' && (
-        <label className="block text-sm">
-          <span className="mb-1.5 block font-medium text-ist-green">Interests</span>
-          <input name="interests" className={field} defaultValue={prefill.interests} />
-        </label>
+        <>
+          <label className="block text-sm">
+            <span className="mb-1.5 block font-medium text-ist-green">Preferred role</span>
+            <select
+              name="interests"
+              required
+              className={field}
+              defaultValue={prefill.interests || ''}
+            >
+              <option value="" disabled>
+                Choose a role
+              </option>
+              {[
+                'Parking',
+                'Hospitality',
+                'Education',
+                'Youth',
+                'Sisters',
+                'Seniors',
+                'Events',
+                'Facilities',
+              ].map((role) => (
+                <option key={role}>{role}</option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm">
+            <span className="mb-1.5 block font-medium text-ist-green">Availability</span>
+            <input
+              name="availability"
+              required
+              maxLength={200}
+              className={field}
+              placeholder="For example: Friday evenings and weekends"
+              defaultValue={prefill.availability}
+            />
+          </label>
+        </>
       )}
 
       {type === 'career-apply' && (
@@ -199,12 +234,22 @@ export function SiteForm({ type, prefill = {}, submitLabel = 'Send message' }: P
       </Button>
 
       {status === 'ok' && (
-        <p className="rounded-2xl bg-ist-teal/10 px-4 py-3 text-sm text-ist-teal">
+        <p
+          className="rounded-2xl bg-ist-teal/10 px-4 py-3 text-sm text-ist-teal"
+          role="status"
+          aria-live="polite"
+        >
           Thank you — your message was sent.
         </p>
       )}
       {status === 'error' && (
-        <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
+        <p
+          className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700"
+          role="alert"
+          aria-live="assertive"
+        >
+          {error}
+        </p>
       )}
     </form>
   );

@@ -10,7 +10,10 @@ import { InstagramFeed } from '@/components/InstagramFeed';
 
 export const metadata: Metadata = { title: 'Contact' };
 
-export default function ContactPage() {
+type Props = { searchParams: Promise<{ topic?: string }> };
+
+export default async function ContactPage({ searchParams }: Props) {
+  const { topic } = await searchParams;
   return (
     <PageTransition>
       <PageHero
@@ -42,6 +45,14 @@ export default function ContactPage() {
               </div>
 
               <div className="border-l-2 border-ist-teal/30 pl-4 text-sm text-ist-ink/65">
+                <p className="font-semibold text-ist-green">Office hours</p>
+                <p className="mt-2">
+                  Office availability changes around prayers and programmes. Please call or email
+                  ahead so staff can confirm a suitable time before you travel.
+                </p>
+              </div>
+
+              <div className="border-l-2 border-ist-teal/30 pl-4 text-sm text-ist-ink/65">
                 <p className="font-semibold text-ist-green">Programme hours (quick reference)</p>
                 <p className="mt-2">Sunday Madrasah: 10:30 AM – 2:00 PM</p>
                 <p>Evening Madressa: Mon–Fri 5:15 – 7:15 PM</p>
@@ -58,6 +69,7 @@ export default function ContactPage() {
                   src={site.mapEmbed}
                   className="h-56 w-full border-0"
                   loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
                 />
               </div>
             </div>
@@ -69,7 +81,7 @@ export default function ContactPage() {
               <span className="eyebrow">Message</span>
               <h2 className="mt-4 font-display text-3xl text-ist-green">Send a message</h2>
               <div className="mt-6">
-                <SiteForm type="contact" />
+                <SiteForm type="contact" prefill={{ topic: topic || 'General' }} />
               </div>
             </div>
           </SlideInRight>

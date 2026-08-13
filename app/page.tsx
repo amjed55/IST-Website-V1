@@ -24,6 +24,7 @@ import { NoticeStrip } from '@/components/NoticeStrip';
 import { MediaBand } from '@/components/MediaBand';
 import { HeroNavTiles } from '@/components/HeroNavTiles';
 import { InstagramFeed } from '@/components/InstagramFeed';
+import { JummahSchedule } from '@/components/JummahSchedule';
 import {
   IconBriefcase,
   IconDonate,
@@ -132,6 +133,10 @@ export default async function HomePage() {
       {/* ── Notices ──────────────────────────────────────────────────── */}
       <Section className="!pb-0">
         <NoticeStrip />
+      </Section>
+
+      <Section className="!pb-0">
+        <JummahSchedule />
       </Section>
 
       {/* ── Pillars ──────────────────────────────────────────────────── */}

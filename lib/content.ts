@@ -34,6 +34,7 @@ export type NavItem = {
 
 export const primaryNav: NavItem[] = [
   { label: 'Home', href: '/' },
+  { label: 'Prayer Times', href: '/prayer-times' },
   {
     label: 'About',
     href: '/about',
@@ -76,7 +77,7 @@ export const primaryNav: NavItem[] = [
   { label: 'Events', href: '/events' },
   { label: 'Visit', href: '/visit' },
   {
-    label: 'Involve',
+    label: 'Get involved',
     href: '/get-involved',
     children: [
       { label: 'Volunteer', href: '/get-involved/volunteer' },

@@ -1,10 +1,7 @@
-'use client';
-
 import Link from 'next/link';
 import { links, primaryNav, site } from '@/lib/content';
 import { connectLinks } from '@/lib/links';
 import { connectIcons, IconInstagram, IconPrayer } from './icons';
-import { FadeUp } from './motion';
 
 const menuLinks = [
   ...primaryNav.map((item) => [item.label, item.href] as const),
@@ -19,10 +16,10 @@ export function Footer() {
         className="container-ist"
         style={{
           paddingBottom:
-            'calc(var(--mobile-cta-h, 0px) + var(--prayer-bar-h, 0px) + 2rem + env(safe-area-inset-bottom))',
+            'calc(var(--prayer-bar-h, 0px) + 2rem + env(safe-area-inset-bottom))',
         }}
       >
-        <FadeUp y={28} className="grid gap-12 py-16 md:grid-cols-3">
+        <div className="grid gap-12 py-16 md:grid-cols-3">
           {/* Brand */}
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ist-teal-light">
@@ -112,7 +109,7 @@ export function Footer() {
               </Link>
             </div>
           </div>
-        </FadeUp>
+        </div>
       </div>
 
       {/* Copyright */}

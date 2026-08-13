@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { MobileCtaBar } from '@/components/MobileCtaBar';
 import { StickyPrayerBar } from '@/components/StickyPrayerBar';
 import { ScrollProgress } from '@/components/motion';
 import { site } from '@/lib/content';
@@ -25,17 +24,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="pattern-mesh">
+        <a
+          href="#main-content"
+          className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-full bg-ist-gold px-4 py-2 text-sm font-semibold text-ist-green-deep transition focus:translate-y-0"
+        >
+          Skip to main content
+        </a>
         <noscript>
           <style>{`[data-reveal],.route-enter{opacity:1!important;transform:none!important}`}</style>
         </noscript>
         <ScrollProgress />
         <Header />
-        <main className="min-h-[70vh] pb-[calc(var(--mobile-cta-h,0px)+var(--prayer-bar-h,0px)+1rem)] lg:pb-[calc(var(--prayer-bar-h,0px)+1rem)]">
+        <main
+          id="main-content"
+          className="min-h-[70vh] pb-[calc(var(--prayer-bar-h,0px)+1rem)]"
+        >
           {children}
         </main>
         <Footer />
         <StickyPrayerBar />
-        <MobileCtaBar />
       </body>
     </html>
   );

@@ -13,12 +13,24 @@ import {
   type PrayerSettings,
   type TodayPrayersResponse,
 } from '@/lib/prayer';
-import { IconPrayer } from './icons';
+import { links } from '@/lib/content';
+import { IconDonate, IconPrayer } from './icons';
 
 const DISMISS_KEY = 'ist-prayer-bar-dismissed';
+const CACHE_KEY = 'ist-prayer-times-cache-v1';
 const TZ = 'America/Toronto';
 
 type Announcement = { id: number; message: string; urgent?: boolean };
+type PrayerPayload = TodayPrayersResponse & { announcements?: Announcement[] };
+
+function torontoDateKey(date: Date) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: TZ,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
+}
 
 function formatGregorian(d: Date) {
   return new Intl.DateTimeFormat('en-CA', {
@@ -66,6 +78,8 @@ export function StickyPrayerBar() {
   const [nextKey, setNextKey] = useState<PrayerKey | null>(null);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState(false);
+  const [cachedAt, setCachedAt] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
   const [now, setNow] = useState(() => new Date());
   const [annIndex, setAnnIndex] = useState(0);
   const prayersRef = useRef<PrayerRow | null>(null);
@@ -100,30 +114,66 @@ export function StickyPrayerBar() {
     let cancelled = false;
 
     async function load() {
+      function useSameDayCache() {
+        try {
+          const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null') as
+            | { dateKey: string; savedAt: string; data: PrayerPayload }
+            | null;
+          if (
+            cached?.dateKey !== torontoDateKey(new Date()) ||
+            !cached.data?.prayers
+          ) {
+            return false;
+          }
+          setPrayers(cached.data.prayers);
+          setSettings(cached.data.settings);
+          setAnnouncements(cached.data.announcements || []);
+          setNextKey(getNextIqamahKey(cached.data.prayers, cached.data.settings));
+          setCachedAt(cached.savedAt);
+          return true;
+        } catch {
+          return false;
+        }
+      }
+
       try {
         const res = await fetch('/api/prayers/today');
-        const data = (await res.json()) as TodayPrayersResponse & {
-          error?: string;
-          announcements?: Announcement[];
-        };
+        const data = (await res.json()) as PrayerPayload & { error?: string };
         if (cancelled) return;
         if (!res.ok || !data.prayers) {
           setError(true);
-          setPrayers(null);
-          setNextKey(null);
-          setAnnouncements(data.announcements || []);
+          if (!useSameDayCache()) {
+            setPrayers(null);
+            setNextKey(null);
+            setAnnouncements(data.announcements || []);
+          }
           return;
         }
         setError(false);
+        setCachedAt(null);
         setPrayers(data.prayers);
         setSettings(data.settings);
         setAnnouncements(data.announcements || []);
         setNextKey(getNextIqamahKey(data.prayers, data.settings));
+        try {
+          localStorage.setItem(
+            CACHE_KEY,
+            JSON.stringify({
+              dateKey: torontoDateKey(new Date()),
+              savedAt: new Date().toISOString(),
+              data,
+            }),
+          );
+        } catch {
+          /* storage is optional */
+        }
       } catch {
         if (!cancelled) {
           setError(true);
-          setPrayers(null);
-          setNextKey(null);
+          if (!useSameDayCache()) {
+            setPrayers(null);
+            setNextKey(null);
+          }
         }
       }
     }
@@ -140,7 +190,7 @@ export function StickyPrayerBar() {
       clearInterval(poll);
       clearInterval(tick);
     };
-  }, []);
+  }, [reloadKey]);
 
   useEffect(() => {
     if (!ready || dismissed) {
@@ -186,7 +236,7 @@ export function StickyPrayerBar() {
         onClick={open}
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="fixed bottom-[calc(var(--mobile-cta-h,3.75rem)+0.75rem+env(safe-area-inset-bottom,0px))] right-3 z-[45] inline-flex items-center gap-2 rounded-full border border-ist-gold/30 bg-ist-green px-3.5 py-2.5 text-sm font-semibold text-white shadow-lift transition hover:-translate-y-0.5 hover:bg-ist-green-deep lg:bottom-5 lg:right-5"
+        className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] right-3 z-[45] inline-flex items-center gap-2 rounded-full border border-ist-gold/30 bg-ist-green px-3.5 py-2.5 text-sm font-semibold text-white shadow-lift transition hover:-translate-y-0.5 hover:bg-ist-green-deep lg:bottom-5 lg:right-5"
         aria-label="Show iqamah prayer times banner"
       >
         <IconPrayer className="h-4 w-4 shrink-0" />
@@ -225,6 +275,16 @@ export function StickyPrayerBar() {
             ·
           </span>
           <span className="text-ist-teal-light">{formatHijri(now)}</span>
+          {error && cachedAt && (
+            <span className="rounded-full bg-ist-gold/20 px-2 py-0.5 text-[10px] font-semibold text-ist-gold">
+              Offline copy · saved{' '}
+              {new Intl.DateTimeFormat('en-CA', {
+                timeZone: TZ,
+                hour: 'numeric',
+                minute: '2-digit',
+              }).format(new Date(cachedAt))}
+            </span>
+          )}
           {currentAnn && (
             <>
               <span className="hidden text-white/30 md:inline" aria-hidden>
@@ -259,9 +319,16 @@ export function StickyPrayerBar() {
         </Link>
 
         <div className="flex min-w-0 flex-1 items-stretch overflow-x-auto">
-          {error || !prayers ? (
+          {!prayers ? (
             <p className="flex flex-1 items-center px-3 py-2.5 text-xs text-white/75">
-              Connecting to Prayer Clock…{' '}
+              Live prayer times are unavailable.
+              <button
+                type="button"
+                onClick={() => setReloadKey((value) => value + 1)}
+                className="ml-2 font-semibold text-ist-gold underline"
+              >
+                Retry
+              </button>
               <Link href="/prayer-times" className="ml-1 underline">
                 open board
               </Link>
@@ -304,6 +371,19 @@ export function StickyPrayerBar() {
             })
           )}
         </div>
+
+        <a
+          href={links.donate}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex shrink-0 items-center justify-center gap-1.5 border-l border-white/15 px-3 text-ist-gold transition hover:bg-white/10 hover:text-white"
+          aria-label="Donate to IST"
+        >
+          <IconDonate className="h-4 w-4" />
+          <span className="hidden text-[10px] font-semibold uppercase tracking-[0.12em] md:inline">
+            Donate
+          </span>
+        </a>
 
         <button
           type="button"
