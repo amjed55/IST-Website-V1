@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { getCareerById, careers } from '@/lib/content';
+import { getCareerById, listPublicCareers } from '@/lib/careers';
 import { images } from '@/lib/images';
 import { Badge, Button, Section } from '@/components/ui';
 import { FadeIn, PageTransition } from '@/components/motion';
@@ -13,10 +13,12 @@ type Props = {
 };
 
 export const metadata: Metadata = { title: 'Apply' };
+export const dynamic = 'force-dynamic';
 
 export default async function CareerApplyPage({ searchParams }: Props) {
   const { job: jobId } = await searchParams;
-  const job = getCareerById(jobId);
+  const job = await getCareerById(jobId);
+  const careers = await listPublicCareers();
 
   if (!jobId) {
     return (
@@ -30,22 +32,26 @@ export default async function CareerApplyPage({ searchParams }: Props) {
         />
         <Section>
           <FadeIn className="space-y-4">
-            {careers.map((c) => (
-              <Link
-                key={c.id}
-                href={`/careers/apply?job=${c.id}`}
-                className="flex flex-col gap-2 border-b border-ist-green/10 py-5 transition hover:border-ist-teal sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div>
-                  <p className="font-display text-xl text-ist-green">{c.title}</p>
-                  <p className="mt-1 text-sm text-ist-muted">
-                    {c.type}
-                    {c.department ? ` · ${c.department}` : ''}
-                  </p>
-                </div>
-                <span className="text-sm font-semibold text-ist-teal">Apply →</span>
-              </Link>
-            ))}
+            {careers.length === 0 ? (
+              <p className="text-ist-muted">There are no open positions right now.</p>
+            ) : (
+              careers.map((c) => (
+                <Link
+                  key={c.id}
+                  href={`/careers/apply?job=${c.id}`}
+                  className="flex flex-col gap-2 border-b border-ist-green/10 py-5 transition hover:border-ist-teal sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <p className="font-display text-xl text-ist-green">{c.title}</p>
+                    <p className="mt-1 text-sm text-ist-muted">
+                      {c.type}
+                      {c.department ? ` · ${c.department}` : ''}
+                    </p>
+                  </div>
+                  <span className="text-sm font-semibold text-ist-teal">Apply →</span>
+                </Link>
+              ))
+            )}
             <Button href="/careers" variant="outline" className="mt-4">
               Back to careers
             </Button>

@@ -88,7 +88,7 @@ export function JummahSchedule() {
             </p>
             <h2 className="mt-2 font-display text-3xl text-ist-green sm:text-4xl">Jummah prayers</h2>
             <p className="mt-2 max-w-2xl text-sm text-ist-muted">
-              Jummah 1–3 at Masjid Darussalam — start (khutba begins), adhan, and khutba times from
+              Jummah 1–3 at Masjid Darus Salaam — start (khutba begins), adhan, and khutba times from
               the live Prayer Clock.
             </p>
           </div>

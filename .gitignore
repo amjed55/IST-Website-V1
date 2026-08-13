@@ -29,3 +29,6 @@
 
 # typescript
 next-env.d.ts
+*.tsbuildinfo
+data/
+public/uploads/

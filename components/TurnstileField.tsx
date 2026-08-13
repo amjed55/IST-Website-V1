@@ -14,6 +14,14 @@ export function TurnstileField({ onToken, onExpire, className = '' }: Props) {
   const ref = useRef<TurnstileInstance | null>(null);
   const siteKey = getTurnstileSiteKey();
 
+  if (!siteKey) {
+    return (
+      <p className={`text-sm text-red-700 ${className}`} role="alert">
+        This form is temporarily unavailable because spam protection is not configured.
+      </p>
+    );
+  }
+
   return (
     <div className={className}>
       <Turnstile

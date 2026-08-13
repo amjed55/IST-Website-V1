@@ -12,9 +12,9 @@ module.exports = {
           'green-deep': '#072A25',
           teal: '#0D9488',
           'teal-light': '#14B8A6',
-          cream: '#F7F4EF',
-          'cream-dark': '#EDE7DC',
-          gold: '#EAB308',
+          cream: '#F3EFE6',
+          'cream-dark': '#EBE4D8',
+          gold: '#B8944A',
           ink: '#12201D',
           muted: '#5C6B66',
         },
@@ -22,6 +22,7 @@ module.exports = {
       fontFamily: {
         display: ['var(--font-display)', 'Georgia', 'serif'],
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        arabic: ['var(--font-arabic)', 'Tahoma', 'serif'],
       },
       boxShadow: {
         soft: '0 10px 40px rgba(11, 61, 54, 0.12)',

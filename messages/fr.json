@@ -1,0 +1,161 @@
+{
+  "Nav": {
+    "home": "Accueil",
+    "prayerTimes": "Horaires de prière",
+    "about": "À propos",
+    "education": "Éducation",
+    "community": "Communauté",
+    "services": "Services",
+    "events": "Événements",
+    "visit": "Visiter",
+    "getInvolved": "Participer",
+    "contact": "Contact",
+    "donate": "Faire un don",
+    "language": "Langue"
+  },
+  "Common": {
+    "learnMore": "En savoir plus",
+    "contactOffice": "Contacter le bureau",
+    "planVisit": "Planifier votre visite",
+    "viewPrayerTimes": "Voir les horaires de prière",
+    "openDonation": "Ouvrir le portail de dons",
+    "backHome": "Retour à l’accueil",
+    "torontoTime": "Heures affichées pour Toronto"
+  },
+  "Footer": {
+    "contact": "Contact",
+    "menu": "Menu",
+    "connect": "Nous suivre",
+    "tagline": "Foi, savoir et communauté à la Masjid Darus Salaam.",
+    "prayerBoard": "Tableau de prière en direct",
+    "liveAudio": "Audio en direct",
+    "instagram": "Instagram",
+    "rights": "Tous droits réservés."
+  },
+  "LiveAudio": {
+    "eyebrow": "En direct de la mosquée",
+    "title": "Écouter sur Mixlr",
+    "description": "Écoutez en direct les conférences, annonces et certains programmes de la Masjid Darus Salaam lorsque la diffusion est active.",
+    "openChannel": "Ouvrir la chaîne Mixlr",
+    "recordings": "Parcourir les enregistrements",
+    "playerTitle": "Lecteur audio en direct de la Masjid Darus Salaam",
+    "offlineNote": "Si le lecteur est silencieux, la mosquée est peut-être hors antenne. Ouvrez la chaîne pour connaître l’état actuel."
+  },
+  "Home": {
+    "eyebrow": "Masjid Darus Salaam",
+    "title": "Société islamique de Toronto",
+    "description": "Foi, savoir et communauté — au service des familles musulmanes de Toronto depuis 1995.",
+    "welcomeTitle": "Un lieu pour prier, apprendre et appartenir",
+    "welcomeBody": "Consultez les prières en direct, les programmes hebdomadaires, les services et les moyens de participer.",
+    "jummah": "Horaires de la prière du vendredi",
+    "explore": "Découvrir l’IST"
+  },
+  "Visit": {
+    "eyebrow": "Planifier votre visite",
+    "title": "Venez à la Masjid Darus Salaam",
+    "description": "Itinéraire, avertissements de stationnement et renseignements avant votre arrivée au 20 Overlea Blvd.",
+    "parkingTitle": "Avertissement important sur le stationnement",
+    "parkingBody": "Ne vous garez pas au 25 Overlea Blvd ni au East York Town Centre. Ces stationnements privés remorquent les véhicules non autorisés.",
+    "firstTitle": "Votre première visite",
+    "firstBody": "Arrivez tôt pour Joumou‘a, portez une tenue modeste, mettez votre téléphone en mode silencieux et suivez les indications. Contactez le bureau à l’avance pour les besoins d’accessibilité.",
+    "maps": "Ouvrir l’itinéraire"
+  },
+  "Contact": {
+    "eyebrow": "Nous contacter",
+    "title": "Entrer en contact",
+    "description": "Posez vos questions au bureau de l’IST sur l’éducation, le Nikah, la Janazah, le bénévolat, les événements ou une première visite.",
+    "hours": "Heures du bureau",
+    "hoursBody": "La disponibilité varie selon les prières et les programmes. Appelez ou écrivez avant de vous déplacer pour confirmer un moment approprié.",
+    "message": "Envoyer un message"
+  },
+  "Prayer": {
+    "eyebrow": "Adoration",
+    "title": "Horaires de prière",
+    "description": "Horaires en direct des prières, de l’iqamah, du lever du soleil et de Joumou‘a à la Masjid Darus Salaam.",
+    "boardNote": "Le tableau de la mosquée apparaît ci-dessous. Les horaires sont synchronisés avec l’horloge de prière de l’IST."
+  },
+  "Events": {
+    "eyebrow": "Horaire communautaire",
+    "title": "Événements et programmes",
+    "description": "Consultez le calendrier communautaire ou abonnez-vous depuis votre application."
+  },
+  "Calendar": {
+    "title": "Calendrier des événements et programmes",
+    "description": "Heures affichées pour Toronto. Abonnez-vous une fois pour rester à jour.",
+    "subscribe": "S’abonner / télécharger",
+    "today": "Aujourd’hui",
+    "previous": "Mois précédent",
+    "next": "Mois suivant",
+    "all": "Tout",
+    "event": "Événements",
+    "program": "Programmes",
+    "month": "Mois",
+    "agenda": "Agenda",
+    "loading": "Chargement du calendrier…",
+    "empty": "Aucun événement ou programme prévu dans cette période.",
+    "add": "Ajouter au calendrier"
+  },
+  "NewMuslim": {
+    "eyebrow": "Bienvenue",
+    "title": "Nouveau dans l’Islam ou à la mosquée ?",
+    "description": "Commencez à votre rythme. Nous accueillons les nouveaux musulmans, les personnes qui découvrent l’Islam et celles qui reviennent à la foi.",
+    "visit": "Visiter sans pression",
+    "visitBody": "Observez une prière, posez vos questions ou familiarisez-vous simplement avec la mosquée.",
+    "shahada": "Poser des questions sur la Shahada",
+    "shahadaBody": "Un Imam peut expliquer sa signification et vous guider dans les prochaines étapes.",
+    "prayer": "Apprendre la prière progressivement",
+    "prayerBody": "Commencez par la purification, les mouvements de Salah et quelques courtes sourates.",
+    "community": "Trouver une communauté",
+    "communityBody": "Le bureau peut mettre les frères et les sœurs en contact avec des cours et du soutien appropriés."
+  },
+  "Zakat": {
+    "eyebrow": "Don",
+    "title": "Calculateur de Zakat",
+    "description": "Une estimation en dollars canadiens avant de consulter une personne qualifiée.",
+    "disclaimer": "Cet outil donne une estimation, pas une fatwa. Confirmez le nisab, les actifs, les dettes et l’année lunaire avec un Imam.",
+    "cash": "Espèces et soldes bancaires",
+    "metals": "Valeur de l’or et de l’argent",
+    "investments": "Placements assujettis à la Zakat",
+    "business": "Stocks et liquidités d’entreprise",
+    "receivables": "Sommes à recevoir",
+    "debts": "Dettes à court terme",
+    "nisab": "Seuil actuel du nisab (CAD)",
+    "nisabPlaceholder": "Saisissez un seuil actuel provenant d’une source fiable",
+    "estimate": "Estimation",
+    "totalAssets": "Total des actifs",
+    "net": "Montant net assujetti",
+    "estimated": "Zakat estimée à 2,5 %",
+    "enterNisab": "Saisissez le nisab actuel pour vérifier l’admissibilité.",
+    "eligible": "Votre montant net atteint le seuil saisi.",
+    "below": "Votre montant net est inférieur au seuil saisi.",
+    "donate": "Continuer vers le don sécurisé"
+  },
+  "Volunteer": {
+    "eyebrow": "Participer",
+    "title": "Faire du bénévolat avec l’IST",
+    "description": "Indiquez le rôle qui vous intéresse et vos disponibilités. L’équipe vous contactera lorsqu’une occasion appropriée se présentera."
+  },
+  "Form": {
+    "name": "Nom",
+    "email": "Courriel",
+    "phone": "Téléphone",
+    "topic": "Sujet",
+    "message": "Message",
+    "role": "Rôle souhaité",
+    "availability": "Disponibilités",
+    "send": "Envoyer le message",
+    "sending": "Envoi…",
+    "success": "Merci — votre message a été envoyé.",
+    "privacy": "En envoyant ce formulaire, vous acceptez que votre demande soit transmise par courriel au personnel de l’IST.",
+    "general": "Général",
+    "nikah": "Nikah",
+    "education": "Éducation",
+    "janazah": "Janazah",
+    "volunteer": "Bénévolat"
+  },
+  "NotFound": {
+    "eyebrow": "404 · Page introuvable",
+    "title": "Laissez-nous vous aider à retrouver votre chemin",
+    "body": "La page a peut-être été déplacée, mais les horaires de prière, les renseignements de visite et le bureau de l’IST restent accessibles."
+  }
+}

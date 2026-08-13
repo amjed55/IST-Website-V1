@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="88" viewBox="0 0 360 88" fill="none">
+  <rect x="2" y="2" width="84" height="84" rx="25" fill="#0B3D36"/>
+  <path d="M44 16c.8 0 1.5.4 1.9 1.1l4.7 8.1 9.1 1.8c1.7.34 2.4 2.4 1.2 3.64l-6.3 6.5 1.1 9.3c.2 1.7-1.5 3-3 2.3L44 43.8l-8.7 4.94c-1.5.7-3.2-.6-3-2.3l1.1-9.3-6.3-6.5c-1.2-1.24-.5-3.3 1.2-3.64l9.1-1.8 4.7-8.1c.4-.7 1.1-1.1 1.9-1.1z" fill="#14B8A6"/>
+  <text x="44" y="72" text-anchor="middle" font-family="Georgia, serif" font-size="16" font-weight="700" fill="#F7F4EF" letter-spacing="1">IST</text>
+  <text x="106" y="39" font-family="Georgia, serif" font-size="27" font-weight="700" fill="#0B3D36">Islamic Society</text>
+  <text x="106" y="67" font-family="Arial, sans-serif" font-size="20" font-weight="600" fill="#0D9488" letter-spacing=".5">OF TORONTO</text>
+</svg>
