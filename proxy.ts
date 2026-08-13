@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ADMIN_COOKIE, adminJwtSecret } from '@/lib/admin-session';
 import { isAppLocale } from '@/i18n/routing';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const locale = pathname.split('/').filter(Boolean)[0];
   if (isAppLocale(locale)) {
