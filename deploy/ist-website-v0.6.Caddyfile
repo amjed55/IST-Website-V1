@@ -1,0 +1,63 @@
+# Islamic Society of Toronto website v0.6 — Caddy site block
+# Import from /etc/caddy/Caddyfile
+# App listens on 127.0.0.1:3006 (ist-website-v0.6.service)
+
+# Temporary IP:port access
+:8086 {
+	encode zstd gzip
+	handle /tracker.js {
+		reverse_proxy 127.0.0.1:3002
+	}
+	handle /api/collect* {
+		reverse_proxy 127.0.0.1:3002
+	}
+	handle {
+		reverse_proxy 127.0.0.1:3006 {
+			header_up Host {http.request.host}
+			header_up X-Forwarded-Host {http.request.host}
+			header_up X-Forwarded-Proto {http.request.scheme}
+			header_up X-Forwarded-Port {http.request.port}
+			header_up Accept-Encoding identity
+		}
+	}
+}
+
+# Cloudflare Flexible SSL reaches origin over HTTP
+http://ist.northlinesconsulting.com {
+	encode zstd gzip
+	handle /tracker.js {
+		reverse_proxy 127.0.0.1:3002
+	}
+	handle /api/collect* {
+		reverse_proxy 127.0.0.1:3002
+	}
+	handle {
+		reverse_proxy 127.0.0.1:3006 {
+			header_up Host {http.request.host}
+			header_up X-Forwarded-Host {http.request.host}
+			header_up X-Forwarded-Proto {http.request.scheme}
+			header_up X-Forwarded-Port {http.request.port}
+			header_up Accept-Encoding identity
+		}
+	}
+}
+
+# Direct HTTPS if DNS is DNS-only (grey cloud) and Caddy can get a cert
+ist.northlinesconsulting.com {
+	encode zstd gzip
+	handle /tracker.js {
+		reverse_proxy 127.0.0.1:3002
+	}
+	handle /api/collect* {
+		reverse_proxy 127.0.0.1:3002
+	}
+	handle {
+		reverse_proxy 127.0.0.1:3006 {
+			header_up Host {http.request.host}
+			header_up X-Forwarded-Host {http.request.host}
+			header_up X-Forwarded-Proto {http.request.scheme}
+			header_up X-Forwarded-Port {http.request.port}
+			header_up Accept-Encoding identity
+		}
+	}
+}

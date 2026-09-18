@@ -6,7 +6,11 @@ import { PageHero } from '@/components/PageHero';
 import { PrayerEmbed } from '@/components/PrayerEmbed';
 import { JummahSchedule } from '@/components/JummahSchedule';
 
-export const metadata: Metadata = { title: 'Prayer Times' };
+export const metadata: Metadata = {
+  title: 'Prayer Times',
+  description:
+    'Live daily prayer, iqamah, sunrise, and Jummah times for Masjid Darus Salaam in Toronto.',
+};
 
 export default function PrayerTimesPage() {
   return (
@@ -16,7 +20,7 @@ export default function PrayerTimesPage() {
         image={images.services}
         eyebrow="Salah board"
         title="Prayer Times"
-        description="Live Classical display from IST’s Prayer Clock — times are subject to change. Iqamah stays in the bar at the bottom of every page."
+        description="Native Classic Prayer Clock board — live times from IST’s central clock. Iqamah also stays in the bar at the bottom of every page."
       />
 
       <Section className="!pt-8 sm:!pt-10">
@@ -32,7 +36,7 @@ export default function PrayerTimesPage() {
             Full prayer clock
           </h2>
           <p className="mt-2 max-w-2xl text-sm text-ist-muted">
-            Same Classic layout used on masjid TVs, scaled to your screen.
+            Same Classic layout used on masjid TVs — built natively on this page, not an iframe.
           </p>
         </FadeIn>
         <FadeIn delay={0.08} className="mt-8">
