@@ -10,6 +10,8 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'www.islamicsocietyoftoronto.com' },
       { protocol: 'https', hostname: 'islamicsocietyoftoronto.com' },
+      { protocol: 'https', hostname: 'ist.northlinesconsulting.com' },
+      { protocol: 'http', hostname: 'ist.northlinesconsulting.com' },
     ],
   },
   async headers() {

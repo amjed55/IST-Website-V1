@@ -3,7 +3,8 @@
 Version `v0.6` runs independently from the other droplet applications:
 
 - Application: `127.0.0.1:3006`
-- Public Caddy listener: `:8086`
+- Public Caddy listener: `:8086` (temporary IP access)
+- Public domain: `https://ist.northlinesconsulting.com`
 - Install root: `/opt/ist-website-v0.6`
 - Environment: `/etc/ist-website-v0.6.env`
 - Service: `ist-website-v0.6.service`
