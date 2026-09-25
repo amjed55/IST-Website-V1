@@ -20,7 +20,7 @@ export default function PrayerTimesPage() {
         image={images.services}
         eyebrow="Salah board"
         title="Prayer Times"
-        description="Native Classic Prayer Clock board — live times from IST’s central clock. Iqamah also stays in the bar at the bottom of every page."
+        description="Live daily prayer and iqamah times for Masjid Darus Salaam. Jummah times are listed first; the full Classic board follows below."
       />
 
       <Section className="!pt-8 sm:!pt-10">

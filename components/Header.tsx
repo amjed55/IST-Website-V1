@@ -126,14 +126,16 @@ export function Header() {
         {/* Desktop nav — middle column always present so CTAs stay right */}
         <div className="min-w-0">
           <nav
-            className="hidden min-w-0 items-center justify-center gap-0.5 lg:flex"
+            className="hidden min-w-0 items-center justify-center gap-0.5 xl:flex"
             aria-label="Primary"
             onMouseLeave={() => setDrop(null)}
           >
-          {primaryNav.map((item) => {
+          {/* Drop Home + Prayer Times — logo and teal CTA cover those paths */}
+          {primaryNav
+            .filter((item) => item.href !== '/' && item.href !== '/prayer-times')
+            .map((item) => {
             const active = isActive(activePath, item);
             const isOpen = drop === item.label;
-            const NavIcon = navIcons[item.label];
             return (
               <div
                 key={item.href}
@@ -149,11 +151,6 @@ export function Header() {
                   aria-expanded={item.children ? isOpen : undefined}
                   aria-haspopup={item.children ? 'menu' : undefined}
                 >
-                  {NavIcon && (
-                    <span className="opacity-70 transition group-hover:opacity-100">
-                      <NavIcon className="h-3.5 w-3.5" />
-                    </span>
-                  )}
                   {t(navKeys[item.href] || item.label)}
                   {item.children && <Chevron open={isOpen} />}
                   <span
@@ -203,21 +200,27 @@ export function Header() {
           </nav>
         </div>
 
-        {/* Right actions — CTAs desktop / menu mobile */}
+          {/* Right actions — CTAs from lg; full text nav from xl */}
         <div className="flex shrink-0 items-center justify-end gap-2">
           <div className="hidden items-center gap-2 lg:flex">
             <Link
               href={hrefFor('/prayer-times')}
-              className="inline-flex items-center gap-2 rounded-full bg-ist-teal px-4 py-2 text-xs font-semibold tracking-wide text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-ist-teal-light"
+              className="inline-flex items-center gap-2 rounded-full bg-ist-teal px-3.5 py-2 text-xs font-semibold tracking-wide text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-ist-teal-light xl:px-4"
             >
               <IconPrayer className="h-3.5 w-3.5" />
               {t('prayerTimes')}
+            </Link>
+            <Link
+              href={hrefFor('/visit')}
+              className="inline-flex items-center gap-1.5 rounded-full border border-ist-green/15 bg-white/80 px-3.5 py-2 text-xs font-semibold tracking-wide text-ist-green transition hover:-translate-y-0.5 hover:border-ist-teal/40 hover:text-ist-teal xl:px-4"
+            >
+              {t('visit')}
             </Link>
             <a
               href={links.donate}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full bg-ist-green px-4 py-2 text-xs font-semibold tracking-wide text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-ist-green-deep"
+              className="inline-flex items-center gap-1.5 rounded-full bg-ist-green px-3.5 py-2 text-xs font-semibold tracking-wide text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-ist-green-deep xl:px-4"
             >
               <IconDonate className="h-3.5 w-3.5" />
               {t('donate')}
@@ -267,7 +270,7 @@ export function Header() {
             exit={{ opacity: 0 }}
           >
             <button
-              className="absolute inset-0 bg-ist-green-deep/45 backdrop-blur-sm"
+              className="absolute inset-0 bg-ist-green-deep/70 backdrop-blur-md"
               aria-label="Close menu"
               onClick={() => setOpen(false)}
             />
@@ -372,6 +375,9 @@ export function Header() {
                 <LanguageSwitcher />
                 <Button href={hrefFor('/prayer-times')} variant="teal" className="w-full">
                   {t('prayerTimes')}
+                </Button>
+                <Button href={hrefFor('/visit')} variant="outline" className="w-full">
+                  {t('visit')}
                 </Button>
                 <Button href={links.donate} variant="primary" external className="w-full">
                   {t('donate')}

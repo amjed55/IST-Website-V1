@@ -200,16 +200,35 @@ export function StickyPrayerBar() {
     };
   }, [reloadKey]);
 
+  const barRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!ready || dismissed) {
       document.documentElement.style.removeProperty('--prayer-bar-h');
       return;
     }
-    document.documentElement.style.setProperty('--prayer-bar-h', '5.75rem');
+
+    const el = barRef.current;
+    if (!el) {
+      document.documentElement.style.setProperty('--prayer-bar-h', '7.5rem');
+      return;
+    }
+
+    const apply = () => {
+      const height = Math.ceil(el.getBoundingClientRect().height);
+      document.documentElement.style.setProperty('--prayer-bar-h', `${height}px`);
+    };
+    apply();
+
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(apply) : null;
+    ro?.observe(el);
+    window.addEventListener('resize', apply);
     return () => {
+      ro?.disconnect();
+      window.removeEventListener('resize', apply);
       document.documentElement.style.removeProperty('--prayer-bar-h');
     };
-  }, [ready, dismissed]);
+  }, [ready, dismissed, prayers, announcements.length, error, cachedAt]);
 
   function close() {
     setDismissed(true);
@@ -262,6 +281,7 @@ export function StickyPrayerBar() {
 
   return (
     <motion.div
+      ref={barRef}
       initial={{ y: 40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       className="fixed inset-x-0 bottom-0 z-[45] border-t border-ist-gold/25 bg-gradient-to-r from-ist-green-deep via-ist-green to-ist-green-deep text-white shadow-[0_-12px_40px_rgba(7,42,37,0.35)]"

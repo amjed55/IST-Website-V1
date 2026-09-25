@@ -36,11 +36,11 @@ export default async function LocalizedHome({
         description={t('description')}
         actions={
           <>
+            <Button href={localeHref(locale, '/prayer-times')} variant="teal">
+              {common('viewPrayerTimes')}
+            </Button>
             <Button href={localeHref(locale, '/visit')} variant="light">
               {common('planVisit')}
-            </Button>
-            <Button href={localeHref(locale, '/prayer-times')} variant="gold">
-              {common('viewPrayerTimes')}
             </Button>
           </>
         }

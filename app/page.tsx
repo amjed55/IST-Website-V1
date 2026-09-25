@@ -12,7 +12,6 @@ import { images, pillarImage, hubImage } from '@/lib/images';
 import { getMediaByKey, getSiteSettings } from '@/lib/data';
 import { Button, Section } from '@/components/ui';
 import {
-  AnimatedCounter,
   FadeUp,
   PageTransition,
   Stagger,
@@ -22,7 +21,6 @@ import { EventsBoard } from '@/components/EventsBoard';
 import { PageHero } from '@/components/PageHero';
 import { NoticeStrip } from '@/components/NoticeStrip';
 import { MediaBand } from '@/components/MediaBand';
-import { HeroNavTiles } from '@/components/HeroNavTiles';
 import { InstagramFeed } from '@/components/InstagramFeed';
 import { JummahSchedule } from '@/components/JummahSchedule';
 import { MixlrPlayer } from '@/components/MixlrPlayer';
@@ -31,20 +29,10 @@ import {
   IconDonate,
   IconEducation,
   IconHands,
-  IconMosque,
-  IconUsers,
   topicIcons,
 } from '@/components/icons';
 
 export const dynamic = 'force-dynamic';
-
-const yearsServing = new Date().getFullYear() - 1995;
-
-const stats = [
-  { value: yearsServing, suffix: '+', label: 'Years serving the community' },
-  { value: 5, suffix: '', label: 'Daily prayers, every day' },
-  { value: programSnapshot.length, suffix: '+', label: 'Active programmes' },
-];
 
 export default async function HomePage() {
   const [settings, heroMedia] = await Promise.all([
@@ -77,10 +65,8 @@ export default async function HomePage() {
 
   return (
     <PageTransition>
-      {/* ── Hero ─────────────────────────────────────────────────────── */}
+      {/* ── Hero — brand, one line, two CTAs, full-bleed photo ───────── */}
       <PageHero
-        banner
-        showScrollCue={false}
         image={heroImage}
         eyebrow={settings.hero_eyebrow || site.masjid}
         title={settings.hero_title || site.name}
@@ -90,62 +76,37 @@ export default async function HomePage() {
         }
         actions={
           <>
+            <Button href="/prayer-times" variant="teal">
+              Prayer times
+            </Button>
             <Button href="/visit" variant="light">
               Plan your visit
             </Button>
-            <Button href={links.donate} variant="gold" external>
-              Donate
-            </Button>
           </>
         }
-        siteMap={<HeroNavTiles />}
       />
 
-      {/* ── Events (directly below banner) ───────────────────────────── */}
-      <Section className="section-band !pt-12">
-        <EventsBoard />
+      {/* ── Jummah first — Friday visitors need this immediately ─────── */}
+      <Section className="section-band !pt-12 !pb-0">
+        <JummahSchedule />
       </Section>
 
-      {/* ── Stats bar ────────────────────────────────────────────────── */}
-      <div className="border-y border-ist-green/8 bg-white">
-        <div className="container-ist">
-          <Stagger staggerDelay={0.1} className="grid divide-x divide-ist-green/8 sm:grid-cols-3">
-            {stats.map((s, i) => {
-              const StatIcon = [IconMosque, IconUsers, IconEducation][i] || IconEducation;
-              return (
-              <StaggerItem key={s.label}>
-                <div className="flex flex-col items-center py-8 text-center">
-                  <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-ist-teal/10 text-ist-teal">
-                    <StatIcon className="h-5 w-5" />
-                  </span>
-                  <p className="font-display text-5xl text-ist-green">
-                    <AnimatedCounter value={s.value} suffix={s.suffix} />
-                  </p>
-                  <p className="mt-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-ist-muted">
-                    {s.label}
-                  </p>
-                </div>
-              </StaggerItem>
-            );})}
-          </Stagger>
-        </div>
-      </div>
-
-      {/* ── Notices ──────────────────────────────────────────────────── */}
+      {/* ── Parking / notices ────────────────────────────────────────── */}
       <Section className="!pb-0">
         <NoticeStrip />
       </Section>
 
-      <Section className="!pb-0">
-        <JummahSchedule />
+      {/* ── Events ───────────────────────────────────────────────────── */}
+      <Section className="section-band">
+        <EventsBoard />
       </Section>
 
-      <Section className="section-band">
+      <Section>
         <MixlrPlayer />
       </Section>
 
       {/* ── Pillars ──────────────────────────────────────────────────── */}
-      <Section>
+      <Section className="section-band">
         <FadeUp>
           <span className="eyebrow">What we offer</span>
           <h2 className="mt-4 font-display text-4xl text-ist-green sm:text-5xl">
@@ -171,14 +132,11 @@ export default async function HomePage() {
                       className="object-cover transition duration-700 group-hover:scale-[1.06]"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-ist-green-deep/80 via-ist-green-deep/15 to-transparent" />
-                    <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/0 text-white/0 transition duration-300 group-hover:bg-white/15 group-hover:text-white/90">
-                      →
-                    </span>
                     <h3 className="absolute bottom-3 left-4 right-4 font-display text-2xl text-white">
                       {p.title}
                     </h3>
                   </div>
-                  <div className="border-x border-b border-ist-green/8 bg-white px-4 py-4">
+                  <div className="border-x border-b border-ist-green/8 bg-white/80 px-4 py-4">
                     <p className="text-sm leading-relaxed text-ist-ink/65">{p.body}</p>
                     <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-ist-teal transition-all duration-200 group-hover:gap-2">
                       Explore <span>→</span>
@@ -192,25 +150,24 @@ export default async function HomePage() {
       </Section>
 
       {/* ── Hubs ─────────────────────────────────────────────────────── */}
-      <Section className="section-band">
+      <Section>
         <FadeUp>
           <span className="eyebrow">Community hubs</span>
-          <h2 className="mt-4 font-display text-4xl text-ist-green sm:text-5xl">Hubs</h2>
+          <h2 className="mt-4 font-display text-4xl text-ist-green sm:text-5xl">
+            Spaces for every age
+          </h2>
           <p className="mt-3 max-w-xl text-base text-ist-ink/65 leading-relaxed">
-            Dedicated spaces for sisters, youth, and seniors.
+            Dedicated programmes for sisters, youth, and seniors.
           </p>
         </FadeUp>
 
-        <Stagger staggerDelay={0.1} className="mt-10 grid gap-6 md:grid-cols-3">
+        <Stagger staggerDelay={0.1} className="mt-10 grid gap-8 md:grid-cols-3">
           {hubs.map((hub) => {
             const img = hubImage(hub.id);
             const Icon = topicIcons[hub.id] || IconEducation;
             return (
               <StaggerItem key={hub.id}>
-                <Link
-                  href={hub.href}
-                  className="group block overflow-hidden border border-ist-green/8 bg-white transition hover:border-ist-teal/40 hover:shadow-soft"
-                >
+                <Link href={hub.href} className="group block overflow-hidden">
                   <div className="relative aspect-[16/10] overflow-hidden">
                     <Image
                       src={img.src}
@@ -224,7 +181,7 @@ export default async function HomePage() {
                       <Icon className="h-[18px] w-[18px]" />
                     </span>
                   </div>
-                  <div className="border-t-2 border-ist-gold/60 px-5 py-5 transition group-hover:border-ist-teal">
+                  <div className="border-t-2 border-ist-gold/50 px-1 pt-4 transition group-hover:border-ist-teal">
                     <h3 className="font-display text-2xl text-ist-green group-hover:text-ist-teal">
                       {hub.title}
                     </h3>
@@ -366,7 +323,7 @@ export default async function HomePage() {
         <MediaBand image={images.visit} eyebrow="Visit us" title="Join us at 20 Overlea Blvd">
           <p className="text-ist-ink/70">{site.address}</p>
           <p className="text-sm font-medium text-ist-gold">
-            ⚠ Please review parking guidance before you arrive — nearby lots actively tow.
+            Please review parking guidance before you arrive — nearby lots actively tow.
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
             <Button href="/visit" variant="primary">

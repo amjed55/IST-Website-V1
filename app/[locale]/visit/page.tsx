@@ -29,11 +29,11 @@ export default async function LocalizedVisitPage({
         description={t('description')}
         actions={
           <>
-            <Button href={maps} variant="teal" external>
-              {t('maps')}
+            <Button href={localeHref(locale, '/prayer-times')} variant="teal">
+              {common('viewPrayerTimes')}
             </Button>
-            <Button href={localeHref(locale, '/contact')} variant="light">
-              {common('contactOffice')}
+            <Button href={maps} variant="light" external>
+              {t('maps')}
             </Button>
           </>
         }
@@ -41,15 +41,18 @@ export default async function LocalizedVisitPage({
       <Section>
         <Stagger className="grid gap-5 md:grid-cols-2">
           <StaggerItem>
-            <article className="h-full border-l-4 border-ist-gold bg-ist-gold/10 p-6">
-              <h2 className="font-display text-3xl text-ist-green">{t('parkingTitle')}</h2>
-              <p className="mt-3 leading-relaxed text-ist-ink/70">{t('parkingBody')}</p>
+            <article className="h-full border border-ist-green/10 bg-white p-6">
+              <h2 className="font-display text-3xl text-ist-green">{t('firstTitle')}</h2>
+              <p className="mt-3 leading-relaxed text-ist-ink/70">{t('firstBody')}</p>
+              <Button href={localeHref(locale, '/contact')} variant="outline" className="mt-5">
+                {common('contactOffice')}
+              </Button>
             </article>
           </StaggerItem>
           <StaggerItem>
-            <article className="h-full border border-ist-green/10 bg-white p-6 shadow-soft">
-              <h2 className="font-display text-3xl text-ist-green">{t('firstTitle')}</h2>
-              <p className="mt-3 leading-relaxed text-ist-ink/70">{t('firstBody')}</p>
+            <article className="h-full border-l-4 border-ist-gold bg-ist-gold/10 p-6">
+              <h2 className="font-display text-3xl text-ist-green">{t('parkingTitle')}</h2>
+              <p className="mt-3 leading-relaxed text-ist-ink/70">{t('parkingBody')}</p>
             </article>
           </StaggerItem>
         </Stagger>

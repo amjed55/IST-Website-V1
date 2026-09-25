@@ -83,20 +83,20 @@ export function PageHero({
   const titleIsString = typeof title === 'string';
   const wordCount = titleIsString ? title.split(' ').length : 0;
 
-  const titleClass = `mt-3 font-display leading-[1.05] drop-shadow-sm ${
+  const titleClass = `mt-4 font-display leading-[1.05] drop-shadow-sm ${
     compact
       ? 'text-4xl sm:text-5xl'
       : banner
         ? 'text-4xl sm:text-5xl lg:text-6xl'
-        : 'text-4xl sm:text-5xl lg:text-7xl'
-  } max-w-3xl`;
+        : 'text-5xl sm:text-6xl lg:text-7xl xl:text-8xl'
+  } max-w-4xl`;
 
   const contentClass = `container-ist relative z-10 flex flex-col justify-end ${
     compact
       ? 'py-12 sm:py-14'
       : banner
         ? 'pb-10 pt-20 sm:pb-12 sm:pt-24'
-        : 'pb-16 pt-24 sm:pb-24 sm:pt-32'
+        : 'pb-20 pt-28 sm:pb-28 sm:pt-36'
   } ${align === 'center' ? 'items-center text-center' : ''}`;
 
   const descDelay = titleIsString ? 0.3 + wordCount * 0.12 + 0.1 : 0.5;
@@ -145,7 +145,7 @@ export function PageHero({
             className={`flex items-center gap-3 ${align === 'center' ? 'justify-center' : ''}`}
           >
             <span className="h-px w-8 bg-ist-gold/80" aria-hidden />
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-ist-teal-light">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-ist-gold sm:text-xs sm:tracking-[0.3em]">
               {eyebrow}
             </p>
           </motion.div>
@@ -171,8 +171,8 @@ export function PageHero({
             initial={{ opacity: 0, y: reduce ? 0 : 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: reduce ? 0 : descDelay, duration: 0.7, ease }}
-            className={`mt-4 text-base text-white/80 sm:text-lg ${
-              align === 'center' ? 'mx-auto max-w-2xl' : 'max-w-xl'
+            className={`mt-5 text-base leading-relaxed text-white/85 sm:text-lg ${
+              align === 'center' ? 'mx-auto max-w-2xl' : 'max-w-lg'
             }`}
           >
             {description}
@@ -185,7 +185,7 @@ export function PageHero({
             initial={{ opacity: 0, y: reduce ? 0 : 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: reduce ? 0 : actionsDelay, duration: 0.7, ease }}
-            className={`mt-5 flex flex-wrap gap-3 ${align === 'center' ? 'justify-center' : ''}`}
+            className={`mt-8 flex flex-wrap gap-3 ${align === 'center' ? 'justify-center' : ''}`}
           >
             {actions}
           </motion.div>
