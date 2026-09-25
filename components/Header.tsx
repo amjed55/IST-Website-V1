@@ -130,9 +130,14 @@ export function Header() {
             aria-label="Primary"
             onMouseLeave={() => setDrop(null)}
           >
-          {/* Drop Home + Prayer Times — logo and teal CTA cover those paths */}
+          {/* Drop Home, Prayer Times, Visit — covered by logo + header CTAs */}
           {primaryNav
-            .filter((item) => item.href !== '/' && item.href !== '/prayer-times')
+            .filter(
+              (item) =>
+                item.href !== '/' &&
+                item.href !== '/prayer-times' &&
+                item.href !== '/visit',
+            )
             .map((item) => {
             const active = isActive(activePath, item);
             const isOpen = drop === item.label;
@@ -301,8 +306,24 @@ export function Header() {
                 </button>
               </div>
 
+              {/* Pinned visitor actions — always visible without scrolling */}
+              <div className="grid gap-2 border-b border-ist-green/8 bg-ist-cream/40 p-4">
+                <Button href={hrefFor('/prayer-times')} variant="teal" className="w-full">
+                  {t('prayerTimes')}
+                </Button>
+                <Button href={hrefFor('/visit')} variant="primary" className="w-full">
+                  {t('visit')}
+                </Button>
+                <Button href={links.donate} variant="gold" external className="w-full">
+                  {t('donate')}
+                </Button>
+                <LanguageSwitcher />
+              </div>
+
               <div className="flex-1 overflow-y-auto px-3 py-3">
-                {primaryNav.map((item, i) => {
+                {primaryNav
+                  .filter((item) => item.href !== '/prayer-times')
+                  .map((item, i) => {
                   const expanded = mobileExpand === item.label;
                   const active = isActive(activePath, item);
                   const NavIcon = navIcons[item.label];
@@ -369,19 +390,6 @@ export function Header() {
                     </motion.div>
                   );
                 })}
-              </div>
-
-              <div className="grid gap-2 border-t border-ist-green/8 p-4">
-                <LanguageSwitcher />
-                <Button href={hrefFor('/prayer-times')} variant="teal" className="w-full">
-                  {t('prayerTimes')}
-                </Button>
-                <Button href={hrefFor('/visit')} variant="outline" className="w-full">
-                  {t('visit')}
-                </Button>
-                <Button href={links.donate} variant="primary" external className="w-full">
-                  {t('donate')}
-                </Button>
               </div>
             </motion.aside>
           </motion.div>

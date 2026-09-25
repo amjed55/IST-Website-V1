@@ -44,7 +44,7 @@ export default function DonatePage() {
             <Button href={links.donate} variant="gold" external>
               Open donation portal
             </Button>
-            <Button href="/get-involved/zakat" variant="outline">
+            <Button href="/get-involved/zakat" variant="ghost">
               Estimate Zakat
             </Button>
           </>

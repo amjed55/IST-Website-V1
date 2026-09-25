@@ -20,39 +20,19 @@ type Props = {
   showScrollCue?: boolean;
 };
 
-// Word-by-word stagger — identical to BPWebsite hero pattern
-function WordHeadline({ text, className }: { text: string; className?: string }) {
+// Gentle fade-up for the brand line — avoids awkward word orphans from per-word splits
+function BrandHeadline({ text, className }: { text: string; className?: string }) {
   const reduce = useReducedMotion();
-  const words = text.split(' ');
-
-  const wordVariants = {
-    hidden: { opacity: 0, y: reduce ? 0 : 60 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: 0.3 + i * 0.12,
-        duration: 0.8,
-        ease,
-      },
-    }),
-  };
 
   return (
-    <h1 className={className}>
-      {words.map((word, i) => (
-        <motion.span
-          key={`${word}-${i}`}
-          custom={i}
-          initial="hidden"
-          animate="visible"
-          variants={wordVariants}
-          className="mr-[0.25em] inline-block"
-        >
-          {word}
-        </motion.span>
-      ))}
-    </h1>
+    <motion.h1
+      className={className}
+      initial={{ opacity: 0, y: reduce ? 0 : 36 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.28, duration: 0.75, ease }}
+    >
+      {text}
+    </motion.h1>
   );
 }
 
@@ -81,14 +61,13 @@ export function PageHero({
 
   const cue = showScrollCue ?? (!compact && !banner);
   const titleIsString = typeof title === 'string';
-  const wordCount = titleIsString ? title.split(' ').length : 0;
 
-  const titleClass = `mt-4 font-display leading-[1.05] drop-shadow-sm ${
+  const titleClass = `mt-4 font-display leading-[1.08] tracking-tight drop-shadow-sm text-balance ${
     compact
       ? 'text-4xl sm:text-5xl'
       : banner
         ? 'text-4xl sm:text-5xl lg:text-6xl'
-        : 'text-5xl sm:text-6xl lg:text-7xl xl:text-8xl'
+        : 'text-5xl sm:text-6xl lg:text-7xl xl:text-[5.25rem]'
   } max-w-4xl`;
 
   const contentClass = `container-ist relative z-10 flex flex-col justify-end ${
@@ -99,8 +78,8 @@ export function PageHero({
         : 'pb-20 pt-28 sm:pb-28 sm:pt-36'
   } ${align === 'center' ? 'items-center text-center' : ''}`;
 
-  const descDelay = titleIsString ? 0.3 + wordCount * 0.12 + 0.1 : 0.5;
-  const actionsDelay = descDelay + 0.15;
+  const descDelay = titleIsString ? 0.45 : 0.5;
+  const actionsDelay = descDelay + 0.12;
   const mapDelay = actionsDelay + 0.12;
 
   const heightClass = compact
@@ -153,7 +132,7 @@ export function PageHero({
 
         {/* Title */}
         {titleIsString ? (
-          <WordHeadline text={title} className={titleClass} />
+          <BrandHeadline text={title} className={titleClass} />
         ) : (
           <motion.h1
             className={titleClass}
