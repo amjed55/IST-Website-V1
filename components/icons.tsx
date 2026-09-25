@@ -53,6 +53,28 @@ export function IconPrayer(props: IconProps) {
   );
 }
 
+export function IconAudio(props: IconProps) {
+  const { title, rest } = base(props);
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      aria-hidden={!title}
+      {...rest}
+    >
+      {title ? <title>{title}</title> : null}
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M4 14.5v-5a8 8 0 0116 0v5M4 14.5a2.5 2.5 0 002.5 2.5H8v-6H6.5A2.5 2.5 0 004 13.5v1zM20 14.5a2.5 2.5 0 01-2.5 2.5H16v-6h1.5a2.5 2.5 0 012.5 2.5v1z"
+      />
+      <path strokeLinecap="round" d="M16 19c-1 .7-2.3 1-4 1" />
+    </svg>
+  );
+}
+
 export function IconAbout(props: IconProps) {
   const { title, rest } = base(props);
   return (
@@ -151,6 +173,164 @@ export function IconHome(props: IconProps) {
   );
 }
 
+export function IconYouth(props: IconProps) {
+  const { title, rest } = base(props);
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden={!title} {...rest}>
+      {title ? <title>{title}</title> : null}
+      <circle cx="12" cy="7" r="3" />
+      <path strokeLinecap="round" d="M6 20v-1a6 6 0 0112 0v1" />
+      <path strokeLinecap="round" d="M4 12h2M18 12h2M7 9l1.5 1.5M17 9l-1.5 1.5" />
+    </svg>
+  );
+}
+
+export function IconSisters(props: IconProps) {
+  const { title, rest } = base(props);
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden={!title} {...rest}>
+      {title ? <title>{title}</title> : null}
+      <circle cx="9" cy="8" r="2.5" />
+      <circle cx="16" cy="8.5" r="2" />
+      <path strokeLinecap="round" d="M4 19a5 5 0 0110 0M13.5 19a4 4 0 016.5 0" />
+    </svg>
+  );
+}
+
+export function IconSeniors(props: IconProps) {
+  const { title, rest } = base(props);
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden={!title} {...rest}>
+      {title ? <title>{title}</title> : null}
+      <circle cx="12" cy="8" r="3" />
+      <path strokeLinecap="round" d="M5 20a7 7 0 0114 0" />
+      <path strokeLinecap="round" d="M12 11v3M9.5 14.5h5" />
+    </svg>
+  );
+}
+
+export function IconBook(props: IconProps) {
+  const { title, rest } = base(props);
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden={!title} {...rest}>
+      {title ? <title>{title}</title> : null}
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 5.5A2.5 2.5 0 016.5 3H20v16H6.5A2.5 2.5 0 004 16.5v-11z" />
+      <path strokeLinecap="round" d="M8 7h8M8 11h6" />
+    </svg>
+  );
+}
+
+export function IconClock(props: IconProps) {
+  const { title, rest } = base(props);
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden={!title} {...rest}>
+      {title ? <title>{title}</title> : null}
+      <circle cx="12" cy="12" r="8.5" />
+      <path strokeLinecap="round" d="M12 7.5V12l3 2" />
+    </svg>
+  );
+}
+
+export function IconHeart(props: IconProps) {
+  const { title, rest } = base(props);
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden={!title} {...rest}>
+      {title ? <title>{title}</title> : null}
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z" />
+    </svg>
+  );
+}
+
+export function IconSports(props: IconProps) {
+  const { title, rest } = base(props);
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden={!title} {...rest}>
+      {title ? <title>{title}</title> : null}
+      <circle cx="12" cy="12" r="8.5" />
+      <path strokeLinecap="round" d="M5.5 8.5c2.5 1 5 1 8 0M5.5 15.5c2.5-1 5-1 8 0" />
+      <path strokeLinecap="round" d="M12 3.5v17" />
+    </svg>
+  );
+}
+
+export function IconUsers(props: IconProps) {
+  const { title, rest } = base(props);
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden={!title} {...rest}>
+      {title ? <title>{title}</title> : null}
+      <circle cx="9" cy="8" r="2.75" />
+      <circle cx="17" cy="9" r="2.25" />
+      <path strokeLinecap="round" d="M3.5 19a5.5 5.5 0 0111 0M14 19a4.5 4.5 0 016.5 0" />
+    </svg>
+  );
+}
+
+export function IconStar(props: IconProps) {
+  const { title, rest } = base(props);
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden={!title} {...rest}>
+      {title ? <title>{title}</title> : null}
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3.5l2.2 5.3 5.8.5-4.4 3.7 1.4 5.6L12 15.8 6.9 18.6l1.4-5.6L4 9.3l5.8-.5L12 3.5z" />
+    </svg>
+  );
+}
+
+export function IconBriefcase(props: IconProps) {
+  const { title, rest } = base(props);
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden={!title} {...rest}>
+      {title ? <title>{title}</title> : null}
+      <rect x="3.5" y="7.5" width="17" height="12" rx="2" />
+      <path strokeLinecap="round" d="M9 7.5V6a2 2 0 012-2h2a2 2 0 012 2v1.5M3.5 12h17" />
+    </svg>
+  );
+}
+
+export function IconHands(props: IconProps) {
+  const { title, rest } = base(props);
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden={!title} {...rest}>
+      {title ? <title>{title}</title> : null}
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8 12V7.5a1.5 1.5 0 013 0V12M11 12V6.5a1.5 1.5 0 013 0V12M14 12V8a1.5 1.5 0 013 0v6.5a4.5 4.5 0 01-4.5 4.5H11A4.5 4.5 0 016.5 14v-1A1.5 1.5 0 019 11.5" />
+    </svg>
+  );
+}
+
+export function IconChild(props: IconProps) {
+  const { title, rest } = base(props);
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden={!title} {...rest}>
+      {title ? <title>{title}</title> : null}
+      <circle cx="12" cy="7" r="3" />
+      <path strokeLinecap="round" d="M7 20v-2a5 5 0 0110 0v2" />
+      <path strokeLinecap="round" d="M9 13h6" />
+    </svg>
+  );
+}
+
+export function IconMosque(props: IconProps) {
+  const { title, rest } = base(props);
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden={!title} {...rest}>
+      {title ? <title>{title}</title> : null}
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 20V11l8-6 8 6v9" />
+      <path strokeLinecap="round" d="M9 20v-5h6v5M12 5V3" />
+      <circle cx="12" cy="2.5" r="0.75" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function IconRing(props: IconProps) {
+  const { title, rest } = base(props);
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden={!title} {...rest}>
+      {title ? <title>{title}</title> : null}
+      <circle cx="12" cy="13" r="6.5" />
+      <path strokeLinecap="round" d="M9 7.5l1.5-3h3L15 7.5" />
+    </svg>
+  );
+}
+
 export const navIcons: Record<string, (props: IconProps) => ReactElement> = {
   Home: IconHome,
   About: IconAbout,
@@ -168,3 +348,35 @@ export const connectIcons = {
   whatsapp: IconWhatsApp,
   instagram: IconInstagram,
 } as const;
+
+export const topicIcons: Record<string, (props: IconProps) => ReactElement> = {
+  youth: IconYouth,
+  sisters: IconSisters,
+  seniors: IconSeniors,
+  education: IconEducation,
+  community: IconCommunity,
+  services: IconServices,
+  events: IconEvents,
+  visit: IconVisit,
+  volunteer: IconHands,
+  donate: IconDonate,
+  careers: IconBriefcase,
+  sports: IconSports,
+  children: IconChild,
+  adults: IconBook,
+  prayer: IconPrayer,
+  mosque: IconMosque,
+  nikah: IconRing,
+  counselling: IconHeart,
+  janazah: IconStar,
+  weekly: IconUsers,
+  story: IconBook,
+  leadership: IconUsers,
+  facility: IconMosque,
+  madressa: IconChild,
+  sunday: IconBook,
+  hifz: IconBook,
+  alim: IconEducation,
+  essentials: IconStar,
+  clock: IconClock,
+};

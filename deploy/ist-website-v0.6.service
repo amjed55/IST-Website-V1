@@ -1,0 +1,27 @@
+[Unit]
+Description=Islamic Society of Toronto website v0.6
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=istwebsite
+Group=istwebsite
+WorkingDirectory=/opt/ist-website-v0.6/.next/standalone
+EnvironmentFile=/etc/ist-website-v0.6.env
+Environment=NODE_ENV=production
+Environment=HOSTNAME=127.0.0.1
+Environment=PORT=3006
+ExecStart=/usr/bin/node /opt/ist-website-v0.6/.next/standalone/server.js
+Restart=always
+RestartSec=5
+TimeoutStopSec=20
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+ReadWritePaths=/opt/ist-website-v0.6/.next/standalone/data
+ReadWritePaths=/opt/ist-website-v0.6/.next/standalone/public/uploads
+
+[Install]
+WantedBy=multi-user.target

@@ -1,14 +1,21 @@
 'use client';
 
 import Link from 'next/link';
+import { ReactNode } from 'react';
 import { links } from '@/lib/content';
 import { Badge, Button, Section } from '@/components/ui';
-import { FadeUp, SlideInLeft, SlideInRight } from '@/components/motion';
+import { FadeUp, PageTransition, SlideInLeft, SlideInRight } from '@/components/motion';
 import { PageHero } from '@/components/PageHero';
 import { SiteForm } from '@/components/SiteForm';
 import type { SubsectionPage } from '@/lib/subsections';
 
-export function SubsectionLayout({ page }: { page: SubsectionPage }) {
+export function SubsectionLayout({
+  page,
+  children,
+}: {
+  page: SubsectionPage;
+  children?: ReactNode;
+}) {
   const donateHref = links.donate;
   const primaryCta =
     page.slug === 'donate'
@@ -16,7 +23,7 @@ export function SubsectionLayout({ page }: { page: SubsectionPage }) {
       : page.cta;
 
   return (
-    <>
+    <PageTransition>
       <PageHero
         compact
         image={page.image}
@@ -37,7 +44,6 @@ export function SubsectionLayout({ page }: { page: SubsectionPage }) {
       />
 
       <Section>
-        {/* Breadcrumb */}
         <FadeUp>
           <nav className="text-sm text-ist-muted" aria-label="Breadcrumb">
             <Link href={page.parentHref} className="font-medium text-ist-teal hover:underline">
@@ -48,38 +54,37 @@ export function SubsectionLayout({ page }: { page: SubsectionPage }) {
           </nav>
         </FadeUp>
 
-        {/* Main content */}
         <div className="mt-10 grid gap-12 lg:grid-cols-[1fr_340px]">
           <SlideInLeft>
-            {/* Tags */}
             {(page.tags?.length || page.comingSoon) && (
               <div className="mb-6 flex flex-wrap gap-2">
-                {page.tags?.map((t) => <Badge key={t}>{t}</Badge>)}
+                {page.tags?.map((t) => (
+                  <Badge key={t}>{t}</Badge>
+                ))}
                 {page.comingSoon && (
                   <Badge className="bg-ist-gold/15 text-ist-green">Coming soon</Badge>
                 )}
               </div>
             )}
 
-            {/* Body paragraphs */}
             <div className="space-y-4">
-              {page.body.map((para) => (
-                <p key={para.slice(0, 48)} className="text-base leading-relaxed text-ist-ink/75">
-                  {para}
-                </p>
+              {page.body.map((para, i) => (
+                <FadeUp key={para.slice(0, 48)} delay={0.05 * i}>
+                  <p className="text-base leading-relaxed text-ist-ink/75">{para}</p>
+                </FadeUp>
               ))}
             </div>
 
-            {/* Schedule */}
             {page.schedule && (
-              <p className="mt-6 border-l-2 border-ist-teal/40 pl-4 text-sm font-medium text-ist-teal">
-                {page.schedule}
-              </p>
+              <FadeUp delay={0.1}>
+                <p className="mt-6 border-l-2 border-ist-teal/40 pl-4 text-sm font-medium text-ist-teal">
+                  {page.schedule}
+                </p>
+              </FadeUp>
             )}
 
-            {/* Contacts */}
             {page.contacts && page.contacts.length > 0 && (
-              <div className="mt-8 border-t border-ist-green/8 pt-6">
+              <FadeUp delay={0.12} className="mt-8 border-t border-ist-green/8 pt-6">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-ist-teal">
                   Contacts
                 </p>
@@ -96,23 +101,25 @@ export function SubsectionLayout({ page }: { page: SubsectionPage }) {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </FadeUp>
             )}
           </SlideInLeft>
 
-          {/* Sidebar — forms / CTA */}
-          <SlideInRight delay={0.08}>
+          <SlideInRight delay={0.1}>
             {page.form === 'program-register' && (
               <div className="border border-ist-green/8 bg-white p-6">
                 <h3 className="font-display text-2xl text-ist-green">Register interest</h3>
                 <p className="mt-2 text-sm text-ist-ink/60">
-                  Tell us you're interested in {page.title}. Staff will follow up by email.
+                  Tell us you&apos;re interested in {page.title}. Staff will follow up by email.
                 </p>
                 <div className="mt-6">
                   <SiteForm
                     type="program-register"
                     submitLabel="Submit interest"
-                    prefill={{ program: page.title, message: `I am interested in ${page.title}.\n\n` }}
+                    prefill={{
+                      program: page.title,
+                      message: `I am interested in ${page.title}.\n\n`,
+                    }}
                   />
                 </div>
               </div>
@@ -121,7 +128,7 @@ export function SubsectionLayout({ page }: { page: SubsectionPage }) {
             {page.form === 'volunteer' && (
               <div className="border border-ist-green/8 bg-white p-6">
                 <h3 className="font-display text-2xl text-ist-green">Volunteer interest</h3>
-                <p className="mt-2 text-sm text-ist-ink/60">Share how you'd like to help.</p>
+                <p className="mt-2 text-sm text-ist-ink/60">Share how you&apos;d like to help.</p>
                 <div className="mt-6">
                   <SiteForm type="volunteer" submitLabel="Submit interest" />
                 </div>
@@ -129,7 +136,7 @@ export function SubsectionLayout({ page }: { page: SubsectionPage }) {
             )}
 
             {page.slug === 'donate' && (
-              <div id="give" className="border border-ist-gold/40 bg-ist-gold/5 p-6 scroll-mt-24">
+              <div id="give" className="scroll-mt-24 border border-ist-gold/40 bg-ist-gold/5 p-6">
                 <h3 className="font-display text-2xl text-ist-green">Give online</h3>
                 <p className="mt-2 text-sm text-ist-ink/60">
                   Open the secure portal to support Zakat, Sadaqah, or the Masjid Fund.
@@ -140,7 +147,6 @@ export function SubsectionLayout({ page }: { page: SubsectionPage }) {
               </div>
             )}
 
-            {/* Empty sidebar fallback */}
             {!page.form && page.slug !== 'donate' && (
               <div className="border-l-2 border-ist-teal/20 pl-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-ist-teal">
@@ -154,13 +160,14 @@ export function SubsectionLayout({ page }: { page: SubsectionPage }) {
           </SlideInRight>
         </div>
 
-        {/* Back link */}
         <FadeUp className="mt-14 border-t border-ist-green/8 pt-6">
           <Link href={page.parentHref} className="text-sm font-semibold text-ist-teal hover:underline">
             ← Back to {page.parentLabel}
           </Link>
         </FadeUp>
       </Section>
-    </>
+
+      {children}
+    </PageTransition>
   );
 }

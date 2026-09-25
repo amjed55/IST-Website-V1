@@ -12,44 +12,27 @@ type Props = {
   title: ReactNode;
   description?: string;
   actions?: ReactNode;
+  siteMap?: ReactNode;
   compact?: boolean;
+  /** Medium banner — shorter than full-screen, taller than compact */
+  banner?: boolean;
   align?: 'left' | 'center';
   showScrollCue?: boolean;
 };
 
-// Word-by-word stagger — identical to BPWebsite hero pattern
-function WordHeadline({ text, className }: { text: string; className?: string }) {
+// Gentle fade-up for the brand line — avoids awkward word orphans from per-word splits
+function BrandHeadline({ text, className }: { text: string; className?: string }) {
   const reduce = useReducedMotion();
-  const words = text.split(' ');
-
-  const wordVariants = {
-    hidden: { opacity: 0, y: reduce ? 0 : 60 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: 0.3 + i * 0.12,
-        duration: 0.8,
-        ease,
-      },
-    }),
-  };
 
   return (
-    <h1 className={className}>
-      {words.map((word, i) => (
-        <motion.span
-          key={`${word}-${i}`}
-          custom={i}
-          initial="hidden"
-          animate="visible"
-          variants={wordVariants}
-          className="mr-[0.25em] inline-block"
-        >
-          {word}
-        </motion.span>
-      ))}
-    </h1>
+    <motion.h1
+      className={className}
+      initial={{ opacity: 0, y: reduce ? 0 : 36 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.28, duration: 0.75, ease }}
+    >
+      {text}
+    </motion.h1>
   );
 }
 
@@ -59,7 +42,9 @@ export function PageHero({
   title,
   description,
   actions,
+  siteMap,
   compact = false,
+  banner = false,
   align = 'left',
   showScrollCue,
 }: Props) {
@@ -70,31 +55,43 @@ export function PageHero({
     target: sectionRef,
     offset: ['start start', 'end start'],
   });
-  const imageY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
-  const textY = useTransform(scrollYProgress, [0, 1], ['0%', compact ? '8%' : '15%']);
-  const textOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const imageY = useTransform(scrollYProgress, [0, 1], ['0%', banner || compact ? '18%' : '30%']);
+  const textY = useTransform(scrollYProgress, [0, 1], ['0%', compact ? '0%' : banner ? '10%' : '15%']);
+  const textOpacity = useTransform(scrollYProgress, [0, 0.8], [1, compact ? 1 : 0]);
 
-  const cue = showScrollCue ?? !compact;
+  const cue = showScrollCue ?? (!compact && !banner);
   const titleIsString = typeof title === 'string';
-  const wordCount = titleIsString ? title.split(' ').length : 0;
 
-  const titleClass = `mt-3 font-display leading-[1.05] drop-shadow-sm ${
-    compact ? 'text-4xl sm:text-5xl' : 'text-4xl sm:text-5xl lg:text-7xl'
-  } max-w-3xl`;
+  const titleClass = `mt-4 font-display leading-[1.08] tracking-tight drop-shadow-sm text-balance ${
+    compact
+      ? 'text-4xl sm:text-5xl'
+      : banner
+        ? 'text-4xl sm:text-5xl lg:text-6xl'
+        : 'text-5xl sm:text-6xl lg:text-7xl xl:text-[5.25rem]'
+  } max-w-4xl`;
 
   const contentClass = `container-ist relative z-10 flex flex-col justify-end ${
-    compact ? 'py-12 sm:py-14' : 'pb-20 pt-28 sm:pb-28 sm:pt-36'
+    compact
+      ? 'py-12 sm:py-14'
+      : banner
+        ? 'pb-10 pt-20 sm:pb-12 sm:pt-24'
+        : 'pb-20 pt-28 sm:pb-28 sm:pt-36'
   } ${align === 'center' ? 'items-center text-center' : ''}`;
 
-  const descDelay = titleIsString ? 0.3 + wordCount * 0.12 + 0.1 : 0.5;
-  const actionsDelay = descDelay + 0.15;
+  const descDelay = titleIsString ? 0.45 : 0.5;
+  const actionsDelay = descDelay + 0.12;
+  const mapDelay = actionsDelay + 0.12;
+
+  const heightClass = compact
+    ? 'min-h-[280px] sm:min-h-[320px]'
+    : banner
+      ? 'min-h-[auto]'
+      : 'min-h-[88vh] sm:min-h-screen';
 
   return (
     <section
       ref={sectionRef}
-      className={`relative overflow-hidden text-white ${
-        compact ? 'min-h-[280px] sm:min-h-[320px]' : 'min-h-[88vh] sm:min-h-screen'
-      }`}
+      className={`relative overflow-hidden text-white ${heightClass}`}
     >
       {/* Parallax background */}
       <motion.div
@@ -127,7 +124,7 @@ export function PageHero({
             className={`flex items-center gap-3 ${align === 'center' ? 'justify-center' : ''}`}
           >
             <span className="h-px w-8 bg-ist-gold/80" aria-hidden />
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-ist-teal-light">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-ist-gold sm:text-xs sm:tracking-[0.3em]">
               {eyebrow}
             </p>
           </motion.div>
@@ -135,7 +132,7 @@ export function PageHero({
 
         {/* Title */}
         {titleIsString ? (
-          <WordHeadline text={title} className={titleClass} />
+          <BrandHeadline text={title} className={titleClass} />
         ) : (
           <motion.h1
             className={titleClass}
@@ -153,8 +150,8 @@ export function PageHero({
             initial={{ opacity: 0, y: reduce ? 0 : 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: reduce ? 0 : descDelay, duration: 0.7, ease }}
-            className={`mt-4 text-base text-white/80 sm:text-lg ${
-              align === 'center' ? 'mx-auto max-w-2xl' : 'max-w-xl'
+            className={`mt-5 text-base leading-relaxed text-white/85 sm:text-lg ${
+              align === 'center' ? 'mx-auto max-w-2xl' : 'max-w-lg'
             }`}
           >
             {description}
@@ -167,9 +164,21 @@ export function PageHero({
             initial={{ opacity: 0, y: reduce ? 0 : 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: reduce ? 0 : actionsDelay, duration: 0.7, ease }}
-            className={`mt-8 flex flex-wrap gap-4 ${align === 'center' ? 'justify-center' : ''}`}
+            className={`mt-8 flex flex-wrap gap-3 ${align === 'center' ? 'justify-center' : ''}`}
           >
             {actions}
+          </motion.div>
+        )}
+
+        {/* Site map / quick links */}
+        {siteMap && (
+          <motion.div
+            initial={{ opacity: 0, y: reduce ? 0 : 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: reduce ? 0 : mapDelay, duration: 0.7, ease }}
+            className={`mt-8 w-full ${banner ? 'max-w-none' : 'max-w-4xl'}`}
+          >
+            {siteMap}
           </motion.div>
         )}
       </motion.div>

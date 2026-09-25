@@ -1,0 +1,4585 @@
+/* Scoped Classic Prayer Clock — IST website embed */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap');
+
+.ist-classic-board /* -----------------------------------------------------------
+   IST Prayer Clock — Display CSS (single-screen, .ist-classic-board 100vh)
+   ----------------------------------------------------------- */
+
+.ist-classic-board{
+  /* Default palette (green / emerald-teal) */
+  --primary:      #0b5345;
+  --accent:       #0d9488;
+  --accent2:      #0f766e;
+  --accent3:      #5eead4;
+  --dark-text:    #0f1f1b;
+  --gray-text:    #64748b;
+  --light-text:   #f8fafc;
+  --light-bg:     #e6f4f1;
+  --border-light: #d4e4e0;
+  --ps-sh-sm:     0 1px 2px rgba(15,32,27,0.06), 0 1px 3px rgba(15,32,27,0.08);
+  --ps-sh-md:     0 4px 10px rgba(15,32,27,0.08), 0 2px 4px rgba(15,32,27,0.06);
+  --ps-sh-lg:     0 14px 30px rgba(15,32,27,0.12), 0 6px 12px rgba(15,32,27,0.08);
+  --ps-radius:    16px;
+}
+
+/* -- Reset + lock to viewport ------------------------------ */
+.ist-classic-board, .ist-classic-board *, .ist-classic-board *::before, .ist-classic-board *::after{ box-sizing: border-box; margin: 0; padding: 0; }
+
+.ist-classic-board{
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: Roboto, Poppins, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  letter-spacing: 0.01em;
+  background: var(--light-bg);
+  color: var(--dark-text);
+}
+
+.ist-classic-board .hidden{ display: none !important; }
+
+/* -- Outer container — fills exactly the viewport ---------- */
+.ist-classic-board .outer-container{
+  height: 100%;
+  max-height: 100%;
+  width: 100%;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(13,148,136,0.10), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(94,234,212,0.12), transparent 55%),
+    linear-gradient(160deg, #eef7f5 0%, #f6fbfa 55%, #eef3f2 100%);
+  overflow: hidden;
+}
+
+/* ── Load-in: hide panels until data ready, then stagger animate ── */
+@keyframes display-card-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ist-classic-board .outer-container:not(.display-ready) .ist-header, .ist-classic-board .outer-container:not(.display-ready) .info-card, .ist-classic-board .outer-container:not(.display-ready) .prayer-card, .ist-classic-board .outer-container:not(.display-ready) .jummah-card, .ist-classic-board .outer-container:not(.display-ready) #tickerBar, .ist-classic-board .outer-container:not(.display-ready) #mediaPanel{
+  opacity: 0;
+}
+
+.ist-classic-board .outer-container.display-ready .ist-header, .ist-classic-board .outer-container.display-ready .info-card, .ist-classic-board .outer-container.display-ready .prayer-grid > *, .ist-classic-board .outer-container.display-ready .sidebar-jummah .jummah-card-bc, .ist-classic-board .outer-container.display-ready .broadcast-bottom-jummah .jummah-card-bc, .ist-classic-board .outer-container.display-ready .sidebar-weather, .ist-classic-board .outer-container.display-ready .sidebar-qr-row, .ist-classic-board .outer-container.display-ready .broadcast-bottom-qr, .ist-classic-board .outer-container.display-ready .broadcast-prayer-rail > *, .ist-classic-board .outer-container.display-ready .jummah-card, .ist-classic-board .outer-container.display-ready #tickerBar, .ist-classic-board .outer-container.display-ready #mediaPanel{
+  animation: display-card-in 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ist-classic-board .outer-container.display-ready .ist-header{ animation-delay: 0.02s; }
+.ist-classic-board .outer-container.display-ready .info-bar .info-card:nth-child(1){ animation-delay: 0.07s; }
+.ist-classic-board .outer-container.display-ready .info-bar .info-card:nth-child(2){ animation-delay: 0.12s; }
+.ist-classic-board .outer-container.display-ready .info-bar .info-card:nth-child(3){ animation-delay: 0.17s; }
+.ist-classic-board .outer-container.display-ready .info-bar .info-card:nth-child(4){ animation-delay: 0.22s; }
+.ist-classic-board .outer-container.display-ready .info-bar .info-card:nth-child(5){ animation-delay: 0.27s; }
+.ist-classic-board .outer-container.display-ready .prayer-grid > *:nth-child(1){ animation-delay: 0.32s; }
+.ist-classic-board .outer-container.display-ready .prayer-grid > *:nth-child(2){ animation-delay: 0.37s; }
+.ist-classic-board .outer-container.display-ready .prayer-grid > *:nth-child(3){ animation-delay: 0.42s; }
+.ist-classic-board .outer-container.display-ready .prayer-grid > *:nth-child(4){ animation-delay: 0.47s; }
+.ist-classic-board .outer-container.display-ready .prayer-grid > *:nth-child(5){ animation-delay: 0.52s; }
+.ist-classic-board .outer-container.display-ready .prayer-grid > *:nth-child(6){ animation-delay: 0.57s; }
+.ist-classic-board .outer-container.display-ready .jummah-card:nth-child(1){ animation-delay: 0.62s; }
+.ist-classic-board .outer-container.display-ready .jummah-card:nth-child(2){ animation-delay: 0.67s; }
+.ist-classic-board .outer-container.display-ready .jummah-card:nth-child(3){ animation-delay: 0.72s; }
+.ist-classic-board .outer-container.display-ready #mediaPanel{ animation-delay: 0.28s; }
+.ist-classic-board .outer-container.display-ready #tickerBar{ animation-delay: 0.78s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ist-classic-board .outer-container:not(.display-ready) .ist-header, .ist-classic-board .outer-container:not(.display-ready) .info-card, .ist-classic-board .outer-container:not(.display-ready) .prayer-card, .ist-classic-board .outer-container:not(.display-ready) .jummah-card, .ist-classic-board .outer-container:not(.display-ready) #tickerBar, .ist-classic-board .outer-container:not(.display-ready) #mediaPanel{
+    opacity: 1;
+  }
+  .ist-classic-board .outer-container.display-ready .ist-header, .ist-classic-board .outer-container.display-ready .info-card, .ist-classic-board .outer-container.display-ready .prayer-grid > *, .ist-classic-board .outer-container.display-ready .jummah-card, .ist-classic-board .outer-container.display-ready #tickerBar, .ist-classic-board .outer-container.display-ready #mediaPanel{
+    animation: none;
+  }
+}
+
+/* -- HEADER ------------------------------------------------ */
+.ist-classic-board .ist-header{
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdfd 100%);
+  border-radius: var(--ps-radius);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--ps-sh-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.ist-classic-board .ist-header::before{
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--primary), var(--accent), var(--accent3), var(--accent), var(--primary));
+}
+
+.ist-classic-board .header-center{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.ist-classic-board .org-logo{
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--ps-sh-sm);
+  flex-shrink: 0;
+}
+
+.ist-classic-board .header-titles{ display: flex; flex-direction: column; gap: 0; }
+
+.ist-classic-board .header-org-name{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.7rem, 1vw, 1rem);
+  font-weight: 600;
+  color: var(--dark-text);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+}
+
+.ist-classic-board .header-org-name-ar{
+  font-family: 'Amiri', serif;
+  font-size: 0.92em;
+  opacity: 0.88;
+  margin-top: -0.15em;
+}
+
+.ist-classic-board .header-prayer-title{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.6rem, 3vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  background: linear-gradient(120deg, var(--primary), var(--accent2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ist-classic-board .header-subtitle{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.7rem, 1vw, 1rem);
+  font-weight: 600;
+  color: var(--accent2);
+}
+
+/* QR codes — platform brand colours */
+.ist-classic-board .header-qr-row{
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+
+.ist-classic-board .qr-block{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 7px 5px;
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+}
+
+.ist-classic-board .qr-img-wrap{
+  position: relative;
+  width: 88px;
+  height: 88px;
+  border-radius: 8px;
+  padding: 3px;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.ist-classic-board .qr-img-wrap img{
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.ist-classic-board .qr-center-icon{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  color: #fff;
+  border: 2px solid #fff;
+  z-index: 2;
+  pointer-events: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.ist-classic-board .qr-label{
+  font-size: 0.58rem;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Instagram */
+.ist-classic-board .qr-block.qr-instagram{
+  background: linear-gradient(135deg, #833ab4 0%, #e1306c 52%, #fcb045 100%);
+  box-shadow: 0 4px 14px rgba(225, 48, 108, 0.35);
+}
+.ist-classic-board .qr-instagram .qr-img-wrap{ border: 2px solid rgba(255, 255, 255, 0.85); }
+.ist-classic-board .qr-instagram .qr-center-icon{
+  background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+}
+
+/* Website */
+.ist-classic-board .qr-block.qr-website{
+  background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
+  box-shadow: 0 4px 14px rgba(0, 114, 255, 0.3);
+}
+.ist-classic-board .qr-website .qr-img-wrap{ border: 2px solid rgba(255, 255, 255, 0.85); }
+.ist-classic-board .qr-website .qr-center-icon{ background: #0072ff; }
+
+/* WhatsApp */
+.ist-classic-board .qr-block.qr-whatsapp{
+  background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+}
+.ist-classic-board .qr-whatsapp .qr-img-wrap{ border: 2px solid rgba(255, 255, 255, 0.85); }
+.ist-classic-board .qr-whatsapp .qr-center-icon{ background: #128c7e; }
+
+/* Donate */
+.ist-classic-board .qr-block.qr-donate{
+  background: linear-gradient(135deg, #dc2626 0%, #f97316 100%);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
+}
+.ist-classic-board .qr-donate .qr-img-wrap{ border: 2px solid rgba(255, 255, 255, 0.85); }
+.ist-classic-board .qr-donate .qr-center-icon{ background: #dc2626; }
+
+/* Custom QR blocks — colours set inline from admin */
+.ist-classic-board .qr-block.qr-custom .qr-img-wrap{ border: 2px solid rgba(255, 255, 255, 0.85); }
+.ist-classic-board .qr-block.qr-custom .qr-center-icon{ color: #fff; }
+
+/* -- INFO BAR ---------------------------------------------- */
+.ist-classic-board .info-bar{
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+}
+
+.ist-classic-board .info-card{
+  background: linear-gradient(150deg, var(--primary) 0%, var(--accent2) 100%);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--light-text);
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--ps-sh-md);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ist-classic-board .info-card::after{
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 45%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.16), transparent);
+  pointer-events: none;
+}
+
+.ist-classic-board .info-icon-badge{
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.16);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22), 0 2px 6px rgba(0,0,0,0.15);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.ist-classic-board .info-content{ flex: 1; min-width: 0; }
+
+.ist-classic-board .info-label{
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.82;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.ist-classic-board .info-value{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1rem, 1.5vw, 1.45rem);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ist-classic-board .info-sub{
+  font-size: 0.68rem;
+  opacity: 0.78;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ist-classic-board .large-time{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.2rem, 2.1vw, 1.9rem);
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ist-classic-board .islamic-date{ color: #fde68a; font-weight: 600; font-size: 0.75rem; }
+.ist-classic-board .islamic-date-ar{
+  color: #fef08a;
+  font-family: 'Amiri', 'Traditional Arabic', serif;
+  font-weight: 700;
+  font-size: clamp(0.85rem, 1.15vw, 0.98rem);
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Date card: allow full Gregorian line wrap; Hijri lines below */
+.ist-classic-board .info-card.ic-date{
+  align-items: flex-start;
+}
+
+.ist-classic-board .info-card.ic-date .info-icon-badge{
+  margin-top: 0.12em;
+}
+
+.ist-classic-board .info-card.ic-date .info-value{
+  line-height: 1.1;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+}
+
+/* Classic: weekday + calendar on two lines (never ellipsis) */
+.ist-classic-board .info-card.ic-date .info-value.greg-date-stack{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
+
+.ist-classic-board .info-card.ic-date .greg-date-line{
+  display: block;
+  max-width: 100%;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  line-height: 1.12;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+
+.ist-classic-board .info-card.ic-date .greg-date-line.greg-date-weekday{
+  font-weight: 800;
+}
+
+@keyframes display-card-in-opacity {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.ist-classic-board[data-theme="classic"] .info-card.ic-date{
+  overflow: visible;
+  align-items: center;
+}
+
+.ist-classic-board[data-theme="classic"] .outer-container.display-ready .info-card.ic-date{
+  animation: display-card-in-opacity 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.07s;
+}
+
+.ist-classic-board[data-theme="classic"] .info-card.ic-date .info-content{
+  overflow: visible;
+}
+
+.ist-classic-board[data-theme="classic"] .info-card.ic-date .info-content.date-content-classic{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(3px, 0.5vh, 7px);
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+/* Flex (not grid) — reliable on BrightSign / older TV browsers */
+.ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-grid{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: clamp(10px, 1.5vw, 24px);
+}
+
+.ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-col{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(2px, 0.35vh, 5px);
+  min-width: 0;
+}
+
+.ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-greg{
+  flex: 1 1 42%;
+}
+
+.ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-hijri{
+  flex: 1 1 58%;
+  align-items: flex-end;
+  text-align: right;
+  border-left: 1px solid rgba(255, 255, 255, 0.22);
+  padding-left: clamp(10px, 1.5vw, 24px);
+}
+
+.ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-weekday, .ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-gregorian{
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.08;
+  display: block;
+  white-space: normal;
+  transform: none;
+}
+
+.ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-weekday{
+  font-weight: 800;
+  font-size: clamp(1.05rem, 2.35vh, 2rem);
+}
+
+.ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-gregorian{
+  font-size: clamp(0.98rem, 2.05vh, 1.8rem);
+  opacity: 0.96;
+}
+
+.ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-hijri-en{
+  color: #fde68a;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: clamp(0.88rem, 1.8vh, 1.4rem);
+  line-height: 1.15;
+  display: block;
+  width: 100%;
+  white-space: normal;
+  overflow: visible;
+  transform: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-hijri-ar-text{
+  color: #fef08a;
+  font-family: 'Amiri', 'Traditional Arabic', serif;
+  font-weight: 700;
+  font-size: clamp(0.98rem, 2vh, 1.5rem);
+  line-height: 1.15;
+  display: block;
+  width: 100%;
+  white-space: normal;
+  overflow: visible;
+  text-align: right;
+  transform: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ist-classic-board .hijri-dates{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin-top: 2px;
+  width: 100%;
+  min-width: 0;
+}
+
+.ist-classic-board .info-card.ic-date .info-sub.islamic-date{
+  font-size: 0.66rem;
+  line-height: 1.15;
+  margin-top: 0;
+  white-space: normal;
+  text-align: left;
+  overflow: visible;
+  text-overflow: unset;
+}
+
+.ist-classic-board .info-card.ic-date .islamic-date-ar{
+  font-size: clamp(0.88rem, 1.2vw, 1.02rem);
+  line-height: 1.15;
+  margin-top: 0;
+  text-align: left;
+  align-self: flex-start;
+  width: 100%;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+}
+
+.ist-classic-board .live-time-wrap{
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ist-classic-board .live-time-wrap .large-time{
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Next prayer info card */
+.ist-classic-board .next-prayer-content{
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  min-width: 0;
+  width: 100%;
+}
+
+.ist-classic-board .next-prayer-split{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px 14px;
+  width: 100%;
+  min-width: 0;
+}
+
+.ist-classic-board .next-prayer-left{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ist-classic-board .next-prayer-right{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.ist-classic-board .next-prayer-heading{
+  letter-spacing: 0.12em;
+}
+
+.ist-classic-board .info-card.ic-next .next-prayer-row{
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: clamp(6px, 0.8vh, 12px);
+  width: 100%;
+  min-width: 0;
+}
+
+.ist-classic-board .info-card.ic-next .next-prayer-icon{
+  grid-column: 1;
+  justify-self: end;
+}
+
+.ist-classic-board .info-card.ic-next .next-prayer-name{
+  grid-column: 2;
+  justify-self: center;
+  text-align: center;
+  flex: unset;
+}
+
+.ist-classic-board .info-card.ic-next .next-prayer-row::after{
+  content: '';
+  grid-column: 3;
+  justify-self: start;
+  width: clamp(36px, 5vw, 48px);
+  height: clamp(36px, 5vw, 48px);
+  flex-shrink: 0;
+}
+
+.ist-classic-board .next-prayer-countdown-line{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.ist-classic-board .next-prayer-countdown-label{
+  font-size: clamp(0.65rem, 1vw, 0.82rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.ist-classic-board .next-countdown{
+  font-family: ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', 'Roboto Mono', monospace;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  white-space: nowrap;
+  display: inline-block;
+  min-width: 9ch;
+  width: 9ch;
+  text-align: center;
+}
+
+.ist-classic-board .info-card.ic-next{
+  background: linear-gradient(145deg, #047857 0%, #059669 42%, #10b981 100%);
+  box-shadow: 0 4px 16px rgba(5, 150, 105, 0.35);
+}
+
+.ist-classic-board .info-card.ic-next .next-prayer-name{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.85rem, 1.4vw, 1.15rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+  opacity: 1;
+  line-height: 1.15;
+  min-width: 0;
+  flex: unset;
+}
+
+.ist-classic-board .info-card.ic-next .next-countdown{
+  font-size: clamp(1.35rem, 2.4vw, 2.1rem);
+  color: #fff;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.ist-classic-board .info-card.ic-next .next-countdown.info-value{
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.ist-classic-board .info-card.ic-next .next-prayer-icon{
+  width: clamp(36px, 5vw, 48px);
+  height: clamp(36px, 5vw, 48px);
+  font-size: clamp(0.95rem, 1.5vw, 1.25rem);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  background: linear-gradient(145deg, rgba(255,255,255,0.32), rgba(255,255,255,0.1));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 3px 12px rgba(0,0,0,0.15);
+}
+
+.ist-classic-board .info-card.ic-next .next-prayer-badge{
+  background: rgba(255,255,255,0.22);
+}
+
+/* Sunrise — orange → coral (always distinct from green info cards) */
+.ist-classic-board .info-card.ic-sunrise{
+  background: linear-gradient(90deg, #ff9100 0%, #ff7043 48%, #ff5e62 100%) !important;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(255, 94, 98, 0.35) !important;
+}
+.ist-classic-board .info-card.ic-sunrise::after{
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent) !important;
+}
+.ist-classic-board .info-card.ic-sunrise .info-label, .ist-classic-board .info-card.ic-sunrise .info-value{
+  color: #fff !important;
+  opacity: 1 !important;
+}
+.ist-classic-board .info-card.ic-sunrise .info-sub{
+  color: #fff8e7 !important;
+  opacity: 1 !important;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 2px rgba(120, 40, 0, 0.45);
+}
+.ist-classic-board .info-card.ic-sunrise .sunrise-badge{
+  background: rgba(255, 255, 255, 0.32) !important;
+  color: #fff !important;
+  animation: sun-pulse 3s ease-in-out infinite;
+}
+@keyframes sun-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); transform: scale(1); }
+  50%      { box-shadow: 0 0 0 7px rgba(255,255,255,0); transform: scale(1.08); }
+}
+
+/* Next prayer pill */
+.ist-classic-board .next-prayer-pill{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.ist-classic-board .next-prayer-icon{
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  border: 1px solid rgba(255,255,255,0.35);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 14px rgba(0,0,0,0.12);
+  animation: next-icon-pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes next-icon-pulse {
+  0%, 100% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 0 0 0 rgba(255,255,255,0.35), 0 4px 14px rgba(0,0,0,0.12); transform: scale(1); }
+  50%      { box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 0 0 7px rgba(255,255,255,0), 0 6px 20px rgba(0,0,0,0.16); transform: scale(1.06); }
+}
+
+.ist-classic-board .next-prayer-name{
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.92;
+  text-align: center;
+}
+
+/* Weather card — dynamic themes */
+.ist-classic-board .info-card.ic-weather{
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.ist-classic-board .info-card.ic-weather .info-label, .ist-classic-board .info-card.ic-weather .info-value, .ist-classic-board .info-card.ic-weather .weather-stat{
+  color: #fff;
+  opacity: 1;
+  position: relative;
+  z-index: 2;
+}
+.ist-classic-board .info-card.ic-weather .info-sub{
+  position: relative;
+  z-index: 2;
+  font-weight: 600;
+}
+.ist-classic-board .info-card.ic-weather .info-icon-badge, .ist-classic-board .info-card.ic-weather .info-content, .ist-classic-board .info-card.ic-weather .weather-stats{
+  position: relative;
+  z-index: 2;
+}
+.ist-classic-board .info-card.ic-weather .weather-badge{
+  background: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+.ist-classic-board .info-card.ic-weather::before, .ist-classic-board .info-card.ic-weather::after{
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ist-classic-board .weather-stats{
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+  font-size: 0.68rem;
+}
+
+.ist-classic-board .weather-stat{ display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.ist-classic-board .weather-stat i{ font-size: 0.6rem; opacity: 0.85; }
+
+/* ── Sunny ── */
+.ist-classic-board .info-card.ic-weather.wx-sunny{
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 45%, #fb923c 100%) !important;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4) !important;
+}
+.ist-classic-board .info-card.ic-weather.wx-sunny .info-sub{ color: #fef3c7; }
+.ist-classic-board .info-card.ic-weather.wx-sunny::before{
+  background: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.45), transparent 55%);
+  animation: wx-sun-glow 4s ease-in-out infinite;
+}
+.ist-classic-board .info-card.ic-weather.wx-sunny .weather-icon-anim{
+  animation: wx-sun-spin 12s linear infinite;
+}
+
+/* ── Partly cloudy ── */
+.ist-classic-board .info-card.ic-weather.wx-partly{
+  background: linear-gradient(135deg, #38bdf8 0%, #60a5fa 50%, #fbbf24 100%) !important;
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.35) !important;
+}
+.ist-classic-board .info-card.ic-weather.wx-partly .info-sub{ color: #e0f2fe; }
+.ist-classic-board .info-card.ic-weather.wx-partly::before{
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: wx-cloud-drift 6s ease-in-out infinite;
+}
+.ist-classic-board .info-card.ic-weather.wx-partly .weather-icon-anim{
+  animation: wx-cloud-bob 3s ease-in-out infinite;
+}
+
+/* ── Cloudy / overcast ── */
+.ist-classic-board .info-card.ic-weather.wx-cloudy{
+  background: linear-gradient(135deg, #64748b 0%, #475569 55%, #334155 100%) !important;
+  box-shadow: 0 4px 14px rgba(71, 85, 105, 0.35) !important;
+}
+.ist-classic-board .info-card.ic-weather.wx-cloudy .info-sub{ color: #cbd5e1; }
+.ist-classic-board .info-card.ic-weather.wx-cloudy::before{
+  background: radial-gradient(ellipse at 70% 20%, rgba(255,255,255,0.18), transparent 60%);
+  animation: wx-cloud-drift 8s ease-in-out infinite reverse;
+}
+.ist-classic-board .info-card.ic-weather.wx-cloudy .weather-icon-anim{
+  animation: wx-cloud-bob 4s ease-in-out infinite;
+}
+
+/* ── Fog ── */
+.ist-classic-board .info-card.ic-weather.wx-fog{
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 50%, #cbd5e1 100%) !important;
+  box-shadow: 0 4px 14px rgba(100, 116, 139, 0.3) !important;
+}
+.ist-classic-board .info-card.ic-weather.wx-fog .info-sub{ color: #f1f5f9; }
+.ist-classic-board .info-card.ic-weather.wx-fog::before, .ist-classic-board .info-card.ic-weather.wx-fog::after{
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+}
+.ist-classic-board .info-card.ic-weather.wx-fog::before{ animation: wx-fog-drift 5s ease-in-out infinite; }
+.ist-classic-board .info-card.ic-weather.wx-fog::after{ animation: wx-fog-drift 7s ease-in-out infinite reverse; opacity: 0.6; }
+
+/* ── Drizzle ── */
+.ist-classic-board .info-card.ic-weather.wx-drizzle{
+  background: linear-gradient(135deg, #64748b 0%, #475569 60%, #334155 100%) !important;
+  box-shadow: 0 4px 14px rgba(51, 65, 85, 0.35) !important;
+}
+.ist-classic-board .info-card.ic-weather.wx-drizzle .info-sub{ color: #bae6fd; }
+.ist-classic-board .info-card.ic-weather.wx-drizzle::after{
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0,
+    transparent 10px,
+    rgba(186, 230, 253, 0.22) 10px,
+    rgba(186, 230, 253, 0.22) 11px
+  );
+  animation: wx-rain-fall 1.2s linear infinite;
+  opacity: 0.7;
+}
+
+/* ── Rain ── */
+.ist-classic-board .info-card.ic-weather.wx-rain{
+  background: linear-gradient(135deg, #334155 0%, #1e3a5f 50%, #0f172a 100%) !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.45) !important;
+}
+.ist-classic-board .info-card.ic-weather.wx-rain .info-sub{ color: #7dd3fc; }
+.ist-classic-board .info-card.ic-weather.wx-rain::after{
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0,
+    transparent 7px,
+    rgba(125, 211, 252, 0.28) 7px,
+    rgba(125, 211, 252, 0.28) 8px
+  );
+  animation: wx-rain-fall 0.65s linear infinite;
+}
+.ist-classic-board .info-card.ic-weather.wx-rain .weather-icon-anim{
+  animation: wx-rain-shake 2s ease-in-out infinite;
+}
+
+/* ── Snow ── */
+.ist-classic-board .info-card.ic-weather.wx-snow{
+  background: linear-gradient(135deg, #e0f2fe 0%, #93c5fd 45%, #6366f1 100%) !important;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3) !important;
+}
+.ist-classic-board .info-card.ic-weather.wx-snow .info-sub{ color: #eff6ff; }
+.ist-classic-board .info-card.ic-weather.wx-snow::after{
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px);
+  background-size: 14px 14px, 20px 20px;
+  background-position: 0 0, 7px 7px;
+  animation: wx-snow-fall 4s linear infinite;
+  opacity: 0.85;
+}
+.ist-classic-board .info-card.ic-weather.wx-snow .weather-icon-anim{
+  animation: wx-snow-spin 5s ease-in-out infinite;
+}
+
+/* ── Thunderstorm ── */
+.ist-classic-board .info-card.ic-weather.wx-storm{
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 45%, #0f172a 100%) !important;
+  box-shadow: 0 4px 18px rgba(49, 46, 129, 0.5) !important;
+}
+.ist-classic-board .info-card.ic-weather.wx-storm .info-sub{ color: #fde68a; }
+.ist-classic-board .info-card.ic-weather.wx-storm::before{
+  background: radial-gradient(circle at 30% 20%, rgba(253, 224, 71, 0.35), transparent 45%);
+  animation: wx-lightning 5s ease-in-out infinite;
+}
+.ist-classic-board .info-card.ic-weather.wx-storm::after{
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0,
+    transparent 8px,
+    rgba(147, 197, 253, 0.2) 8px,
+    rgba(147, 197, 253, 0.2) 9px
+  );
+  animation: wx-rain-fall 0.5s linear infinite;
+  opacity: 0.55;
+}
+.ist-classic-board .info-card.ic-weather.wx-storm .weather-icon-anim{
+  animation: wx-bolt-flash 3s ease-in-out infinite;
+}
+
+/* ── Night variants (layered on weather condition) ── */
+.ist-classic-board .info-card.ic-weather.wx-sunny.wx-night{
+  background: linear-gradient(135deg, #1e3a8a 0%, #312e81 45%, #1e1b4b 100%) !important;
+  box-shadow: 0 4px 16px rgba(30, 27, 75, 0.55) !important;
+}
+.ist-classic-board .info-card.ic-weather.wx-sunny.wx-night .info-sub{ color: #c7d2fe; }
+.ist-classic-board .info-card.ic-weather.wx-sunny.wx-night::before{
+  background: radial-gradient(circle at 78% 22%, rgba(253, 224, 71, 0.35), transparent 42%);
+  animation: wx-moon-glow 5s ease-in-out infinite;
+}
+.ist-classic-board .info-card.ic-weather.wx-sunny.wx-night .weather-icon-anim{
+  animation: wx-moon-bob 4s ease-in-out infinite;
+}
+
+.ist-classic-board .info-card.ic-weather.wx-partly.wx-night{
+  background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #1e1b4b 100%) !important;
+  box-shadow: 0 4px 16px rgba(30, 58, 138, 0.45) !important;
+}
+.ist-classic-board .info-card.ic-weather.wx-partly.wx-night .info-sub{ color: #bfdbfe; }
+.ist-classic-board .info-card.ic-weather.wx-partly.wx-night::before{
+  background: radial-gradient(circle at 72% 18%, rgba(253, 224, 71, 0.22), transparent 48%);
+  animation: wx-moon-glow 6s ease-in-out infinite;
+}
+
+.ist-classic-board .info-card.ic-weather.wx-cloudy.wx-night{
+  background: linear-gradient(135deg, #334155 0%, #1e293b 55%, #0f172a 100%) !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.5) !important;
+}
+.ist-classic-board .info-card.ic-weather.wx-cloudy.wx-night .info-sub{ color: #94a3b8; }
+
+.ist-classic-board .info-card.ic-weather.wx-fog.wx-night{
+  background: linear-gradient(135deg, #475569 0%, #334155 50%, #1e293b 100%) !important;
+  box-shadow: 0 4px 14px rgba(30, 41, 59, 0.45) !important;
+}
+.ist-classic-board .info-card.ic-weather.wx-fog.wx-night .info-sub{ color: #cbd5e1; }
+
+.ist-classic-board .info-card.ic-weather.wx-drizzle.wx-night{
+  background: linear-gradient(135deg, #1e293b 0%, #172554 60%, #0f172a 100%) !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.5) !important;
+}
+.ist-classic-board .info-card.ic-weather.wx-drizzle.wx-night .info-sub{ color: #93c5fd; }
+
+.ist-classic-board .info-card.ic-weather.wx-rain.wx-night{
+  background: linear-gradient(135deg, #0f172a 0%, #172554 50%, #020617 100%) !important;
+  box-shadow: 0 4px 16px rgba(2, 6, 23, 0.55) !important;
+}
+.ist-classic-board .info-card.ic-weather.wx-rain.wx-night .info-sub{ color: #7dd3fc; }
+
+.ist-classic-board .info-card.ic-weather.wx-snow.wx-night{
+  background: linear-gradient(135deg, #1e3a8a 0%, #4338ca 45%, #312e81 100%) !important;
+  box-shadow: 0 4px 16px rgba(49, 46, 129, 0.45) !important;
+}
+.ist-classic-board .info-card.ic-weather.wx-snow.wx-night .info-sub{ color: #dbeafe; }
+
+.ist-classic-board .info-card.ic-weather.wx-storm.wx-night{
+  background: linear-gradient(135deg, #020617 0%, #1e1b4b 45%, #000000 100%) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.65) !important;
+}
+.ist-classic-board .info-card.ic-weather.wx-storm.wx-night .info-sub{ color: #fde68a; }
+.ist-classic-board .info-card.ic-weather.wx-storm.wx-night::before{
+  background: radial-gradient(circle at 28% 18%, rgba(253, 224, 71, 0.5), transparent 40%);
+}
+
+@keyframes wx-moon-glow {
+  0%, 100% { opacity: 0.65; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.06); }
+}
+@keyframes wx-moon-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2px); }
+}
+
+@keyframes wx-sun-glow {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.08); }
+}
+@keyframes wx-sun-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes wx-cloud-drift {
+  0%, 100% { transform: translateX(-8%); opacity: 0.5; }
+  50%      { transform: translateX(8%); opacity: 0.9; }
+}
+@keyframes wx-cloud-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+@keyframes wx-fog-drift {
+  0%, 100% { transform: translateX(-12%); opacity: 0.35; }
+  50%      { transform: translateX(12%); opacity: 0.75; }
+}
+@keyframes wx-rain-fall {
+  from { transform: translateY(-12px); }
+  to   { transform: translateY(12px); }
+}
+@keyframes wx-rain-shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-1px); }
+  75%      { transform: translateX(1px); }
+}
+@keyframes wx-snow-fall {
+  from { background-position: 0 0, 7px 7px; }
+  to   { background-position: 0 24px, 7px 31px; }
+}
+@keyframes wx-snow-spin {
+  0%, 100% { transform: rotate(-8deg) scale(1); }
+  50%      { transform: rotate(8deg) scale(1.08); }
+}
+@keyframes wx-lightning {
+  0%, 88%, 100% { opacity: 0; }
+  90%, 92%     { opacity: 1; }
+  91%          { opacity: 0.2; }
+}
+@keyframes wx-bolt-flash {
+  0%, 90%, 100% { filter: brightness(1); transform: scale(1); }
+  92%           { filter: brightness(1.8); transform: scale(1.12); }
+}
+
+.ist-classic-board .info-card.ic-weather .info-label, .ist-classic-board .info-card.ic-weather .info-value, .ist-classic-board .info-card.ic-weather .weather-stat{
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
+/* -- PRAYER GRID — fills all remaining height -------------- */
+.ist-classic-board .prayer-grid{
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 7px;
+  perspective: 900px;
+}
+
+.ist-classic-board .prayer-card{
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--ps-sh-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 0;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+
+/* Current prayer — warm “NOW” emphasis (distinct from green NEXT) */
+.ist-classic-board .prayer-card.active.prayer-now, .ist-classic-board .jummah-card.active.prayer-now{
+  border-color: #0d9488;
+  border-width: 2px;
+  z-index: 3;
+  opacity: 1;
+  filter: none;
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 0 3px rgba(13, 148, 136, 0.28),
+    0 6px 20px rgba(13, 148, 136, 0.22);
+}
+.ist-classic-board .prayer-card.active.prayer-now::after, .ist-classic-board .jummah-card.active.prayer-now::after{
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(13, 148, 136, 0.12) 0%, transparent 48%);
+}
+.ist-classic-board .prayer-card.active.prayer-now .iqama-box, .ist-classic-board .jummah-card.active.prayer-now .j-col-khutba{
+  box-shadow: inset 0 0 0 2px rgba(13, 148, 136, 0.35);
+}
+
+.ist-classic-board .prayer-card.next-prayer, .ist-classic-board .jummah-card.next-prayer{
+  border-color: #22c55e;
+  border-width: 2px;
+  position: relative;
+  z-index: 2;
+  overflow: visible;
+  transition: none;
+  transform-origin: center bottom;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform, box-shadow, border-color;
+  box-shadow:
+    0 0 0 2px rgba(74, 222, 128, 0.45),
+    0 2px 10px rgba(34, 197, 94, 0.2);
+}
+
+/* Bold (default) — full lift + pulse */
+.ist-classic-board[data-next-anim="bold"] .prayer-card.next-prayer, .ist-classic-board[data-next-anim="bold"] .jummah-card.next-prayer, .ist-classic-board:not([data-next-anim]) .prayer-card.next-prayer, .ist-classic-board:not([data-next-anim]) .jummah-card.next-prayer{
+  animation: next-card-pulse 2.6s ease-in-out infinite;
+}
+
+/* Subtle — gentle glow only */
+.ist-classic-board[data-next-anim="subtle"] .prayer-card.next-prayer, .ist-classic-board[data-next-anim="subtle"] .jummah-card.next-prayer{
+  animation: next-card-pulse-subtle 3.2s ease-in-out infinite;
+}
+
+/* Off — static highlight, no motion */
+.ist-classic-board[data-next-anim="off"] .prayer-card.next-prayer, .ist-classic-board[data-next-anim="off"] .jummah-card.next-prayer{
+  animation: none;
+  transform: none;
+}
+
+/* Subtle tint — no sweep that reads as motion blur */
+.ist-classic-board .prayer-card.next-prayer::before, .ist-classic-board .jummah-card.next-prayer::before{
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(34, 197, 94, 0.1) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.85;
+}
+
+@keyframes next-card-pulse {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1) rotateX(0deg);
+    border-color: #22c55e;
+    box-shadow:
+      0 0 0 2px rgba(74, 222, 128, 0.4),
+      0 2px 8px rgba(34, 197, 94, 0.15);
+  }
+  50% {
+    transform: translate3d(0, -7px, 10px) scale(1.04) rotateX(2.5deg);
+    border-color: #16a34a;
+    box-shadow:
+      0 0 0 3px rgba(74, 222, 128, 0.52),
+      0 8px 18px rgba(34, 197, 94, 0.3);
+  }
+}
+
+@keyframes next-card-pulse-subtle {
+  0%, 100% {
+    transform: none;
+    border-color: #22c55e;
+    box-shadow:
+      0 0 0 2px rgba(74, 222, 128, 0.38),
+      0 2px 6px rgba(34, 197, 94, 0.12);
+  }
+  50% {
+    transform: none;
+    border-color: #16a34a;
+    box-shadow:
+      0 0 0 3px rgba(74, 222, 128, 0.48),
+      0 4px 12px rgba(34, 197, 94, 0.22);
+  }
+}
+
+/* One-shot when "next" changes, then continuous whole-card pulse */
+.ist-classic-board[data-next-anim="bold"] .prayer-card.card-flash, .ist-classic-board[data-next-anim="bold"] .jummah-card.card-flash, .ist-classic-board:not([data-next-anim]) .prayer-card.card-flash, .ist-classic-board:not([data-next-anim]) .jummah-card.card-flash{
+  animation: next-card-flash-once 0.75s ease-out forwards,
+             next-card-pulse 2.6s ease-in-out infinite 0.75s;
+}
+
+.ist-classic-board[data-next-anim="subtle"] .prayer-card.card-flash, .ist-classic-board[data-next-anim="subtle"] .jummah-card.card-flash{
+  animation: next-card-tint-flash 0.75s ease-out forwards,
+             next-card-pulse-subtle 3.2s ease-in-out infinite 0.75s;
+}
+
+.ist-classic-board[data-next-anim="off"] .prayer-card.card-flash, .ist-classic-board[data-next-anim="off"] .jummah-card.card-flash{
+  animation: none;
+}
+
+.ist-classic-board .prayer-card.card-flash::before, .ist-classic-board .jummah-card.card-flash::before{
+  animation: next-card-tint-flash 0.75s ease-out forwards;
+}
+
+@keyframes next-card-flash-once {
+  0%   {
+    transform: translate3d(0, 4px, -6px) scale(0.98) rotateX(-2deg);
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.75);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotateX(0deg);
+    box-shadow:
+      0 0 0 2px rgba(74, 222, 128, 0.45),
+      0 2px 10px rgba(34, 197, 94, 0.2);
+  }
+}
+
+@keyframes next-card-tint-flash {
+  0%   { opacity: 0; }
+  40%  { opacity: 1; }
+  100% { opacity: 0.85; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ist-classic-board .prayer-card.next-prayer, .ist-classic-board .jummah-card.next-prayer{
+    animation: none !important;
+    transform: none;
+    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.45);
+  }
+  .ist-classic-board .prayer-card.card-flash, .ist-classic-board .jummah-card.card-flash{
+    animation: none !important;
+  }
+  .ist-classic-board .prayer-card.next-prayer::before, .ist-classic-board .jummah-card.next-prayer::before{
+    opacity: 0.5;
+  }
+  .ist-classic-board .badge-next{ animation: none; }
+  .ist-classic-board .badge-next::before{ animation: none; }
+  .ist-classic-board .badge-now{ animation: none; }
+}
+
+.ist-classic-board .card-badge{
+  position: absolute;
+  z-index: 20;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 9px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.ist-classic-board .badge-next{
+  top: 8px;
+  left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: linear-gradient(135deg, #34d399 0%, #10b981 45%, #059669 100%);
+  color: #fff;
+  padding: 6px 14px 6px 11px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255,255,255,0.45);
+  box-shadow: 0 3px 14px rgba(5,150,105,0.55), 0 0 0 2px rgba(52,211,153,0.35);
+  animation: badge-next-pulse 2.4s cubic-bezier(0.34, 1.25, 0.64, 1) infinite;
+  will-change: transform, box-shadow;
+}
+
+.ist-classic-board .badge-next::before{
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 0 10px 3px rgba(255,255,255,0.85);
+  animation: badge-dot-pulse 1.3s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes badge-next-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 3px 14px rgba(5,150,105,0.5), 0 0 0 2px rgba(52,211,153,0.3); }
+  50%      { transform: scale(1.03); box-shadow: 0 4px 16px rgba(16,185,129,0.55), 0 0 0 3px rgba(74,222,128,0.35); }
+}
+
+@keyframes badge-dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1) translateZ(0); }
+  50%      { opacity: 0.55; transform: scale(1.4) translateZ(0); }
+}
+
+.ist-classic-board .badge-now{
+  top: 8px;
+  right: 8px;
+  left: auto;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 50%, #0f766e 100%);
+  color: #fff;
+  padding: 6px 14px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255,255,255,0.5);
+  box-shadow: 0 3px 14px rgba(13,148,136,0.5), 0 0 0 2px rgba(45,212,191,0.35);
+  animation: badge-now-glow 2.8s ease-in-out infinite;
+}
+
+@keyframes badge-now-glow {
+  0%, 100% { box-shadow: 0 3px 14px rgba(13,148,136,0.45), 0 0 0 2px rgba(45,212,191,0.3); }
+  50%      { box-shadow: 0 4px 18px rgba(13,148,136,0.6), 0 0 0 3px rgba(45,212,191,0.45); }
+}
+
+/* Card headers */
+.ist-classic-board .card-header{
+  flex-shrink: 0;
+  padding: 10px 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 4px;
+  color: #fff;
+  position: relative;
+  box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08);
+}
+
+.ist-classic-board .card-header::after{
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.14), transparent);
+  pointer-events: none;
+}
+
+.ist-classic-board .ch-fajr{ background: linear-gradient(135deg, #0b5345, #0f766e); }
+.ist-classic-board .ch-dhuhr{ background: linear-gradient(135deg, #0d9488, #2dd4bf); }
+.ist-classic-board .ch-asr{ background: linear-gradient(135deg, #0f766e, #0d9488); }
+.ist-classic-board .ch-maghrib{ background: linear-gradient(135deg, #115e59, #0d9488); }
+.ist-classic-board .ch-isha{ background: linear-gradient(135deg, #0b5345, #134e4a); }
+.ist-classic-board .ch-zawal{ background: linear-gradient(135deg, #b91c1c, #dc2626); }
+
+.ist-classic-board .ch-icon{
+  font-size: clamp(1.7rem, 2.6vw, 2.5rem);
+  line-height: 1;
+  flex-shrink: 0;
+  color: rgba(255,255,255,0.92);
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.22));
+}
+
+.ist-classic-board .maghrib-icon{ color: #fde68a; }
+
+.ist-classic-board .prayer-en{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.9rem, 1.3vw, 1.18rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.ist-classic-board .prayer-ar{
+  font-family: 'Amiri', serif;
+  font-size: clamp(0.82rem, 1.1vw, 1rem);
+  opacity: 0.85;
+  direction: rtl;
+}
+
+/* Card .ist-classic-board */
+.ist-classic-board .card-body{
+  flex: 1;
+  padding: 8px 10px 10px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+}
+
+.ist-classic-board .time-rows{ display: flex; flex-direction: column; flex: 1; min-height: 0; justify-content: space-evenly; gap: 0; padding-bottom: 8px; }
+
+.ist-classic-board .time-row{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  padding: 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.ist-classic-board .tl{
+  font-size: clamp(0.75rem, 1vw, 0.95rem);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gray-text);
+}
+
+.ist-classic-board .begins-val{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.0rem, 1.5vw, 1.3rem);
+  color: var(--gray-text);
+  font-weight: 500;
+}
+
+.ist-classic-board .adhan-val{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.25rem, 1.9vw, 1.65rem);
+  color: var(--dark-text);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.ist-classic-board .iqama-box{
+  background: linear-gradient(180deg, rgba(13,148,136,0.10), rgba(13,148,136,0.05));
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px rgba(13,148,136,0.18);
+  padding: 0 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex: 1;
+  min-height: 0;
+  text-align: center;
+}
+
+.ist-classic-board .iqama-label{
+  font-size: clamp(0.72rem, 0.95vw, 0.9rem);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.ist-classic-board .iqama-val{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.5rem, 2.6vw, 2.4rem);
+  font-weight: 700;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.ist-classic-board .maghrib-iq{ font-style: italic; font-size: clamp(0.72rem, 1.1vw, 1rem); }
+
+/* Zawal card */
+.ist-classic-board .zawal-body{
+  justify-content: space-between;
+  align-items: stretch;
+  padding: 10px;
+  gap: 8px;
+}
+
+.ist-classic-board .zawal-top{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: 1;
+  text-align: center;
+  background: rgba(220,38,38,0.06);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.ist-classic-board .zawal-window-box{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: var(--light-bg);
+  border-radius: 8px;
+  padding: 10px 8px;
+  flex: 1;
+  text-align: center;
+}
+
+.ist-classic-board .zawal-label{
+  font-size: clamp(0.6rem, 0.82vw, 0.75rem);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #dc2626;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.ist-classic-board .zawal-no-prayer{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.2rem, 1.8vw, 1.7rem);
+  font-weight: 700;
+  color: #dc2626;
+  line-height: 1.1;
+}
+
+/* -- JUMMAH ------------------------------------------------ */
+.ist-classic-board .jummah-section{ flex-shrink: 0; }
+
+.ist-classic-board .jummah-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  perspective: 900px;
+}
+
+.ist-classic-board .jummah-card{
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--ps-sh-md);
+  overflow: hidden;
+  position: relative;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ist-classic-board .jummah-header{
+  background: linear-gradient(135deg, var(--primary), var(--accent2));
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  color: #fff;
+}
+
+.ist-classic-board .j-title{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.88rem, 1.2vw, 1.1rem);
+  font-weight: 700;
+}
+
+.ist-classic-board .j-arabic{
+  font-family: 'Amiri', serif;
+  font-size: clamp(0.82rem, 1.1vw, 1rem);
+  opacity: 0.85;
+  direction: rtl;
+}
+
+.ist-classic-board .j-icon{ font-size: clamp(1rem, 1.5vw, 1.35rem); opacity: 0.9; margin-top: 2px; }
+
+.ist-classic-board .jummah-body{
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+}
+
+.ist-classic-board .j-col{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.ist-classic-board .j-col-label{
+  font-size: clamp(0.72rem, 0.95vw, 0.88rem);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gray-text);
+}
+
+.ist-classic-board .j-col-time{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.1rem, 1.7vw, 1.6rem);
+  font-weight: 700;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.ist-classic-board .j-divider{
+  width: 1px;
+  height: 36px;
+  background: var(--border-light);
+  flex-shrink: 0;
+  margin: 0 6px;
+}
+
+.ist-classic-board .j-col-khutba{
+  background: linear-gradient(180deg, rgba(13,148,136,0.10), rgba(13,148,136,0.05));
+  box-shadow: inset 0 0 0 1px rgba(13,148,136,0.16);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+/* -- TICKER ------------------------------------------------ */
+.ist-classic-board .ticker-bar{
+  flex-shrink: 0;
+  background: linear-gradient(90deg, var(--primary), var(--accent2), var(--primary));
+  border-radius: 12px;
+  box-shadow: var(--ps-sh-md);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.ist-classic-board .ticker-icon{
+  color: #fcd34d;
+  font-size: 1rem;
+  flex-shrink: 0;
+  animation: bullhorn 1.8s ease-in-out infinite;
+}
+
+@keyframes bullhorn {
+  0%,100% { transform: rotate(0deg) scale(1); }
+  20%      { transform: rotate(-10deg) scale(1.15); }
+  40%      { transform: rotate(6deg) scale(1.1); }
+}
+
+.ist-classic-board .ticker-wrap{ flex: 1; overflow: hidden; white-space: nowrap; }
+
+.ist-classic-board .ticker-track{
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  white-space: nowrap;
+  width: max-content;
+  animation: ticker-scroll var(--ticker-dur, 60s) linear infinite;
+  font-size: clamp(0.78rem, 1.1vw, 0.95rem);
+  font-weight: 600;
+  color: #fff;
+}
+
+.ist-classic-board .ticker-item{
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.ist-classic-board .ticker-item::after{
+  content: '\2726';
+  margin: 0 clamp(1rem, 2vw, 1.75rem);
+  opacity: 0.72;
+  font-size: 0.82em;
+  font-weight: 400;
+}
+
+.ist-classic-board .ticker-urgent-pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 55%, #d97706 100%);
+  color: #451a03;
+  font-weight: 800;
+  padding: 0.25em 0.75em;
+  border-radius: 999px;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+.ist-classic-board .ticker-urgent-pill .ticker-urgent-icon{
+  font-size: 0.72em;
+}
+
+.ist-classic-board .ticker-bar-urgent{
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.4), 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+.ist-classic-board .ticker-bar-urgent .ticker-icon{
+  background: rgba(251, 191, 36, 0.35) !important;
+  color: #fef3c7 !important;
+}
+
+.ist-classic-board .ticker-bar:hover .ticker-track{ animation-play-state: paused; }
+
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-25%); }
+}
+
+
+/* Change badges */
+.ist-classic-board .badge-changes{
+  top: 8px;
+  right: 8px;
+  background: #1d4ed8;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 9px;
+  letter-spacing: 0.04em;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 20;
+}
+
+/* TIME CHANGED: absolute corner badge top-right */
+.ist-classic-board .badge-time-changed{
+  top: 8px;
+  right: 8px;
+  background: #ea580c;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  z-index: 20;
+}
+
+/* Orange outline when iqama time changed vs yesterday */
+.ist-classic-board .prayer-card.time-changed{
+  border-color: #ea580c !important;
+  border-width: 2px !important;
+  box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.22) !important;
+}
+
+.ist-classic-board .prayer-card.time-changed, .ist-classic-board .prayer-card.has-change-badge{
+  overflow: visible;
+}
+
+/* Highlight iqamah when today's time differs from yesterday */
+.ist-classic-board .prayer-card.time-changed .iqama-box{
+  background: linear-gradient(180deg, rgba(234, 88, 12, 0.16), rgba(249, 115, 22, 0.07));
+  box-shadow: inset 0 0 0 1.5px rgba(234, 88, 12, 0.38);
+}
+
+.ist-classic-board .prayer-card.time-changed.active.prayer-now .iqama-box{
+  box-shadow: inset 0 0 0 2px rgba(234, 88, 12, 0.45);
+}
+
+.ist-classic-board .prayer-card.time-changed .iqama-label{
+  color: #c2410c;
+}
+
+.ist-classic-board .prayer-card.time-changed .iqama-val{
+  color: #ea580c;
+  font-weight: 800;
+}
+
+/* Upcoming iqamah change — pill below iqama box */
+.ist-classic-board .iqama-change{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  align-self: center;
+  margin: 6px auto 2px;
+  padding: 5px 11px;
+  max-width: calc(100% - 4px);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 55%, #e0e7ff 100%);
+  border: 1px solid rgba(37, 99, 235, 0.28);
+  box-shadow:
+    0 2px 8px rgba(37, 99, 235, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.ist-classic-board .iqama-change-icon{
+  flex-shrink: 0;
+  font-size: clamp(0.58rem, 0.72vw, 0.68rem);
+  color: #2563eb;
+  opacity: 0.9;
+}
+
+.ist-classic-board .iqama-change-day{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.58rem, 0.72vw, 0.68rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #1d4ed8;
+}
+
+.ist-classic-board .iqama-change-sep{
+  color: #93c5fd;
+  font-size: 0.85em;
+  line-height: 1;
+  user-select: none;
+}
+
+.ist-classic-board .iqama-change-time{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.72rem, 0.95vw, 0.86rem);
+  font-weight: 700;
+  color: #1e3a8a;
+  letter-spacing: 0.02em;
+}
+
+.ist-classic-board .iqama-tomorrow-hint{
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.58rem, 0.75vw, 0.68rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  opacity: 0.85;
+  vertical-align: middle;
+}
+
+.ist-classic-board .iqama-tomorrow-hint i{
+  font-size: 0.62rem;
+  opacity: 0.7;
+}
+
+/* Zawal window label */
+.ist-classic-board .zawal-window-label{
+  font-size: clamp(0.6rem, 0.82vw, 0.75rem);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.ist-classic-board .zawal-dash{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1rem, 1.5vw, 1.4rem);
+  font-weight: 700;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+/* Ticker info icon */
+.ist-classic-board .ticker-info-icon{
+  color: rgba(255,255,255,0.7);
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+/* ===== LAYOUT TEMPLATES (structural / sizing only) ========= */
+/* .ist-classic-board[data-theme="classic"] = default flex layout */
+
+/* ── Classic — compact prayer cards, fill main zone without internal gaps ── */
+.ist-classic-board[data-theme="classic"] .prayer-grid{
+  flex: 1 1 0;
+  min-height: 0;
+  grid-auto-rows: minmax(0, 1fr);
+  align-content: stretch;
+  align-items: stretch;
+}
+
+.ist-classic-board[data-theme="classic"] .prayer-card:not(.prayer-card-bc), .ist-classic-board[data-theme="classic"] .zawal-card{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* NEXT card keeps full pop-out / 3D pulse — grid cell stays fixed height */
+.ist-classic-board[data-theme="classic"] .prayer-card.next-prayer, .ist-classic-board[data-theme="classic"] .jummah-card.next-prayer{
+  overflow: visible;
+  z-index: 3;
+}
+
+.ist-classic-board[data-theme="classic"] .prayer-card.active.prayer-now, .ist-classic-board[data-theme="classic"] .jummah-card.active.prayer-now{
+  transform: none !important;
+}
+
+.ist-classic-board[data-theme="classic"] .card-header{
+  flex-shrink: 0;
+  min-height: 0;
+  padding: clamp(5px, 0.65vh, 10px) clamp(8px, 0.75vw, 12px) clamp(4px, 0.5vh, 8px);
+  gap: clamp(2px, 0.25vh, 4px);
+}
+
+.ist-classic-board[data-theme="classic"] .ch-icon{
+  font-size: clamp(1.35rem, 2.2vh, 2rem);
+}
+
+.ist-classic-board[data-theme="classic"] .prayer-en{
+  font-size: clamp(0.92rem, 1.45vh, 1.35rem);
+}
+
+.ist-classic-board[data-theme="classic"] .prayer-ar{
+  font-size: clamp(0.82rem, 1.2vh, 1.05rem);
+}
+
+.ist-classic-board[data-theme="classic"] .tl{
+  font-size: clamp(0.72rem, 1.15vh, 0.95rem);
+}
+
+.ist-classic-board[data-theme="classic"] .begins-val{
+  font-size: clamp(1rem, 1.65vh, 1.45rem);
+}
+
+.ist-classic-board[data-theme="classic"] .adhan-val{
+  font-size: clamp(1.15rem, 1.95vh, 1.65rem);
+}
+
+.ist-classic-board[data-theme="classic"] .iqama-label{
+  font-size: clamp(0.68rem, 1.05vh, 0.88rem);
+}
+
+.ist-classic-board[data-theme="classic"] .iqama-val{
+  font-size: clamp(1.45rem, 2.6vh, 2.35rem);
+  line-height: 1.05;
+}
+
+.ist-classic-board[data-theme="classic"] .card-body{
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: clamp(5px, 0.45vh, 9px);
+  padding: clamp(5px, 0.5vh, 8px) clamp(8px, 0.75vw, 12px) clamp(6px, 0.55vh, 10px);
+  overflow: hidden;
+}
+
+.ist-classic-board[data-theme="classic"] .time-rows{
+  flex: 0 0 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: clamp(2px, 0.25vh, 4px);
+  justify-content: unset;
+  padding-bottom: 0;
+}
+
+.ist-classic-board[data-theme="classic"] .time-row{
+  flex: unset;
+  min-height: 0;
+  padding: clamp(1px, 0.2vh, 3px) 0;
+  align-items: center;
+}
+
+.ist-classic-board[data-theme="classic"] .iqama-box{
+  flex: unset;
+  min-height: 0;
+  margin-top: 0;
+  padding: clamp(3px, 0.35vh, 6px) clamp(6px, 0.55vw, 10px);
+  gap: clamp(1px, 0.12vh, 2px);
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.ist-classic-board[data-theme="classic"] .iqama-change{
+  flex: 0 0 auto;
+  margin-top: 0;
+  padding: clamp(2px, 0.25vh, 4px) clamp(4px, 0.4vw, 6px);
+}
+
+.ist-classic-board[data-theme="classic"] .zawal-body{
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: clamp(5px, 0.45vh, 9px);
+  padding: clamp(5px, 0.5vh, 8px) clamp(8px, 0.75vw, 12px) clamp(6px, 0.55vh, 10px);
+}
+
+.ist-classic-board[data-theme="classic"] .zawal-top, .ist-classic-board[data-theme="classic"] .zawal-window-box{
+  flex: 0 0 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1px, 0.15vh, 3px);
+  padding: clamp(4px, 0.4vh, 8px) clamp(4px, 0.4vw, 6px);
+  border-radius: 8px;
+}
+
+.ist-classic-board[data-theme="classic"] .jummah-section{
+  flex: 0 0 auto;
+  margin-top: 0;
+}
+
+.ist-classic-board[data-theme="classic"] .jummah-grid{
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.ist-classic-board[data-theme="classic"] .jummah-card{
+  grid-column: span 2;
+}
+
+.ist-classic-board[data-theme="classic"] .jummah-section .jummah-grid{
+  min-height: clamp(72px, 8vh, 120px);
+}
+
+/* Classic next-prayer — center name under heading (balanced icon spacer) */
+.ist-classic-board[data-theme="classic"] .info-card.ic-next .next-prayer-left{
+  align-items: center;
+  width: 100%;
+}
+
+.ist-classic-board[data-theme="classic"] .info-card.ic-next .info-content{
+  overflow: visible;
+}
+
+.ist-classic-board[data-theme="classic"] .info-card.ic-next .next-prayer-heading{
+  text-align: center;
+  width: 100%;
+}
+
+.ist-classic-board[data-theme="classic"] .info-card.ic-next .next-prayer-split{
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  align-items: stretch;
+  gap: clamp(4px, 0.45vh, 8px);
+}
+
+.ist-classic-board[data-theme="classic"] .info-card.ic-next .next-prayer-right{
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.ist-classic-board[data-theme="classic"] .info-card.ic-next .next-countdown{
+  margin: 0 auto;
+  width: auto;
+  min-width: 8ch;
+  max-width: 100%;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.ist-classic-board[data-theme="classic"] #tickerBar{
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+/* ── Structural wrappers — transparent outside "warm" template ─
+   display:contents makes .info-panel and .bottom-bar invisible
+   to flex/grid layout, so all other templates are unaffected.  */
+.ist-classic-board .info-panel{ display: contents; }
+.ist-classic-board .bottom-bar{ display: contents; }
+/* Ticker renders last in any auto flex layout (other templates
+   use explicit grid-row or order overrides which take precedence) */
+.ist-classic-board #tickerBar{ order: 99; }
+
+/* ── BROADCAST layout: media left (primary) | title + prayers right; status strip + ticker bottom ── */
+.ist-classic-board[data-theme="warm"] .outer-container{
+  display: grid;
+  grid-template-columns: minmax(0, 7.25fr) minmax(0, 2.75fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 9vh) minmax(0, 5.5vh);
+  gap: clamp(4px, 0.35vh, 8px);
+  padding: clamp(4px, 0.35vh, 8px);
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+/* Right rail — masjid title + vertical prayer cards */
+.ist-classic-board[data-theme="warm"] .broadcast-right-panel{
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, 0.4vh, 8px);
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-right-panel .ist-header{
+  flex: 0 0 auto;
+  border-radius: 6px;
+  padding: clamp(4px, 0.5vh, 8px) clamp(6px, 0.5vw, 10px);
+  border: none;
+  box-shadow: var(--ps-sh-sm);
+}
+
+.ist-classic-board[data-theme="warm"] .prayer-grid.broadcast-prayer-rail{
+  perspective: none;
+  grid-template-columns: 1fr;
+  grid-auto-rows: unset;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-prayer-rail{
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+  gap: clamp(2px, 0.25vh, 4px);
+  align-items: stretch;
+  /* Override .prayer-grid perspective — 3D transforms squash NEXT cards */
+  perspective: none;
+}
+
+/* Bottom strip — unified 3-zone grid: jummah | status | QR */
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip{
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 0.22fr) minmax(0, 1fr) minmax(0, 0.24fr);
+  grid-template-rows: 1fr;
+  align-items: stretch;
+  gap: clamp(4px, 0.35vh, 8px);
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+  padding: clamp(3px, 0.3vh, 6px);
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 6px;
+  border: none;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip:not(:has(#jummahSection)){
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.24fr);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip:not(:has(.broadcast-bottom-qr)){
+  grid-template-columns: minmax(0, 0.22fr) minmax(0, 1fr);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip:not(:has(#jummahSection)):not(:has(.broadcast-bottom-qr)){
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip:has(.broadcast-bottom-qr) .info-bar{
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 0.72fr) minmax(0, 1.56fr);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .info-bar{
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  flex: unset;
+  min-width: 0;
+  gap: clamp(4px, 0.35vh, 8px);
+  align-items: stretch;
+  align-self: stretch;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .info-card{
+  flex: unset;
+  min-width: 0;
+  border-radius: 6px;
+  border-bottom: none;
+  margin: 0;
+  align-self: stretch;
+  height: 100%;
+  min-height: 0;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: clamp(4px, 0.45vh, 8px) clamp(6px, 0.5vw, 10px);
+  background: linear-gradient(150deg, var(--primary) 0%, var(--accent2) 100%);
+  box-shadow: none;
+  color: #fff;
+  overflow: hidden;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .info-card .info-content{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  min-height: 0;
+  gap: clamp(2px, 0.3vh, 6px);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-date .hijri-dates{
+  align-items: center;
+  width: 100%;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-date .islamic-date, .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-date .islamic-date-ar{
+  text-align: center;
+  align-self: center;
+  width: 100%;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-date .info-sub.islamic-date{
+  text-align: center;
+  align-self: center;
+  white-space: normal;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-time .live-time-wrap{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .info-card.ic-date, .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .info-card.ic-time{
+  background: linear-gradient(150deg, var(--primary) 0%, var(--accent2) 100%) !important;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .info-card .info-label, .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .info-card .info-value, .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .info-card .info-sub{
+  color: #fff;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .info-card.ic-date .islamic-date, .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .info-card.ic-date .islamic-date-ar{
+  color: #fde68a;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .info-label{
+  font-size: clamp(0.65rem, 1.1vh, 0.95rem);
+  letter-spacing: 0.1em;
+  margin-bottom: 0;
+  white-space: nowrap;
+  opacity: 0.88;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip:not(:has(.broadcast-bottom-qr)) .info-bar{
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 0.8fr) minmax(0, 1.6fr);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .info-card.ic-next .info-icon-badge{
+  display: none;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-jummah{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  align-self: stretch;
+  gap: clamp(4px, 0.35vh, 8px);
+  min-width: 0;
+  height: 100%;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-jummah .jummah-card-bc{
+  width: auto;
+  min-width: 0;
+  min-height: unset;
+  height: 100%;
+  display: grid;
+  grid-template-rows: minmax(0, auto) minmax(0, 1fr);
+  align-items: stretch;
+  overflow: visible;
+  border-radius: 6px;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-jummah .jummah-card-bc .bc-card-head{
+  flex: unset;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: clamp(2px, 0.35vh, 6px) clamp(4px, 0.4vw, 6px);
+  min-width: unset;
+  width: 100%;
+  border-radius: 6px 6px 0 0;
+  min-height: 0;
+  gap: clamp(1px, 0.15vh, 3px);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-jummah .jummah-card-bc .bc-card-head i{
+  font-size: clamp(0.9rem, 1.75vh, 1.55rem);
+  line-height: 1;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-jummah .jummah-card-bc .bc-card-name{
+  font-size: clamp(0.72rem, 1.35vh, 1.15rem);
+  line-height: 1.1;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-jummah .jummah-card-bc .bc-jummah-sub{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.52rem, 0.95vh, 0.82rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.05;
+  opacity: 0.92;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-jummah .jummah-card-bc .bc-jummah-body{
+  flex: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(2px, 0.35vh, 6px) clamp(4px, 0.35vw, 6px);
+  background: rgba(16, 185, 129, 0.06);
+  border-radius: 0 0 6px 6px;
+  min-height: 0;
+  overflow: visible;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-jummah .jummah-card-bc .bc-iqama-val{
+  font-size: clamp(0.88rem, 1.65vh, 1.45rem);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.ist-classic-board[data-theme="warm"] .header-qr-row.broadcast-bottom-qr{
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+  flex: unset !important;
+  flex-wrap: unset !important;
+  flex-shrink: 1;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  align-items: stretch;
+  align-content: stretch;
+  align-self: stretch;
+  justify-content: stretch;
+  gap: clamp(2px, 0.25vh, 5px);
+  padding: 0;
+  margin-left: 0;
+  border: none;
+  background: transparent;
+  overflow: hidden;
+}
+
+.ist-classic-board[data-theme="warm"] .header-qr-row.broadcast-bottom-qr .qr-block{
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: unset !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1px, 0.15vh, 3px);
+  padding: clamp(1px, 0.2vh, 4px) clamp(1px, 0.15vw, 3px);
+  box-sizing: border-box;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+
+.ist-classic-board[data-theme="warm"] .header-qr-row.broadcast-bottom-qr .qr-img-wrap{
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 1;
+  align-self: center;
+  justify-self: center;
+  margin: 0 auto;
+  padding: 1px;
+  border: none;
+  box-sizing: border-box;
+}
+
+.ist-classic-board[data-theme="warm"] .header-qr-row.broadcast-bottom-qr .qr-img-wrap img{
+  object-fit: contain;
+}
+
+.ist-classic-board[data-theme="warm"] .header-qr-row.broadcast-bottom-qr .qr-label{
+  font-size: clamp(0.38rem, 1.1vh, 0.68rem);
+  flex: 0 0 auto;
+  line-height: 1.05;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  color: var(--primary);
+}
+
+.ist-classic-board[data-theme="warm"] .header-qr-row.broadcast-bottom-qr .qr-center-icon{
+  width: 26%;
+  height: 26%;
+  min-width: 8px;
+  min-height: 8px;
+  max-width: 20px;
+  max-height: 20px;
+  font-size: clamp(0.35rem, 0.65vh, 0.58rem);
+}
+
+/* Ticker — full-width row 3 */
+.ist-classic-board[data-theme="warm"] #tickerBar{
+  grid-column: 1 / -1; grid-row: 3; order: unset;
+  flex-shrink: 0;
+  flex-direction: row !important;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  padding: clamp(5px, 0.65vh, 10px) clamp(10px, 1vw, 16px) !important;
+  gap: clamp(6px, 0.75vh, 12px);
+  overflow: hidden;
+  border-top: none !important;
+  border-radius: 6px;
+}
+.ist-classic-board[data-theme="warm"] #tickerBar:not(.hidden)::before{ display: none !important; }
+.ist-classic-board[data-theme="warm"] .ticker-icon, .ist-classic-board[data-theme="warm"] .ticker-info-icon{ display: flex !important; }
+.ist-classic-board[data-theme="warm"] .ticker-icon{
+  font-size: clamp(1.35rem, 2.85vh, 2.35rem);
+}
+.ist-classic-board[data-theme="warm"] .ticker-info-icon{
+  font-size: clamp(1.15rem, 2.35vh, 1.85rem);
+}
+.ist-classic-board[data-theme="warm"] .ticker-wrap{ overflow: hidden; min-width: 0; flex: 1; }
+.ist-classic-board[data-theme="warm"] .ticker-track{
+  animation: ticker-scroll var(--ticker-dur, 60s) linear infinite !important;
+  display: inline-flex !important;
+  white-space: nowrap !important;
+  width: max-content !important;
+  font-size: clamp(0.95rem, 2.1vh, 1.75rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  color: #fff !important;
+}
+.ist-classic-board[data-theme="warm"] .ticker-item::after{
+  margin: 0 clamp(14px, 2vw, 28px);
+  font-size: 0.85em;
+}
+.ist-classic-board[data-theme="warm"] .bottom-bar{
+  display: none;
+}
+
+.ist-classic-board[data-theme="warm"] .prayer-grid:not(.broadcast-prayer-rail){
+  display: none;
+}
+
+/* Slideshow: primary left column — fill cell edge-to-edge, scale slides to max fit (no crop) */
+.ist-classic-board[data-theme="warm"].show-media #mediaPanel{
+  display: flex !important;
+  flex-direction: column;
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  align-self: stretch;
+  justify-self: stretch;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ist-classic-board[data-theme="warm"].show-media #mediaPanel .slide-container{
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.ist-classic-board[data-theme="warm"].show-media #mediaPanel .slide{
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding: 0;
+  margin: 0;
+}
+
+.ist-classic-board[data-theme="warm"].show-media #mediaPanel .slide img, .ist-classic-board[data-theme="warm"].show-media #mediaPanel .slide video{
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  background: #000;
+}
+
+.ist-classic-board[data-theme="warm"].show-media #mediaPanel .slide-dots{
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  padding: clamp(3px, 0.35vh, 6px);
+}
+
+/* ── Info cards: hide sunrise + weather ── */
+.ist-classic-board[data-theme="warm"] .ic-sunrise{ display: none !important; }
+
+/* Broadcast sidebar weather — between next-prayer and jummah */
+.ist-classic-board[data-theme="warm"] .sidebar-weather{
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(8px, 1.2vh, 12px);
+  border-radius: 0;
+  box-shadow: none;
+  border-bottom: none;
+  padding: clamp(10px, 1.6vh, 16px) clamp(12px, 1.4vw, 18px);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.ist-classic-board[data-theme="warm"] .sidebar-weather .sidebar-wx-main{
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.4vw, 14px);
+  width: 100%;
+}
+
+.ist-classic-board[data-theme="warm"] .sidebar-weather .sidebar-wx-icon{
+  font-size: clamp(1.5rem, 3.2vh, 2.25rem);
+  flex-shrink: 0;
+  opacity: 0.95;
+}
+
+.ist-classic-board[data-theme="warm"] .sidebar-weather .sidebar-wx-text{
+  min-width: 0;
+  flex: 1;
+}
+
+.ist-classic-board[data-theme="warm"] .sidebar-weather .info-label{
+  font-size: clamp(0.58rem, 1.1vh, 0.72rem);
+  letter-spacing: 0.1em;
+  margin-bottom: 2px;
+}
+
+.ist-classic-board[data-theme="warm"] .sidebar-weather .info-value{
+  font-size: clamp(1.15rem, 2.6vh, 1.85rem);
+  line-height: 1.05;
+}
+
+.ist-classic-board[data-theme="warm"] .sidebar-weather .info-sub{
+  font-size: clamp(0.68rem, 1.25vh, 0.88rem);
+  line-height: 1.15;
+}
+
+.ist-classic-board[data-theme="warm"] .sidebar-weather .weather-stats{
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: clamp(6px, 0.8vh, 10px) clamp(10px, 1.2vw, 14px);
+  width: 100%;
+  font-size: clamp(0.62rem, 1.1vh, 0.78rem);
+}
+
+.ist-classic-board[data-theme="warm"] .sidebar-weather .weather-stat{
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: center;
+}
+
+/* Full-width dark card blocks — content-sized, no wasted vertical space */
+.ist-classic-board[data-theme="warm"] .info-card{
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  border-radius: 0;
+  box-shadow: none;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  padding: clamp(10px, 1.6vh, 16px) clamp(12px, 1.4vw, 18px);
+  flex: 0 0 auto;
+  min-height: unset;
+}
+
+.ist-classic-board[data-theme="warm"] .info-icon-badge{ display: none !important; }
+.ist-classic-board[data-theme="warm"] .info-content{
+  min-width: 0;
+  width: 100%;
+  flex: 1;
+}
+
+.ist-classic-board[data-theme="warm"] .info-label{
+  font-size: clamp(0.58rem, 1.1vh, 0.72rem);
+  letter-spacing: 0.1em;
+  margin-bottom: 2px;
+}
+
+/* Local time — fits panel without clipping */
+.ist-classic-board[data-theme="warm"] .ic-time{
+  flex: 0 0 auto;
+}
+
+.ist-classic-board[data-theme="warm"] .ic-time .info-content, .ist-classic-board[data-theme="warm"] .ic-time .live-time-wrap{
+  padding-right: clamp(6px, 1vw, 12px);
+  box-sizing: border-box;
+}
+
+.ist-classic-board[data-theme="warm"] .ic-time .live-time-wrap{
+  width: 100%;
+}
+
+.ist-classic-board[data-theme="warm"] .ic-time .large-time{
+  font-size: clamp(1.35rem, min(4.2vh, 7.5vw), 2.85rem);
+  line-height: 1.05;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  max-width: 100%;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+/* Date — compact, Hijri stacked left */
+.ist-classic-board[data-theme="warm"] .ic-date{
+  flex: 0 0 auto;
+}
+
+.ist-classic-board[data-theme="warm"] .ic-date .info-value{
+  font-size: clamp(0.95rem, 2vh, 1.45rem);
+  white-space: normal;
+  line-height: 1.08;
+  text-align: left;
+}
+
+.ist-classic-board[data-theme="warm"] .ic-date .hijri-dates{
+  gap: 1px;
+  margin-top: 3px;
+}
+
+.ist-classic-board[data-theme="warm"] .ic-date .info-sub.islamic-date{
+  font-size: clamp(0.62rem, 1.1vh, 0.82rem);
+  line-height: 1.12;
+  text-align: left;
+  white-space: normal;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-date .info-sub.islamic-date{
+  text-align: center;
+  align-self: center;
+}
+
+.ist-classic-board[data-theme="warm"] .ic-date .islamic-date-ar{
+  font-size: clamp(0.78rem, 1.55vh, 1.05rem);
+  line-height: 1.12;
+  text-align: left;
+  align-self: flex-start;
+  width: 100%;
+  white-space: normal;
+}
+
+/* Next prayer — centered stack in bottom strip */
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next{
+  flex: unset;
+  min-height: unset;
+  overflow: visible;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(4px, 0.45vh, 8px) clamp(8px, 0.65vw, 14px);
+  background: linear-gradient(155deg, #065f46 0%, #059669 38%, #10b981 72%, #047857 100%) !important;
+  box-shadow: none;
+  border-left: 3px solid #34d399;
+  border-bottom: none;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .info-content, .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-prayer-content{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 0;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-prayer-split{
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  align-items: stretch;
+  justify-content: center;
+  text-align: center;
+  gap: clamp(3px, 0.4vh, 7px);
+  width: 100%;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-prayer-left{
+  gap: clamp(2px, 0.35vh, 6px);
+  align-items: center;
+  flex: unset;
+  min-width: 0;
+  width: 100%;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-prayer-heading, .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-prayer-countdown-label{
+  font-size: clamp(0.72rem, 1.2vh, 1.1rem);
+  color: rgba(255,255,255,0.88);
+  letter-spacing: 0.12em;
+  text-align: center;
+  width: 100%;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-prayer-row{
+  gap: clamp(6px, 0.8vh, 12px);
+  width: 100%;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-prayer-row::after{
+  width: clamp(30px, 3.5vh, 52px);
+  height: clamp(30px, 3.5vh, 52px);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-prayer-right{
+  gap: clamp(2px, 0.35vh, 5px);
+  padding: clamp(4px, 0.45vh, 8px) 0 0;
+  border-left: none;
+  border-top: 1px solid rgba(255,255,255,0.22);
+  align-items: center;
+  flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-countdown{
+  font-size: clamp(1.45rem, min(3.8vh, 3.2vw), 2.85rem);
+  font-weight: 800;
+  color: #fff;
+  text-shadow: none;
+  white-space: nowrap;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  width: auto;
+  min-width: 8ch;
+  max-width: 100%;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-countdown.info-value{
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip:not(:has(.broadcast-bottom-qr)) .ic-next .next-countdown{
+  font-size: clamp(1.65rem, min(4.2vh, 3.6vw), 3.25rem);
+}
+
+/* Bottom strip — date & clock typography (centered, fill card) */
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-date .info-value{
+  font-size: clamp(1.05rem, 2.2vh, 2rem);
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  width: 100%;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-date .islamic-date, .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-date .islamic-date-ar{
+  font-size: clamp(0.82rem, 1.55vh, 1.35rem);
+  line-height: 1.12;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-time .large-time{
+  font-size: clamp(1.75rem, min(5vh, 5.2vw), 3.5rem);
+  white-space: nowrap;
+  text-align: center;
+  width: 100%;
+  line-height: 1;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-prayer-icon{
+  width: clamp(30px, 3.5vh, 52px);
+  height: clamp(30px, 3.5vh, 52px);
+  font-size: clamp(0.95rem, 1.85vh, 1.55rem);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-prayer-name{
+  font-size: clamp(1.1rem, 2.15vh, 2rem);
+  text-align: center;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+/* Header in right rail — title block */
+.ist-classic-board[data-theme="warm"] .broadcast-right-panel .ist-header{
+  border-bottom: none;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-right-panel .header-prayer-title{
+  font-size: clamp(1.35rem, 2.85vh, 2.35rem);
+  line-height: 1.05;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-right-panel .header-org-name{
+  font-size: clamp(0.78rem, 1.35vh, 1.05rem);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-right-panel .header-subtitle{
+  font-size: clamp(0.72rem, 1.2vh, 0.95rem);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-right-panel .org-logo{
+  width: clamp(44px, 5.5vh, 64px);
+  height: clamp(44px, 5.5vh, 64px);
+}
+
+.ist-classic-board[data-theme="warm"] #mediaPanel{
+  margin: 0;
+  border-radius: 4px;
+}
+
+.ist-classic-board[data-theme="warm"] .media-empty, .ist-classic-board[data-theme="warm"] .media-empty-warm{
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .prayer-card-bc, .ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .zawal-card-bc, .ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .prayer-card{
+  border-radius: 6px;
+  border-width: 1px !important;
+  transition: box-shadow 0.25s, background-color 0.25s !important;
+  transform: none !important;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-card-head{
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  padding: clamp(1px, 0.22vh, 4px) clamp(4px, 0.45vw, 7px);
+  gap: clamp(2px, 0.3vh, 5px);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-card-head i{
+  font-size: clamp(1.05rem, 2.35vh, 1.95rem);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-card-name{
+  font-size: clamp(1.22rem, 2.45vh, 1.95rem);
+  line-height: 1.02;
+  white-space: nowrap;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-times.bc-times-stacked, .ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-times-stacked{
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: clamp(2px, 0.35vh, 5px);
+  padding: clamp(2px, 0.35vh, 5px) clamp(3px, 0.4vw, 6px) clamp(3px, 0.4vh, 6px);
+  flex: 1 1 auto !important;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-time-row{
+  padding: clamp(2px, 0.35vh, 5px) clamp(4px, 0.45vw, 8px);
+  gap: clamp(4px, 0.45vw, 8px);
+  flex: 0 0 auto;
+  min-height: unset;
+  display: grid !important;
+  grid-template-columns: minmax(0, 0.4fr) minmax(0, 0.6fr);
+  align-items: center;
+  justify-items: stretch;
+  overflow: hidden;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-time-row .bc-time-lbl{
+  font-size: clamp(0.62rem, 1.25vh, 0.95rem);
+  line-height: 1.05;
+  text-align: left;
+  justify-self: start;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-time-row .bc-time-val{
+  font-size: clamp(1.05rem, 2.15vh, 1.75rem);
+  line-height: 1.05;
+  text-align: right;
+  justify-self: end;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-time-row .bc-iqama-val{
+  font-size: clamp(1.15rem, 2.45vh, 2.05rem);
+  line-height: 1.05;
+}
+
+/* Broadcast rail load-in — opacity only (no translateY that breaks layout) */
+@keyframes display-card-in-rail {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.ist-classic-board[data-theme="warm"] .outer-container.display-ready .broadcast-prayer-rail > *{
+  animation: display-card-in-rail 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Broadcast rail NEXT — badge only; gentle flash/glow (no transform, no size change) */
+@keyframes broadcast-next-glow {
+  0%, 100% {
+    box-shadow: var(--ps-sh-md);
+    background-color: #fff;
+  }
+  50% {
+    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.42), 0 0 18px rgba(34, 197, 94, 0.18);
+    background-color: rgba(240, 253, 244, 1);
+  }
+}
+
+@keyframes broadcast-next-flash-once {
+  0% {
+    box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.75), 0 0 28px rgba(34, 197, 94, 0.35);
+    background-color: rgba(220, 252, 231, 1);
+  }
+  100% {
+    box-shadow: var(--ps-sh-md);
+    background-color: #fff;
+  }
+}
+
+/* Broadcast rail NEXT — bc-is-next avoids global .next-prayer transforms entirely */
+.ist-classic-board[data-theme="warm"] .outer-container.display-ready .broadcast-prayer-rail .prayer-card-bc.bc-is-next, .ist-classic-board[data-theme="warm"] .broadcast-bottom-jummah .jummah-card-bc.bc-is-next{
+  animation: broadcast-next-glow 2.8s ease-in-out infinite !important;
+}
+
+.ist-classic-board[data-theme="warm"] .outer-container.display-ready .broadcast-prayer-rail .prayer-card-bc.bc-next-flash, .ist-classic-board[data-theme="warm"] .broadcast-bottom-jummah .jummah-card-bc.bc-next-flash{
+  animation: broadcast-next-flash-once 0.85s ease-out forwards,
+             broadcast-next-glow 2.8s ease-in-out infinite 0.85s !important;
+}
+
+.ist-classic-board[data-theme="warm"][data-next-anim="off"] .broadcast-prayer-rail .prayer-card-bc.bc-is-next, .ist-classic-board[data-theme="warm"][data-next-anim="off"] .broadcast-prayer-rail .prayer-card-bc.bc-next-flash, .ist-classic-board[data-theme="warm"][data-next-anim="off"] .broadcast-bottom-jummah .jummah-card-bc.bc-is-next, .ist-classic-board[data-theme="warm"][data-next-anim="off"] .broadcast-bottom-jummah .jummah-card-bc.bc-next-flash{
+  animation: none !important;
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .prayer-card-bc.active.prayer-now .bc-card-head{
+  padding-right: clamp(48px, 4.5vw, 64px);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-zawal-body{
+  padding: clamp(2px, 0.35vh, 5px) clamp(4px, 0.45vw, 7px);
+  gap: clamp(2px, 0.3vh, 4px);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-zawal-label{
+  font-size: clamp(0.95rem, 1.95vh, 1.55rem);
+  white-space: nowrap;
+  padding: clamp(2px, 0.35vh, 4px) clamp(4px, 0.45vw, 7px);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-zawal-window{
+  font-size: clamp(0.92rem, 1.75vh, 1.45rem);
+  white-space: nowrap;
+  padding: clamp(2px, 0.35vh, 4px) clamp(4px, 0.45vw, 7px);
+}
+
+/* Legacy warm header/QR rules (classic sidebar layout removed) */
+.ist-classic-board[data-theme="warm"] .ist-header{
+  padding: clamp(10px, 1.6vh, 18px) clamp(12px, 1.4vw, 16px);
+  border-radius: 0;
+  border-bottom: 1px solid var(--border-light);
+  border-top: none;
+  flex-direction: column;
+  align-items: stretch;
+  overflow: visible;
+  gap: clamp(8px, 1.4vh, 14px);
+  justify-content: flex-start;
+}
+
+.ist-classic-board[data-theme="warm"] .header-center{
+  flex: 0 0 auto;
+  min-width: 0;
+  width: 100%;
+}
+
+.ist-classic-board[data-theme="warm"] .org-logo{
+  width: clamp(48px, 6vh, 72px);
+  height: clamp(48px, 6vh, 72px);
+}
+
+.ist-classic-board[data-theme="warm"] .header-org-name{
+  font-size: clamp(0.72rem, 1.35vh, 0.95rem);
+}
+
+.ist-classic-board[data-theme="warm"] .header-org-name-ar{
+  font-size: clamp(0.82rem, 1.75vh, 1.1rem);
+}
+
+.ist-classic-board[data-theme="warm"] .header-prayer-title{
+  font-size: clamp(1.45rem, 4.2vh, 2.45rem);
+  line-height: 1.05;
+}
+
+.ist-classic-board[data-theme="warm"] .header-subtitle{
+  font-size: clamp(0.68rem, 1.25vh, 0.88rem);
+}
+
+.ist-classic-board[data-theme="warm"] .header-qr-row:not(.broadcast-bottom-qr){
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: clamp(4px, 0.5vw, 8px);
+  width: 100%;
+  padding-top: 0;
+  flex: 0 0 auto;
+  min-height: unset;
+  overflow: visible;
+}
+
+.ist-classic-board[data-theme="warm"] .header-qr-row:not(.broadcast-bottom-qr) .qr-block{
+  flex: 1 1 0;
+  min-width: 0;
+  padding: clamp(3px, 0.6vh, 6px) clamp(2px, 0.35vw, 5px);
+  gap: clamp(2px, 0.4vh, 4px);
+}
+
+.ist-classic-board[data-theme="warm"] .header-qr-row:not(.broadcast-bottom-qr) .qr-img-wrap{
+  width: 100%;
+  max-width: clamp(44px, 6.2vh, 72px);
+  height: auto;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  padding: 2px;
+  border-radius: 6px;
+}
+
+.ist-classic-board[data-theme="warm"] .qr-center-icon{
+  width: clamp(14px, 2vh, 22px);
+  height: clamp(14px, 2vh, 22px);
+  font-size: clamp(0.48rem, 0.9vh, 0.62rem);
+}
+
+.ist-classic-board[data-theme="warm"] .qr-label{
+  font-size: clamp(0.38rem, 0.75vh, 0.52rem);
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Broadcast bottom QR — must stay grid (overrides any later header-qr-row flex rules) */
+.ist-classic-board[data-theme="warm"] .header-qr-row.broadcast-bottom-qr{
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* ── Broadcast prayer cards — uniform single-row grid ── */
+.ist-classic-board[data-theme="warm"] .prayer-card-bc, .ist-classic-board[data-theme="warm"] .zawal-card-bc, .ist-classic-board[data-theme="warm"] .jummah-card-bc{
+  height: 100%;
+  min-height: 0;
+  align-self: stretch;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-width: 1px !important;
+  transform: none !important;
+  box-sizing: border-box;
+}
+
+.ist-classic-board[data-theme="warm"] .prayer-card-bc.active.prayer-now, .ist-classic-board[data-theme="warm"] .jummah-card-bc.active.prayer-now{
+  transform: none !important;
+  border-width: 1px !important;
+  box-shadow:
+    0 0 0 2px rgba(13, 148, 136, 0.35),
+    0 4px 14px rgba(13, 148, 136, 0.18) !important;
+}
+
+.ist-classic-board[data-theme="warm"] .prayer-card-bc.active.prayer-now::after, .ist-classic-board[data-theme="warm"] .jummah-card-bc.active.prayer-now::after{
+  display: none;
+}
+
+.ist-classic-board[data-theme="warm"] .bc-card-head{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(4px, 0.8vh, 8px);
+  padding: clamp(6px, 1.2vh, 12px) clamp(8px, 1.2vw, 14px);
+  flex: 0 0 auto;
+  color: #fff;
+}
+
+.ist-classic-board[data-theme="warm"] .jummah-bc-head{
+  background: linear-gradient(135deg, var(--primary), var(--accent2));
+}
+
+.ist-classic-board[data-theme="warm"] .bc-card-head i{
+  font-size: clamp(1rem, 2.4vh, 1.85rem);
+  line-height: 1;
+  opacity: 0.95;
+}
+
+.ist-classic-board[data-theme="warm"] .bc-card-name{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.95rem, 2.2vh, 1.65rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+}
+
+.ist-classic-board[data-theme="warm"] .bc-times{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(2px, 0.5vh, 6px);
+  padding: clamp(6px, 1.2vh, 14px) clamp(6px, 0.8vw, 10px) clamp(8px, 1.4vh, 16px);
+  flex: 1 1 auto;
+  align-content: center;
+  min-height: 0;
+}
+
+/* Stacked Begins / Adhan / Iqamah rows */
+.ist-classic-board[data-theme="warm"] .bc-times-stacked{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  gap: clamp(3px, 0.55vh, 7px);
+  padding: clamp(5px, 1vh, 12px) clamp(8px, 1vw, 14px) clamp(6px, 1.1vh, 14px);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.ist-classic-board[data-theme="warm"] .bc-time-row{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(6px, 1vw, 12px);
+  padding: clamp(3px, 0.65vh, 7px) clamp(8px, 1vw, 12px);
+  border-radius: 7px;
+  background: rgba(15, 23, 42, 0.03);
+  min-height: 0;
+}
+
+.ist-classic-board[data-theme="warm"] .bc-time-row .bc-time-lbl{
+  text-align: left;
+  flex-shrink: 0;
+}
+
+.ist-classic-board[data-theme="warm"] .bc-time-row .bc-time-val{
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.ist-classic-board[data-theme="warm"] .bc-iqama-row{
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0.05) 100%);
+  box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.18);
+}
+
+.ist-classic-board[data-theme="warm"] .prayer-card-bc.time-changed .bc-iqama-row{
+  background: linear-gradient(180deg, rgba(234, 88, 12, 0.16), rgba(249, 115, 22, 0.07));
+  box-shadow: inset 0 0 0 1.5px rgba(234, 88, 12, 0.38);
+}
+
+.ist-classic-board[data-theme="warm"] .prayer-card-bc.time-changed .bc-iqama-row .bc-time-lbl{
+  color: #c2410c;
+}
+
+.ist-classic-board[data-theme="warm"] .bc-jummah-body{
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(4px, 0.9vh, 10px) clamp(4px, 0.6vw, 8px) clamp(6px, 1.2vh, 12px);
+  min-height: 0;
+}
+
+.ist-classic-board[data-theme="warm"] .jummah-card-bc .bc-card-head{
+  padding: clamp(4px, 0.85vh, 8px) clamp(6px, 0.8vw, 10px);
+  gap: clamp(3px, 0.5vh, 6px);
+}
+
+.ist-classic-board[data-theme="warm"] .jummah-card-bc .bc-card-head i{
+  font-size: clamp(0.85rem, 1.8vh, 1.35rem);
+}
+
+.ist-classic-board[data-theme="warm"] .jummah-card-bc .bc-card-name{
+  font-size: clamp(0.78rem, 1.65vh, 1.15rem);
+}
+
+.ist-classic-board[data-theme="warm"] .jummah-card-bc .bc-iqama-val{
+  font-size: clamp(1.15rem, 2.9vh, 2.4rem);
+}
+
+.ist-classic-board[data-theme="warm"] .bc-time-col{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2px, 0.45vh, 5px);
+  min-width: 0;
+}
+
+.ist-classic-board[data-theme="warm"] .bc-time-lbl{
+  font-size: clamp(0.58rem, 1.35vh, 0.88rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.ist-classic-board[data-theme="warm"] .bc-time-val{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.05rem, 2.6vh, 2rem);
+  font-weight: 700;
+  line-height: 1;
+  color: #1e293b;
+  font-variant-numeric: tabular-nums;
+}
+
+.ist-classic-board[data-theme="warm"] .bc-iqama-col{
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.04) 100%);
+  border-radius: 8px;
+  padding: clamp(4px, 0.9vh, 10px) clamp(4px, 0.6vw, 8px);
+}
+
+.ist-classic-board[data-theme="warm"] .bc-iqama-val{
+  font-size: clamp(1.25rem, 3.2vh, 2.65rem);
+  font-weight: 800;
+  color: #059669;
+}
+
+.ist-classic-board[data-theme="warm"] .prayer-card-bc.time-changed .bc-iqama-col{
+  background: linear-gradient(180deg, rgba(234, 88, 12, 0.16), rgba(249, 115, 22, 0.07));
+  box-shadow: inset 0 0 0 1.5px rgba(234, 88, 12, 0.38);
+}
+
+.ist-classic-board[data-theme="warm"] .prayer-card-bc.time-changed .bc-iqama-col .bc-time-lbl, .ist-classic-board[data-theme="warm"] .prayer-card-bc.time-changed .bc-iqama-row .bc-time-lbl{
+  color: #c2410c;
+}
+
+.ist-classic-board[data-theme="warm"] .prayer-card-bc.time-changed .bc-iqama-val{
+  color: #ea580c;
+}
+
+/* Broadcast: no in-flow change pill — keeps card height fixed */
+.ist-classic-board[data-theme="warm"] .prayer-card-bc .iqama-change{
+  display: none;
+}
+
+/* Broadcast upcoming iqamah — compact absolute badge (day + new time) */
+.ist-classic-board[data-theme="warm"] .prayer-card-bc .badge-changes-bc{
+  top: 5px;
+  left: 5px;
+  right: auto;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 4px 8px;
+  max-width: calc(100% - 10px);
+  line-height: 1.1;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+}
+
+.ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .prayer-card-bc .badge-changes-bc{
+  top: 4px;
+  left: 4px;
+  padding: 3px 7px;
+}
+
+.ist-classic-board[data-theme="warm"] .prayer-card-bc .badge-changes-bc-day{
+  font-size: clamp(0.48rem, 0.92vh, 0.62rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.92;
+}
+
+.ist-classic-board[data-theme="warm"] .prayer-card-bc .badge-changes-bc-time{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.58rem, 1.05vh, 0.74rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ist-classic-board[data-theme="warm"] .prayer-card-bc .bc-iqama-row.bc-iqama-future-change{
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.22);
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.07) 0%, rgba(37, 99, 235, 0.03) 100%);
+}
+
+.ist-classic-board[data-theme="warm"] .prayer-card-bc .card-badge, .ist-classic-board[data-theme="warm"] .jummah-card-bc .card-badge{
+  font-size: clamp(0.52rem, 1vh, 0.72rem);
+  padding: 3px 8px;
+}
+
+.ist-classic-board[data-theme="warm"] .prayer-card-bc .badge-next, .ist-classic-board[data-theme="warm"] .prayer-card-bc .badge-now, .ist-classic-board[data-theme="warm"] .jummah-card-bc .badge-next, .ist-classic-board[data-theme="warm"] .jummah-card-bc .badge-now{
+  top: 5px;
+  right: 5px;
+  left: auto;
+}
+
+.ist-classic-board[data-theme="warm"] .prayer-card-bc .badge-changes, .ist-classic-board[data-theme="warm"] .prayer-card-bc .badge-time-changed{
+  top: 5px;
+  left: 5px;
+  right: auto;
+}
+
+/* Broadcast NEXT — rail uses bc-is-next (see broadcast-prayer-rail rules above) */
+
+.ist-classic-board[data-theme="warm"] .prayer-card-bc.card-flash:not(.bc-is-next), .ist-classic-board[data-theme="warm"] .jummah-card-bc.card-flash:not(.bc-is-next){
+  transform: none !important;
+  animation: broadcast-next-flash-once 0.85s ease-out forwards !important;
+}
+
+/* Zawal — compact broadcast card, same height as prayer row */
+.ist-classic-board[data-theme="warm"] .zawal-card-bc{
+  height: 100%;
+  min-height: 0;
+  align-self: stretch;
+}
+
+.ist-classic-board[data-theme="warm"] .bc-zawal-body{
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-evenly;
+  gap: clamp(3px, 0.55vh, 7px);
+  padding: clamp(5px, 1vh, 12px) clamp(8px, 1vw, 14px) clamp(6px, 1.1vh, 14px);
+  text-align: center;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.ist-classic-board[data-theme="warm"] .bc-zawal-label{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.95rem, 2.2vh, 1.65rem);
+  font-weight: 700;
+  color: #dc2626;
+  line-height: 1.05;
+  padding: clamp(3px, 0.65vh, 7px) clamp(8px, 1vw, 12px);
+  border-radius: 7px;
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.ist-classic-board[data-theme="warm"] .bc-zawal-window{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.85rem, 1.9vh, 1.35rem);
+  font-weight: 600;
+  color: #64748b;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  padding: clamp(3px, 0.65vh, 7px) clamp(8px, 1vw, 12px);
+  border-radius: 7px;
+  background: rgba(15, 23, 42, 0.03);
+}
+
+/* Zawal — classic warm overrides (non-bc fallback) */
+.ist-classic-board[data-theme="warm"] .zawal-card .card-body{
+  flex: 0 0 auto;
+}
+
+.ist-classic-board[data-theme="warm"] .zawal-body{
+  flex: 0 1 auto;
+  padding: clamp(4px, 0.8vh, 8px);
+  gap: 4px;
+}
+
+.ist-classic-board[data-theme="warm"] .zawal-top, .ist-classic-board[data-theme="warm"] .zawal-window-box{
+  padding: clamp(4px, 0.8vh, 8px);
+}
+
+.ist-classic-board[data-theme="warm"] .zawal-label, .ist-classic-board[data-theme="warm"] .zawal-window-label{
+  font-size: clamp(0.62rem, 1.3vh, 0.9rem);
+}
+
+.ist-classic-board[data-theme="warm"] .zawal-no-prayer{
+  font-size: clamp(0.95rem, 2.1vh, 1.5rem);
+}
+
+.ist-classic-board[data-theme="warm"] .zawal-dash{
+  font-size: clamp(0.95rem, 2.1vh, 1.5rem);
+}
+
+/* (Broadcast jummah lives in .sidebar-jummah below next-prayer card) */
+
+/* ── MEDIA PANEL ─────────────────────────────────────────── */
+.ist-classic-board #mediaPanel{
+  display: none;
+  flex-direction: column;
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  min-height: 0;
+  margin: 0 4px;
+}
+.ist-classic-board .slide-container{ flex: 1; position: relative; overflow: hidden; min-height: 0; }
+.ist-classic-board .slide{
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.8s ease;
+}
+.ist-classic-board .slide.active{ opacity: 1; }
+.ist-classic-board .slide img, .ist-classic-board .slide video{
+  width: 100%; height: 100%;
+  object-fit: contain; display: block;
+  background: #000;
+}
+.ist-classic-board .slide-dots{
+  display: flex; gap: 5px; justify-content: center;
+  padding: 5px; flex-shrink: 0; background: rgba(0,0,0,0.6);
+}
+.ist-classic-board .slide-dot{ width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: background 0.3s; }
+.ist-classic-board .slide-dot.active{ background: rgba(255,255,255,0.9); }
+
+/* Display status banner (loading / offline / error) */
+.ist-classic-board .display-status-banner{
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 6px 12px; font-size: 0.78rem; font-weight: 600;
+  background: rgba(15, 35, 24, 0.92); color: #d1fae5;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+.ist-classic-board .display-status-banner.display-status-error{ background: rgba(127, 29, 29, 0.92); color: #fecaca; }
+
+.ist-classic-board .media-empty{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 28px;
+  background: linear-gradient(160deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.05) 100%);
+  color: rgba(255,255,255,0.55);
+  font-size: 0.85rem;
+}
+.ist-classic-board .media-empty-warm{
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 20%, rgba(16, 185, 129, 0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(245, 158, 11, 0.12) 0%, transparent 65%),
+    linear-gradient(165deg, rgba(5, 80, 60, 0.55) 0%, rgba(15, 35, 24, 0.75) 100%);
+}
+.ist-classic-board .media-empty-inner{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 320px;
+}
+.ist-classic-board .media-empty i{ font-size: 2.4rem; opacity: 0.45; }
+.ist-classic-board .media-empty-icon-wrap{
+  width: clamp(72px, 14vw, 104px);
+  height: clamp(72px, 14vw, 104px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+.ist-classic-board .media-empty-icon-wrap i{
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  opacity: 0.85;
+  color: #a7f3d0;
+}
+.ist-classic-board .media-empty-logo{
+  width: clamp(72px, 14vw, 104px);
+  height: clamp(72px, 14vw, 104px);
+  object-fit: contain;
+  border-radius: 16px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+.ist-classic-board .media-empty-title{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+.ist-classic-board .media-empty-warm .media-empty-title{
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+.ist-classic-board .media-empty-sub{
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.55);
+  max-width: 280px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ===== COLOUR THEMES ======================================= */
+/* .ist-classic-board[data-color="green"] is the default — no overrides needed */
+
+
+/* ── OCEAN (light blue) — mirrors default green structure ── */
+.ist-classic-board[data-color="ocean"]{
+  --primary: #0c4a6e;
+  --accent: #0284c7;
+  --accent2: #0369a1;
+  --accent3: #7dd3fc;
+  --dark-text: #0c2340;
+  --gray-text: #64748b;
+  --light-bg: #e8f4fc;
+  --border-light: #bae6fd;
+}
+.ist-classic-board[data-color="ocean"] .outer-container{
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(2,132,199,0.10), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(125,211,252,0.14), transparent 55%),
+    linear-gradient(160deg, #eff8ff 0%, #f8fcff 55%, #eef6fb 100%);
+}
+.ist-classic-board[data-color="ocean"] .info-card{
+  background: linear-gradient(150deg, var(--primary), var(--accent2));
+}
+.ist-classic-board[data-color="ocean"] .ch-fajr{ background: linear-gradient(135deg, #0c4a6e, #0369a1); }
+.ist-classic-board[data-color="ocean"] .ch-dhuhr{ background: linear-gradient(135deg, #0284c7, #38bdf8); }
+.ist-classic-board[data-color="ocean"] .ch-asr{ background: linear-gradient(135deg, #0369a1, #0ea5e9); }
+.ist-classic-board[data-color="ocean"] .ch-maghrib{ background: linear-gradient(135deg, #075985, #0284c7); }
+.ist-classic-board[data-color="ocean"] .ch-isha{ background: linear-gradient(135deg, #1e40af, #2563eb); }
+.ist-classic-board[data-color="ocean"] .jummah-header{
+  background: linear-gradient(135deg, var(--primary), var(--accent2));
+}
+.ist-classic-board[data-color="ocean"] .ticker-bar{
+  background: linear-gradient(90deg, var(--primary), var(--accent2), var(--primary));
+}
+
+/* ── Broadcast — 1080p TV baseline (1280×720+) ── */
+@media (min-width: 1280px) and (min-height: 720px) {
+  .ist-classic-board[data-theme="warm"] .outer-container{
+    grid-template-rows: minmax(0, 1fr) auto auto;
+  }
+}
+
+/* ── 4K / large TV (3840×2160 and similar) ── */
+@media (min-width: 2560px) and (min-height: 1400px) and (max-height: 2300px) {
+  .ist-classic-board[data-theme="warm"] .outer-container{
+    grid-template-columns: minmax(0, 7.3fr) minmax(0, 2.7fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 10.5vh) minmax(0, 5vh);
+    gap: clamp(4px, 0.3vh, 6px);
+    padding: clamp(4px, 0.3vh, 6px);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-right-panel .header-prayer-title{
+    font-size: clamp(1.55rem, 2.75vh, 2.45rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-card-name{
+    font-size: clamp(1.22rem, 2.45vh, 1.95rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-time-lbl{
+    font-size: clamp(0.72rem, 1.45vh, 1.05rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-time-val{
+    font-size: clamp(1.32rem, 2.75vh, 2.25rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-iqama-val{
+    font-size: clamp(1.55rem, 3.35vh, 2.75rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-card-head i{
+    font-size: clamp(1.25rem, 2.85vh, 2.25rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-time .large-time{
+    font-size: clamp(1.65rem, min(4.5vh, 4.2vw), 3.25rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-countdown{
+    font-size: clamp(1.75rem, min(4.2vh, 3.6vw), 3.15rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .ticker-track{
+    font-size: clamp(1rem, 1.85vh, 1.55rem) !important;
+  }
+
+  .ist-classic-board[data-theme="warm"] .ticker-icon{
+    font-size: clamp(1.1rem, 2vh, 1.65rem);
+  }
+}
+
+/* ── BrightSign 3640×2680 (and similar tall 4K signage) ── */
+@media (min-width: 3400px) and (min-height: 2400px) {
+  .ist-classic-board[data-theme="warm"] .outer-container{
+    grid-template-columns: minmax(0, 73fr) minmax(0, 27fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 9.5vh) minmax(0, 5.5vh);
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .ist-classic-board[data-theme="warm"].show-media #mediaPanel{
+    border-radius: 4px;
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-right-panel{
+    gap: 5px;
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-right-panel .ist-header{
+    padding: 8px 10px;
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-right-panel .header-prayer-title{
+    font-size: clamp(1.85rem, 2.85vh, 3rem);
+    white-space: nowrap;
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-right-panel .header-org-name{
+    font-size: clamp(0.88rem, 1.35vh, 1.15rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-right-panel .header-subtitle{
+    font-size: clamp(0.82rem, 1.25vh, 1.05rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-right-panel .org-logo{
+    width: clamp(52px, 4vh, 72px);
+    height: clamp(52px, 4vh, 72px);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-prayer-rail{
+    gap: 3px;
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-times-stacked{
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-card-head i{
+    font-size: clamp(1.25rem, 2.65vh, 2.35rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-card-name{
+    font-size: clamp(1.35rem, 2.35vh, 2.05rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-time-row .bc-time-lbl{
+    font-size: clamp(0.68rem, 1.15vh, 0.9rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-time-row .bc-time-val{
+    font-size: clamp(1.15rem, 1.95vh, 1.55rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-prayer-rail .bc-time-row .bc-iqama-val{
+    font-size: clamp(1.25rem, 2.15vh, 1.75rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip{
+    height: 100%;
+    min-height: 0;
+    max-height: 100%;
+    grid-template-columns: minmax(0, 0.19fr) minmax(0, 1fr) minmax(0, 0.22fr);
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip:not(:has(#jummahSection)){
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.22fr);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip:not(:has(.broadcast-bottom-qr)) .info-bar{
+    grid-template-columns: minmax(0, 0.75fr) minmax(0, 0.75fr) minmax(0, 2fr);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip:not(:has(.broadcast-bottom-qr)){
+    grid-template-columns: minmax(0, 0.19fr) minmax(0, 1fr);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .info-label{
+    font-size: clamp(0.78rem, 1.15vh, 1.05rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-date .info-value{
+    font-size: clamp(1.25rem, 2.35vh, 2.25rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-date .islamic-date, .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-date .islamic-date-ar{
+    font-size: clamp(0.95rem, 1.65vh, 1.45rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-time .large-time{
+    font-size: clamp(2.1rem, 4.8vh, 4rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-countdown{
+    font-size: clamp(1.85rem, 4.2vh, 3.35rem);
+    width: auto;
+    min-width: 8ch;
+    overflow: visible;
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip:not(:has(.broadcast-bottom-qr)) .ic-next .next-countdown{
+    font-size: clamp(2.1rem, 5vh, 4.25rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-prayer-row::after{
+    width: clamp(34px, 3.8vh, 58px);
+    height: clamp(34px, 3.8vh, 58px);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-prayer-name{
+    font-size: clamp(1.25rem, 2.25vh, 2.15rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-prayer-heading, .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-prayer-countdown-label{
+    font-size: clamp(0.85rem, 1.35vh, 1.25rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .ic-next .next-prayer-icon{
+    width: clamp(34px, 3.8vh, 58px);
+    height: clamp(34px, 3.8vh, 58px);
+    font-size: clamp(1.05rem, 2vh, 1.75rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-jummah .jummah-card-bc .bc-card-head i{
+    font-size: clamp(1rem, 1.75vh, 1.35rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-jummah .jummah-card-bc .bc-card-name{
+    font-size: clamp(0.72rem, 1.15vh, 0.95rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-jummah .jummah-card-bc .bc-iqama-val{
+    font-size: clamp(0.95rem, 1.55vh, 1.35rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .header-qr-row.broadcast-bottom-qr{
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .ist-classic-board[data-theme="warm"] .header-qr-row.broadcast-bottom-qr .qr-label{
+    font-size: clamp(0.42rem, 1.2vh, 0.72rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] #tickerBar{
+    height: 100%;
+    min-height: 0;
+    max-height: 100%;
+    padding: 10px 14px !important;
+  }
+
+  .ist-classic-board[data-theme="warm"] .ticker-icon{
+    font-size: clamp(1.45rem, 2.65vh, 2.45rem);
+  }
+
+  .ist-classic-board[data-theme="warm"] .ticker-track{
+    font-size: clamp(1.25rem, 2vh, 1.95rem) !important;
+  }
+}
+
+/* ── Classic template — large TV type (1080p + 4K BrightSign viewports) ── */
+@media (min-width: 1280px) and (min-height: 720px) {
+  .ist-classic-board[data-theme="classic"] .org-logo{
+    width: clamp(80px, 8vh, 120px);
+    height: clamp(80px, 8vh, 120px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .header-prayer-title{
+    font-size: clamp(2rem, 4.5vh, 3.5rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .header-org-name, .ist-classic-board[data-theme="classic"] .header-subtitle{
+    font-size: clamp(0.85rem, 1.6vh, 1.2rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .qr-img-wrap{
+    width: clamp(72px, 7vh, 100px);
+    height: clamp(72px, 7vh, 100px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .qr-label{
+    font-size: clamp(0.55rem, 1vh, 0.75rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card{
+    padding: clamp(14px, 1.8vh, 24px) clamp(16px, 1.5vw, 24px);
+    gap: clamp(12px, 1.4vh, 18px);
+    border-radius: 16px;
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-icon-badge{
+    width: clamp(50px, 5.2vh, 72px);
+    height: clamp(50px, 5.2vh, 72px);
+    font-size: clamp(1.35rem, 2.8vh, 2.15rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-label{
+    font-size: clamp(0.62rem, 1.25vh, 0.95rem);
+    letter-spacing: 0.12em;
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-value{
+    font-size: clamp(1.2rem, 2.6vh, 2.2rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-sub{
+    font-size: clamp(0.78rem, 1.45vh, 1.05rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .large-time{
+    font-size: clamp(1.5rem, 3.2vh, 2.85rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-weekday{
+    font-size: clamp(1.15rem, 2.5vh, 2.15rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-gregorian{
+    font-size: clamp(1.05rem, 2.15vh, 1.85rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-hijri-en{
+    font-size: clamp(0.95rem, 1.85vh, 1.35rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-hijri-ar-text{
+    font-size: clamp(1.05rem, 2vh, 1.55rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-grid{
+    gap: clamp(12px, 1.5vw, 26px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .next-prayer-name{
+    font-size: clamp(1.1rem, 2.2vh, 1.75rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .next-countdown{
+    font-size: clamp(1.1rem, 2.2vh, 1.85rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-next .next-countdown{
+    font-size: clamp(1.05rem, 2vh, 1.65rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .next-prayer-icon{
+    width: clamp(36px, 4vh, 52px);
+    height: clamp(36px, 4vh, 52px);
+    font-size: clamp(1rem, 2vh, 1.5rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .weather-stats{
+    font-size: clamp(0.72rem, 1.3vh, 0.95rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .prayer-grid{
+    gap: clamp(8px, 0.9vh, 14px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .jummah-section{
+    min-height: clamp(72px, 10vh, 140px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .jummah-card{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ist-classic-board[data-theme="classic"] .jummah-body{
+    flex: 1 1 auto;
+    align-items: center;
+  }
+
+  .ist-classic-board[data-theme="classic"] .card-header{
+    padding: clamp(6px, 0.75vh, 12px) clamp(10px, 0.9vw, 14px) clamp(5px, 0.55vh, 9px);
+    gap: clamp(2px, 0.25vh, 4px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .ch-icon{
+    font-size: clamp(1.65rem, 2.85vh, 2.55rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .prayer-en{
+    font-size: clamp(1.15rem, 2vh, 1.85rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .prayer-ar{
+    font-size: clamp(0.95rem, 1.6vh, 1.35rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .card-body{
+    padding: clamp(6px, 0.55vh, 10px) clamp(8px, 0.75vw, 12px) clamp(7px, 0.6vh, 11px);
+    gap: clamp(3px, 0.35vh, 6px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .tl{
+    font-size: clamp(0.88rem, 1.5vh, 1.25rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .begins-val{
+    font-size: clamp(1.25rem, 2.25vh, 2rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .adhan-val{
+    font-size: clamp(1.45rem, 2.65vh, 2.35rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .iqama-box{
+    padding: clamp(4px, 0.4vh, 8px) clamp(6px, 0.55vw, 10px);
+    border-radius: 8px;
+    min-height: 0;
+  }
+
+  .ist-classic-board[data-theme="classic"] .iqama-label{
+    font-size: clamp(0.82rem, 1.45vh, 1.2rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .iqama-val{
+    font-size: clamp(1.85rem, 3.35vh, 2.85rem);
+    line-height: 1.05;
+  }
+
+  .ist-classic-board[data-theme="classic"] .time-row{
+    min-height: 0;
+    padding: clamp(1px, 0.2vh, 3px) 0;
+  }
+
+  .ist-classic-board[data-theme="classic"] .time-rows{
+    gap: clamp(2px, 0.25vh, 4px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .zawal-top, .ist-classic-board[data-theme="classic"] .zawal-window-box{
+    min-height: 0;
+    padding: clamp(3px, 0.35vh, 6px) clamp(4px, 0.4vw, 6px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .zawal-body{
+    padding: clamp(5px, 0.5vh, 8px) clamp(8px, 0.75vw, 12px) clamp(6px, 0.55vh, 10px);
+    gap: clamp(3px, 0.35vh, 6px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .zawal-label, .ist-classic-board[data-theme="classic"] .zawal-window-label{
+    font-size: clamp(0.78rem, 1.45vh, 1.1rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .zawal-no-prayer{
+    font-size: clamp(1.15rem, 2.4vh, 1.85rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .zawal-dash{
+    font-size: clamp(1.1rem, 2.2vh, 1.75rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .j-title{
+    font-size: clamp(1rem, 2vh, 1.5rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .j-col-label{
+    font-size: clamp(0.82rem, 1.55vh, 1.15rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .j-col-time{
+    font-size: clamp(1.2rem, 2.6vh, 2.05rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .j-icon{
+    font-size: clamp(1.15rem, 2.2vh, 1.65rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] #tickerBar{
+    padding: clamp(14px, 1.8vh, 26px) clamp(18px, 2vw, 32px);
+    min-height: clamp(56px, 5.5vh, 96px);
+    border-radius: 14px;
+  }
+
+  .ist-classic-board[data-theme="classic"] .ticker-track{
+    font-size: clamp(1.1rem, 2.4vh, 1.95rem);
+    font-weight: 700;
+  }
+
+  .ist-classic-board[data-theme="classic"] .ticker-icon{
+    font-size: clamp(1.25rem, 2.6vh, 2.15rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-next .next-prayer-row::after{
+    width: clamp(36px, 4vh, 52px);
+    height: clamp(36px, 4vh, 52px);
+  }
+}
+
+/* ── Classic — 4K UHD (3840×2160) ── */
+@media (min-width: 3000px) and (min-height: 1900px) and (max-height: 2300px) {
+  .ist-classic-board[data-theme="classic"] .outer-container{
+    gap: clamp(12px, 1vh, 18px);
+    padding: clamp(12px, 1vh, 18px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .ist-header{
+    padding: clamp(18px, 1.75vh, 28px) clamp(22px, 1.75vw, 34px);
+    gap: clamp(14px, 1.35vh, 22px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .org-logo{
+    width: clamp(112px, 10.5vh, 158px);
+    height: clamp(112px, 10.5vh, 158px);
+    border-radius: 18px;
+  }
+
+  .ist-classic-board[data-theme="classic"] .header-center{
+    gap: clamp(16px, 1.4vh, 24px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .header-prayer-title{
+    font-size: clamp(3rem, 6vh, 5rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .header-org-name{
+    font-size: clamp(1.2rem, 2.15vh, 1.75rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .header-subtitle{
+    font-size: clamp(1.1rem, 2vh, 1.55rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .header-qr-row{
+    gap: clamp(12px, 1vh, 16px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .qr-block{
+    padding: clamp(12px, 1.1vh, 18px) clamp(12px, 1vw, 16px) clamp(10px, 0.9vh, 14px);
+    gap: clamp(8px, 0.7vh, 11px);
+    border-radius: 18px;
+  }
+
+  .ist-classic-board[data-theme="classic"] .qr-img-wrap{
+    width: clamp(108px, 9.5vh, 148px);
+    height: clamp(108px, 9.5vh, 148px);
+    padding: clamp(5px, 0.4vh, 7px);
+    border-radius: 12px;
+  }
+
+  .ist-classic-board[data-theme="classic"] .qr-center-icon{
+    width: clamp(32px, 2.85vh, 42px);
+    height: clamp(32px, 2.85vh, 42px);
+    font-size: clamp(0.95rem, 1.55vh, 1.2rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .qr-label{
+    font-size: clamp(0.82rem, 1.45vh, 1.1rem);
+    letter-spacing: 0.06em;
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-bar{
+    gap: clamp(12px, 0.9vh, 16px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card{
+    padding: clamp(22px, 2.35vh, 38px) clamp(22px, 1.6vw, 32px);
+    gap: clamp(16px, 1.55vh, 26px);
+    border-radius: 20px;
+    min-height: clamp(130px, 12.5vh, 185px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-icon-badge{
+    width: clamp(72px, 6.75vh, 102px);
+    height: clamp(72px, 6.75vh, 102px);
+    font-size: clamp(1.95rem, 3.65vh, 3rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-label{
+    font-size: clamp(0.92rem, 1.65vh, 1.28rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-value{
+    font-size: clamp(1.65rem, 3.25vh, 2.95rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-sub{
+    font-size: clamp(1.05rem, 1.9vh, 1.45rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .large-time{
+    font-size: clamp(2.35rem, 4.5vh, 4rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-weekday{
+    font-size: clamp(1.55rem, 3vh, 2.75rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-gregorian{
+    font-size: clamp(1.35rem, 2.65vh, 2.35rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-hijri-en{
+    font-size: clamp(1.15rem, 2.25vh, 1.85rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-hijri-ar-text{
+    font-size: clamp(1.35rem, 2.55vh, 2.15rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-date .date-classic-grid{
+    gap: clamp(16px, 1.8vw, 36px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .prayer-grid{
+    gap: clamp(12px, 0.8vh, 16px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .card-header{
+    flex: 0 0 auto;
+    min-height: clamp(80px, 8.5vh, 130px);
+    padding: clamp(14px, 1.35vh, 22px) clamp(14px, 1vw, 18px) clamp(12px, 1.15vh, 18px);
+    gap: clamp(6px, 0.55vh, 10px);
+    justify-content: center;
+  }
+
+  .ist-classic-board[data-theme="classic"] .ch-icon{
+    font-size: clamp(2.75rem, 4.75vh, 4rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .prayer-en{
+    font-size: clamp(1.85rem, 3.15vh, 2.75rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .prayer-ar{
+    font-size: clamp(1.45rem, 2.45vh, 2.05rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .card-body{
+    flex: 1 1 0;
+    justify-content: space-between;
+    padding: clamp(18px, 1.5vh, 28px) clamp(14px, 1vw, 20px) clamp(16px, 1.35vh, 26px);
+    gap: clamp(14px, 1.25vh, 22px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .time-rows{
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    min-height: 0;
+    gap: clamp(8px, 0.75vh, 14px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .tl{
+    font-size: clamp(1.25rem, 2.25vh, 1.85rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .begins-val{
+    font-size: clamp(1.95rem, 3.35vh, 2.95rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .adhan-val{
+    font-size: clamp(2.15rem, 3.85vh, 3.45rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .time-row{
+    padding: clamp(6px, 0.55vh, 11px) 0;
+  }
+
+  .ist-classic-board[data-theme="classic"] .iqama-label{
+    font-size: clamp(1.2rem, 2.1vh, 1.75rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .iqama-val{
+    font-size: clamp(3.1rem, 6vh, 5rem);
+    line-height: 1.02;
+  }
+
+  .ist-classic-board[data-theme="classic"] .iqama-box{
+    flex: 1 1 0;
+    min-height: clamp(110px, 11vh, 175px);
+    justify-content: center;
+    padding: clamp(14px, 1.15vh, 22px) clamp(12px, 0.9vw, 18px);
+    border-radius: 14px;
+  }
+
+  .ist-classic-board[data-theme="classic"] .zawal-body{
+    flex: 1 1 0;
+    justify-content: space-between;
+    padding: clamp(18px, 1.5vh, 28px) clamp(14px, 1vw, 20px) clamp(16px, 1.35vh, 26px);
+    gap: clamp(14px, 1.25vh, 22px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .zawal-top, .ist-classic-board[data-theme="classic"] .zawal-window-box{
+    flex: 1 1 0;
+    justify-content: center;
+    padding: clamp(14px, 1.15vh, 22px) clamp(10px, 0.75vw, 14px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .zawal-no-prayer{
+    font-size: clamp(1.95rem, 3.35vh, 2.85rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .zawal-dash{
+    font-size: clamp(1.85rem, 3.15vh, 2.65rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .zawal-label, .ist-classic-board[data-theme="classic"] .zawal-window-label{
+    font-size: clamp(1.2rem, 2.1vh, 1.65rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-next .next-prayer-name{
+    font-size: clamp(1.85rem, 3.15vh, 2.65rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-next .next-countdown{
+    font-size: clamp(1.65rem, 3vh, 2.75rem);
+    width: auto;
+    min-width: 8ch;
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-next .next-prayer-icon{
+    width: clamp(56px, 5.35vh, 76px);
+    height: clamp(56px, 5.35vh, 76px);
+    font-size: clamp(1.65rem, 2.75vh, 2.35rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-next .next-prayer-row::after{
+    width: clamp(56px, 5.35vh, 76px);
+    height: clamp(56px, 5.35vh, 76px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .info-card.ic-next .next-prayer-heading, .ist-classic-board[data-theme="classic"] .info-card.ic-next .next-prayer-countdown-label{
+    font-size: clamp(1.05rem, 1.85vh, 1.45rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .jummah-section .jummah-grid{
+    min-height: clamp(160px, 15.5vh, 240px);
+    gap: clamp(12px, 0.9vh, 16px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .jummah-header{
+    padding: clamp(16px, 1.45vh, 24px) clamp(18px, 1.4vw, 26px);
+    gap: clamp(4px, 0.45vh, 8px);
+    min-height: clamp(56px, 5.5vh, 88px);
+    justify-content: center;
+  }
+
+  .ist-classic-board[data-theme="classic"] .j-title{
+    font-size: clamp(1.55rem, 2.75vh, 2.25rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .j-arabic{
+    font-size: clamp(1.3rem, 2.25vh, 1.85rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .j-icon{
+    font-size: clamp(1.65rem, 2.95vh, 2.35rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .jummah-body{
+    flex: 1 1 0;
+    padding: clamp(18px, 1.55vh, 28px) clamp(18px, 1.4vw, 26px);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ist-classic-board[data-theme="classic"] .j-col-label{
+    font-size: clamp(1.1rem, 1.95vh, 1.55rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .j-col-time{
+    font-size: clamp(2.05rem, 3.65vh, 3.05rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] #tickerBar{
+    padding: clamp(24px, 2.75vh, 42px) clamp(28px, 2.25vw, 44px);
+    min-height: clamp(96px, 8.75vh, 145px);
+    border-radius: 18px;
+    gap: clamp(16px, 1.35vh, 24px);
+  }
+
+  .ist-classic-board[data-theme="classic"] .ticker-track{
+    font-size: clamp(1.65rem, 3.15vh, 2.85rem);
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .ist-classic-board[data-theme="classic"] .ticker-icon{
+    font-size: clamp(1.85rem, 3.35vh, 2.85rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .ticker-info-icon{
+    font-size: clamp(1.65rem, 2.95vh, 2.45rem);
+  }
+
+  .ist-classic-board[data-theme="classic"] .weather-stats{
+    font-size: clamp(0.95rem, 1.65vh, 1.3rem);
+  }
+}
+
+/* -- RESPONSIVE ------------------------------------------------------------
+   Reflow gracefully at every window size. Wide screens keep the designed
+   single-screen layout; medium screens thin out columns; small screens stack
+   into one clean scrolling column so nothing ever overlaps, clips or collapses.
+   -------------------------------------------------------------------------- */
+
+/* Medium — thin the 6-up prayer row + shrink the broadcast sidebar.
+   Start at 1100px so the 1280×720 TV target keeps 6 columns. */
+@media (max-width: 1100px) {
+  .ist-classic-board .prayer-grid{ grid-template-columns: repeat(3, 1fr); }
+  .ist-classic-board[data-theme="classic"] .jummah-grid{ grid-template-columns: repeat(3, 1fr); }
+  .ist-classic-board[data-theme="classic"] .jummah-card{ grid-column: span 1; }
+  .ist-classic-board[data-theme="warm"] .outer-container{ grid-template-columns: minmax(0, 7fr) minmax(0, 3fr); }
+  .ist-classic-board[data-theme="warm"] .prayer-grid{ grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+@media (max-width: 960px) {
+  .ist-classic-board .info-bar{ grid-template-columns: repeat(3, 1fr); }
+  .ist-classic-board[data-theme="warm"] .outer-container{ grid-template-columns: minmax(0, 7fr) minmax(0, 3fr); }
+  .ist-classic-board[data-theme="warm"] .jummah-section{ flex: 0 0 130px; }
+}
+
+/* Small — collapse into a single scrolling column (every template) */
+@media (max-width: 860px) {
+  .ist-classic-board, .ist-classic-board{ height: auto; min-height: 100%; overflow-x: hidden; overflow-y: auto; }
+  .ist-classic-board .outer-container{
+    height: auto; max-height: none; min-height: 100%;
+    display: flex !important; flex-direction: column !important; gap: 8px;
+  }
+
+  .ist-classic-board .ist-header{ order: 1; }
+  .ist-classic-board .info-bar{ grid-template-columns: repeat(2, 1fr) !important; order: 2; }
+  .ist-classic-board .prayer-grid{ grid-template-columns: repeat(2, 1fr) !important; flex: none; order: 3; }
+  .ist-classic-board .jummah-section{ order: 4; }
+  .ist-classic-board .jummah-grid{ grid-template-columns: 1fr !important; }
+  .ist-classic-board #tickerBar{ order: 9; }
+
+  /* Broadcast: dismantle the desktop two-column grid → media on top, then the
+     same stacked cards everyone else uses (no empty side rails, no clipping). */
+  .ist-classic-board[data-theme="warm"] .info-panel{ display: contents !important; }
+  .ist-classic-board[data-theme="warm"] .bottom-bar{ display: contents !important; }
+  .ist-classic-board[data-theme="warm"] .info-bar{
+    display: grid !important; grid-template-columns: repeat(2, 1fr) !important;
+    flex: none !important; order: 2;
+  }
+  .ist-classic-board[data-theme="warm"] .info-card{
+    flex-direction: row !important; align-items: center !important;
+    border-radius: 10px !important; border-bottom: none !important;
+    flex: none !important; padding: 12px 14px !important;
+  }
+  .ist-classic-board[data-theme="warm"] .info-icon-badge{ display: flex !important; }
+  .ist-classic-board[data-theme="warm"] .ic-sunrise, .ist-classic-board[data-theme="warm"] .ic-weather{ display: flex !important; }
+  .ist-classic-board[data-theme="warm"] .large-time{ font-size: clamp(1.6rem, 8vw, 3rem) !important; }
+  .ist-classic-board[data-theme="warm"] .prayer-grid{ grid-template-columns: repeat(2, 1fr) !important; flex: none; order: 3; }
+  .ist-classic-board[data-theme="warm"] .jummah-section{ flex: none !important; order: 4; }
+  .ist-classic-board[data-theme="warm"] #tickerBar{ order: 9 !important; grid-row: auto !important; grid-column: auto !important; }
+  .ist-classic-board[data-theme="warm"].show-media #mediaPanel{
+    display: flex !important; order: 2; min-height: 240px; margin: 0;
+  }
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip{
+    flex-direction: column;
+    display: flex;
+    height: auto;
+    min-height: unset;
+    overflow: visible;
+  }
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .info-bar{
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    min-width: unset;
+    flex: none !important;
+    width: 100%;
+  }
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-strip .info-card{
+    min-width: unset;
+    min-height: unset;
+    height: auto;
+  }
+  .ist-classic-board[data-theme="warm"] .broadcast-bottom-jummah{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+    justify-content: center;
+  }
+  .ist-classic-board[data-theme="warm"] .header-qr-row.broadcast-bottom-qr{
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+    min-width: unset;
+    width: 100%;
+  }
+}
+
+/* Extra small — single column everywhere */
+@media (max-width: 520px) {
+  .ist-classic-board .info-bar, .ist-classic-board[data-theme="warm"] .info-bar{ grid-template-columns: 1fr !important; }
+  .ist-classic-board .prayer-grid, .ist-classic-board[data-theme="warm"] .prayer-grid{ grid-template-columns: 1fr !important; }
+  .ist-classic-board .header-qr-row{ display: none; }
+  .ist-classic-board .ist-header{ flex-direction: column; align-items: flex-start; gap: 6px; }
+}
+
+/* -- IQAMAH COUNTDOWN OVERLAY ------------------------------ */
+.ist-classic-board .iqama-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: linear-gradient(160deg, var(--primary, #004d40) 0%, #00695c 50%, #003d32 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: overlay-fade-in 0.6s ease;
+}
+.ist-classic-board .iqama-overlay.hidden{ display: none !important; }
+
+@keyframes overlay-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.ist-classic-board .iqama-overlay-inner{
+  text-align: center;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  user-select: none;
+}
+
+.ist-classic-board .iqama-overlay-label{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.5rem, 3.5vw, 2.8rem);
+  font-weight: 600;
+  opacity: 0.75;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: -0.1em;
+}
+
+.ist-classic-board .iqama-overlay-seconds{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(12rem, 28vw, 26rem);
+  font-weight: 700;
+  line-height: 0.9;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  animation: count-glow 2s ease-in-out infinite;
+}
+
+@keyframes count-glow {
+  0%, 100% {
+    opacity: 1;
+    text-shadow: 0 0 60px rgba(255,255,255,0.28);
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.92;
+    text-shadow: 0 0 24px rgba(255,255,255,0.12);
+    transform: scale(0.995);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ist-classic-board .iqama-overlay{
+    animation: none;
+  }
+  .ist-classic-board .iqama-overlay-seconds{
+    animation: none;
+    transition: none;
+  }
+}
+
+.ist-classic-board .iqama-overlay-unit{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1rem, 2.2vw, 1.8rem);
+  font-weight: 400;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-top: 0.2em;
+}
+
+.ist-classic-board .iqama-overlay-prayer{
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  font-weight: 700;
+  margin-top: 1.8rem;
+  letter-spacing: 0.05em;
+  color: rgba(255,255,255,0.9);
+}
+
+.ist-classic-board .iqama-overlay-arabic{
+  font-family: 'Amiri', serif;
+  font-size: clamp(1.8rem, 4vw, 3.5rem);
+  opacity: 0.65;
+  direction: rtl;
+  margin-top: 0.25rem;
+}
+
+/* ===========================================================================
+   PORTRAIT SUPPORT  (vertical screens) — reflow grids to stay legible & filled
+   =========================================================================== */
+@media (orientation: portrait) {
+  .ist-classic-board .info-bar{ grid-template-columns: repeat(2, 1fr); }
+  .ist-classic-board .prayer-grid{ grid-template-columns: repeat(2, 1fr); }
+  .ist-classic-board .jummah-grid{ grid-template-columns: repeat(3, 1fr); }
+  .ist-classic-board .prayer-ar{ display: block; }
+
+  /* Give the cards more vertical presence on tall screens */
+  .ist-classic-board .iqama-val{ font-size: clamp(1.7rem, 4.5vw, 3rem); }
+  .ist-classic-board .adhan-val{ font-size: clamp(1.3rem, 3.4vw, 1.9rem); }
+  .ist-classic-board .header-prayer-title{ font-size: clamp(1.8rem, 5vw, 3rem); }
+
+}
+
+/* ── TV modes: large text ── */
+.ist-classic-board.large-text{
+  font-size: 1.1em;
+}
+.ist-classic-board.large-text .info-value, .ist-classic-board.large-text .info-value.large-time, .ist-classic-board.large-text .prayer-en, .ist-classic-board.large-text .iqama-val, .ist-classic-board.large-text .adhan-val, .ist-classic-board.large-text .j-col-time{
+  font-size: 1.08em;
+}
+.ist-classic-board.large-text .header-prayer-title{
+  font-size: clamp(2rem, 5.5vw, 3.4rem);
+}
+
+.ist-classic-board .publish-fresh-dot{
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.35);
+  animation: fresh-dot-pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes fresh-dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.85); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ist-classic-board .publish-fresh-dot{ animation: none; }
+}
+
+.ist-classic-board .display-preview-banner{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  background: rgba(5, 150, 105, 0.95);
+  color: #ecfdf5;
+  text-align: center;
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+.ist-classic-board .display-preview-banner i{ margin-right: 8px; }
+.ist-classic-board:has(.display-preview-banner) .outer-container{
+  padding-top: 36px;
+  height: 100%;
+  max-height: 100%;
+}

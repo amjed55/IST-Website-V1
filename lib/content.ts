@@ -11,7 +11,6 @@ export const site = {
   formTo: 'mamjed@myist.org',
   mapEmbed:
     'https://www.google.com/maps?q=20+Overlea+Blvd,+Toronto,+ON+M4H+1A4&output=embed',
-  mixlr: 'https://mixlr.com/',
 };
 
 export const links = {
@@ -24,13 +23,12 @@ export const links = {
   instagram:
     process.env.NEXT_PUBLIC_INSTAGRAM_URL ||
     'https://www.instagram.com/islamicsocietyoftoronto',
-  prayerClock:
-    process.env.NEXT_PUBLIC_PRAYER_CLOCK_EMBED_URL ||
-    'http://localhost:5000/classic',
-  prayerApi:
-    process.env.NEXT_PUBLIC_PRAYER_CLOCK_API_URL ||
-    process.env.NEXT_PUBLIC_PRAYER_CLOCK_EMBED_URL?.replace(/\/classic\/?$/, '') ||
-    'http://localhost:5000',
+  prayerClock: '/prayer-times',
+  mixlr: 'https://masjid-darus-salaam.mixlr.com/',
+  mixlrRecordings: 'https://masjid-darus-salaam.mixlr.com/recordings',
+  mixlrEmbed:
+    process.env.NEXT_PUBLIC_MIXLR_EMBED_URL ||
+    'https://mixlr.com/masjid-darus-salaam/embed?autoplay=false&color=0b3d36',
 };
 
 export type NavItem = {
@@ -41,6 +39,7 @@ export type NavItem = {
 
 export const primaryNav: NavItem[] = [
   { label: 'Home', href: '/' },
+  { label: 'Prayer Times', href: '/prayer-times' },
   {
     label: 'About',
     href: '/about',
@@ -83,7 +82,7 @@ export const primaryNav: NavItem[] = [
   { label: 'Events', href: '/events' },
   { label: 'Visit', href: '/visit' },
   {
-    label: 'Involve',
+    label: 'Get involved',
     href: '/get-involved',
     children: [
       { label: 'Volunteer', href: '/get-involved/volunteer' },
@@ -230,7 +229,7 @@ export const lifeServices = [
     id: 'janazah',
     title: 'Funeral & Janazah Services',
     summary:
-      'Dedicated Janazah facilities are planned as part of our building development. This service will be announced when available.',
+      'Dedicated Janazah facilities are not yet available. If a death has occurred, contact the IST office and a licensed local funeral provider so the office can confirm what prayer or facility support is currently possible.',
     comingSoon: true,
   },
 ];
@@ -242,42 +241,140 @@ export type EventItem = {
   summary: string;
   badge?: string;
   location?: string;
+  status: 'upcoming' | 'past';
+  recurring?: boolean;
+  details?: string[];
+  /** When set, schedule window is derived from today's Zuhr iqamah */
+  scheduleKind?: 'zuhr-window';
+  imageSrc?: string;
+  startsAt?: string;
+  endsAt?: string;
+  hub?: 'youth' | 'sisters' | 'seniors';
 };
 
 export const events: EventItem[] = [
+  {
+    id: 'youth-friday',
+    title: 'Friday Youth Programme',
+    dateLabel: 'Every Friday after Isha',
+    summary:
+      'Small talk with refreshments, followed by basketball — a weekly night for youth to connect after Isha.',
+    badge: 'Youth',
+    location: 'Masjid Darus Salaam',
+    status: 'upcoming',
+    recurring: true,
+    hub: 'youth',
+    details: [
+      'Starts after Isha prayer',
+      'Short talk with refreshments',
+      'Basketball afterward',
+    ],
+  },
+  {
+    id: 'brothers-basketball',
+    title: 'Brothers Basketball Programme',
+    dateLabel: 'Every Saturday · Zuhr iqamah to +3 hours',
+    summary:
+      'Ages 16–25 · 8 weeks · Seerah talks of the Prophet ﷺ · 5v5 full-court games with scoreboard. No late entries — gym closes 30 minutes after Zuhr iqamah.',
+    badge: 'Youth',
+    location: 'IST Gym',
+    status: 'upcoming',
+    recurring: true,
+    scheduleKind: 'zuhr-window',
+    hub: 'youth',
+    details: [
+      'Ages 16–25',
+      '8-week programme',
+      'Talks on the Seerah of the Prophet ﷺ',
+      '5v5 full-court games with scoreboard',
+      'No late entries — gym closes 30 min after Zuhr iqamah',
+    ],
+  },
+  {
+    id: 'sisters-volleyball',
+    title: 'Sisters Drop-in Volleyball',
+    dateLabel: 'Wednesday, August 12 · 8:00–10:00 PM',
+    summary: 'Sisters-only drop-in volleyball. Come play and connect.',
+    badge: 'Sisters',
+    location: 'IST Gym',
+    status: 'upcoming',
+    hub: 'sisters',
+    details: ['Sisters only', 'Drop-in', '8:00 PM – 10:00 PM'],
+  },
+  {
+    id: 'badminton-dropin',
+    title: 'Badminton Registered Drop-in',
+    dateLabel: 'Tuesday, July 28 · 8:00–10:00 PM',
+    summary: 'Registered drop-in badminton for ages 16+.',
+    badge: 'Sports',
+    location: 'IST Gym',
+    status: 'past',
+    details: ['Ages 16+', 'Registered drop-in', '8:00 PM – 10:00 PM'],
+  },
   {
     id: 'jummah',
     title: 'Friday Jummah Prayer',
     dateLabel: 'Every Friday',
     summary:
-      'Join the congregation for khutbah and Jummah prayer. Multiple congregations are held each week — check the prayer board or website for updated times.',
+      'Join the congregation for khutbah and Jummah prayer. Multiple congregations are held each week — check the prayer board for updated times.',
     badge: 'Weekly',
     location: '20 Overlea Blvd',
+    status: 'upcoming',
+    recurring: true,
+  },
+];
+
+export const siteMapLinks = [
+  { label: 'Children', href: '/education/madressa' },
+  { label: 'Youth', href: '/community/youth' },
+  { label: 'Adults', href: '/education/adults' },
+  { label: 'Sisters', href: '/community/sisters' },
+  { label: 'Seniors', href: '/community/seniors' },
+  { label: 'Sports', href: '/events#sports' },
+  { label: 'Social Media / Connect', href: '#social' },
+  { label: 'Deen Programs', href: '/community/weekly' },
+  { label: 'Education', href: '/education' },
+  { label: 'Our Mission', href: '/about/story' },
+];
+
+export const connectThroughIst = [
+  {
+    title: 'Volunteer',
+    href: '/get-involved/volunteer',
+    body: 'Give your time — from event support to youth mentoring and education programmes.',
   },
   {
-    id: 'youth-friday',
-    title: 'Youth Programme Night',
-    dateLabel: 'Every Friday evening',
-    summary:
-      'Youth gather each Friday to learn from scholars, strengthen their Islamic identity, and build lasting bonds of brotherhood and community.',
-    badge: 'Featured',
-    location: 'Masjid Darus Salaam',
+    title: 'Donate',
+    href: '/get-involved/donate',
+    body: 'Sustain daily prayers, education, and community services with your contribution.',
+    external: true,
+    externalHref: links.donate,
   },
   {
-    id: 'operating-donate',
-    title: 'Support Our Masjid\'s Daily Operations',
-    dateLabel: 'Ongoing',
-    summary:
-      'Your sadaqah and voluntary contributions help sustain daily prayers, education programmes, and community services. Every amount is appreciated.',
-    badge: 'Announcement',
+    title: 'Careers',
+    href: '/careers',
+    body: 'Explore open roles and join the team serving Masjid Darus Salaam.',
+  },
+];
+
+export const hubs = [
+  {
+    id: 'sisters',
+    title: "Sisters' Hub",
+    href: '/community/sisters',
+    body: 'Classes, gatherings, and programmes for women — faith, sisterhood, and service.',
   },
   {
-    id: 'careers-open',
-    title: 'Now Hiring — Maktab Teacher & Marketing Coordinator',
-    dateLabel: 'Apply by July 19, 2026',
-    summary:
-      'Two part-time positions are currently open: a Maktab Teacher (Male) and a Digital Marketing & Social Media Coordinator. Submit a resume and cover letter to jobs@myist.org.',
-    badge: 'Careers',
+    id: 'youth',
+    title: 'Youth Hub',
+    href: '/community/youth',
+    body: 'Friday nights for learning, leadership, and a confident Muslim identity.',
+  },
+  {
+    id: 'seniors',
+    title: 'Seniors Hub',
+    href: '/community/seniors',
+    body: 'Spiritual and social support for our elders, rooted in dignity and care.',
   },
 ];
 
@@ -296,6 +393,9 @@ export type Career = {
   applySubject: string;
   responsibilities: string[];
   requirements: string[];
+  /** Poster path from CMS uploads or seeded assets */
+  imageSrc?: string;
+  isActive?: boolean;
 };
 
 export const careersEmail = 'jobs@myist.org';
@@ -329,6 +429,7 @@ export const careers: Career[] = [
       'Fluent in English',
       'Proven ability to manage a classroom of boys aged 5–14',
     ],
+    isActive: false,
   },
   {
     id: 'social-media-coordinator',
@@ -358,15 +459,27 @@ export const careers: Career[] = [
       'Reliable, self-directed, and collaborative',
       'Genuine passion for storytelling that serves a faith-based community',
     ],
+    isActive: false,
   },
 ];
 
+/** @deprecated Prefer `@/lib/careers` — kept for seed/compat lookups against static seed data. */
 export function getCareerById(id: string | null | undefined) {
   if (!id) return undefined;
   return careers.find((c) => c.id === id);
 }
 
 export const pillars = [
+  {
+    title: 'Marriage Services',
+    href: '/services/nikah',
+    body: 'Nikah ceremonies and marriage counselling guided by qualified scholars.',
+  },
+  {
+    title: 'Funeral Services',
+    href: '/services/janazah',
+    body: 'Current Janazah guidance and office contact while dedicated facilities are planned.',
+  },
   {
     title: 'Education',
     href: '/education',
@@ -375,17 +488,7 @@ export const pillars = [
   {
     title: 'Community',
     href: '/community',
-    body: 'Youth Hub, Sisters\u2019 programmes, seniors support, and weekly spiritual gatherings.',
-  },
-  {
-    title: 'Life Services',
-    href: '/services',
-    body: 'Nikah ceremonies, marriage counselling, and Janazah care — guided by qualified scholars.',
-  },
-  {
-    title: 'Visit',
-    href: '/visit',
-    body: 'Address, parking guidance, and everything you need to know before your first visit.',
+    body: 'Youth Hub, Sisters’ programmes, seniors support, and weekly spiritual gatherings.',
   },
 ];
 
