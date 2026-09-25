@@ -127,7 +127,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Header />
           <main
             id="main-content"
-            className="min-h-[70vh] pb-[calc(var(--prayer-bar-h,0px)+1rem)]"
+            className="min-h-[70vh]"
           >
             {children}
           </main>

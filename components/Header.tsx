@@ -178,7 +178,8 @@ export function Header() {
                       <div className="w-[240px] overflow-hidden rounded-2xl border border-ist-green/10 bg-white p-1.5 shadow-[0_20px_50px_rgba(11,61,54,0.14)]">
                         {item.children.map((child) => {
                           const childActive =
-                            pathname === child.href || pathname.startsWith(`${child.href}/`);
+                            activePath === child.href ||
+                            activePath.startsWith(`${child.href}/`);
                           return (
                             <Link
                               key={child.href}

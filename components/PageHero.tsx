@@ -56,8 +56,8 @@ export function PageHero({
     offset: ['start start', 'end start'],
   });
   const imageY = useTransform(scrollYProgress, [0, 1], ['0%', banner || compact ? '18%' : '30%']);
-  const textY = useTransform(scrollYProgress, [0, 1], ['0%', compact ? '8%' : banner ? '10%' : '15%']);
-  const textOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const textY = useTransform(scrollYProgress, [0, 1], ['0%', compact ? '0%' : banner ? '10%' : '15%']);
+  const textOpacity = useTransform(scrollYProgress, [0, 0.8], [1, compact ? 1 : 0]);
 
   const cue = showScrollCue ?? (!compact && !banner);
   const titleIsString = typeof title === 'string';
